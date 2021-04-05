@@ -1,19 +1,20 @@
 import * as React from 'react';
 
+import ConnectSpotify from './ConnectSpotify';
+
 export function App({ initialData }) {
-  const [count, setCount] = React.useState(0);
+  // console.log(initialData.spotAuthorized);
+  const { spotAuthorized } = initialData;
   return (
     <div>
-      <h1>{initialData.appName}</h1>
-      This is a sample stateful and server-side rendered React application.
-      <br />
-      <br />
-      Here is a button that will track how many times you click it:
-      <br />
-      <br />
-      <button title="increment" onClick={() => setCount(count + 1)}>
-        {count}
-      </button>
+      <h1>PlayMix</h1>
+      {spotAuthorized || (
+        <>
+          <p>To use this app you must connect to spotify</p>
+          <ConnectSpotify />
+        </>
+      )}
+      {spotAuthorized && <p>Yay! Spotify connected. Welcome to PlayMix</p>}
     </div>
   );
 }

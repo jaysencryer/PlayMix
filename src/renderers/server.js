@@ -3,13 +3,15 @@ import * as ReactDOMServer from 'react-dom/server';
 
 import { App } from 'components/App';
 
-export async function serverRenderer() {
+export async function serverRenderer(authToken = false) {
+  console.log(authToken);
   const initialData = {
-    appName: 'Reactful',
+    appName: 'PlayMix',
+    spotAuthorized: authToken,
   };
 
   const pageData = {
-    title: `Hello ${initialData.appName}`,
+    title: `${initialData.appName}`,
   };
 
   return Promise.resolve({
