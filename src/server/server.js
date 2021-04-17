@@ -3,15 +3,24 @@ import morgan from 'morgan';
 import serialize from 'serialize-javascript';
 import dotenv from 'dotenv';
 import querystring from 'querystring';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
 
-import { generateRandomString } from './utils';
+import {
+  generateRandomString,
+  getSpotifyProfile,
+  getSpotifyToken,
+  uriEncode,
+} from './utils';
 
 const app = express();
 app.enable('trust proxy');
 app.use(morgan('common'));
+app.use(cors());
+app.use(cookieParser());
 
 app.use(express.static('public'));
 
@@ -47,6 +56,7 @@ const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
 );
 
 const stateKey = 'spotify_auth_state';
+const spotifyProfile = {};
 
 app.get('/', async (req, res) => {
   try {
@@ -77,6 +87,45 @@ app.get('/connectSpotify', (req, res) => {
 
 // When Spotify is successfully connected it will fire back to this route
 app.get('/authorized', async (req, res) => {
+  // check that we are correctly verified
+  const code = req.query.code || null;
+  const state = req.query.state || null;
+  const storedState = req.cookies ? req.cookies[stateKey] : null;
+
+  let error = {};
+
+  if (state === null || state !== storedState) {
+    // some error authenticating occurred
+    error['message'] = 'Initial authorization failed';
+    res.render('error', { error: error });
+  } else {
+    // All authenticated
+    // Now we need to get our spotify token - and user info
+    const spotifyTokenBody = {
+      code,
+      redirect_uri,
+      grant_type: 'authorization_code',
+    };
+
+    const formBody = uriEncode(spotifyTokenBody);
+
+    // Get Spotify Access Tokens
+    ({
+      access_token: spotifyProfile.accessToken,
+      refresh_token: spotifyProfile.refreshToken,
+      error: error,
+    } = await getSpotifyToken(formBody, authBuffer));
+
+    // Get spotify profile data
+    ({
+      user: spotifyProfile.user,
+      avatar: spotifyProfile.avatar,
+      error: error,
+    } = await getSpotifyProfile(spotifyProfile.accessToken));
+  }
+
+  console.log(spotifyProfile);
+
   try {
     const vars = await serverRenderer(true);
     res.render('index', vars);
@@ -84,6 +133,16 @@ app.get('/authorized', async (req, res) => {
     console.error(err);
     res.status(500).send('Server error');
   }
+});
+
+// Load spotify playlists for current user
+app.get('/playlists', async (req, res) => {
+  // check to see if we already have playlists loaded.
+  if (!spotifyProfile.playLists) {
+    spotifyProfile['playLists'] = await getSpotifyPlayLists;
+  }
+  // If not load all users playlists
+  // send back json list of playlists
 });
 
 app.listen(config.port, config.host, () => {
