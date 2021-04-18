@@ -8,7 +8,6 @@ import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
-import { testRenderer } from 'renderers/test';
 
 import {
   generateRandomString,
@@ -127,7 +126,6 @@ app.get('/authorized', async (req, res) => {
     } = await getSpotifyProfile(spotifyProfile.accessToken));
   }
 
-  console.log(spotifyProfile);
   if (error) {
     console.error(
       `Spotify connection and initial load failed: ${error.message}`,
@@ -151,13 +149,6 @@ app.get('/playlists', async (req, res) => {
   }
   // send back json list of playlists
   res.send(spotifyProfile.playLists);
-});
-app.get('/test', async (req, res) => {
-  console.log('get test');
-
-  // res.render('error', { error: { message: 'This is a test' } });
-  const vars = await testRenderer();
-  res.render('test', vars);
 });
 
 app.listen(config.port, config.host, () => {

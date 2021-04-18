@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { StaticRouter, BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import Header from './Header';
 import ConnectSpotify from './ConnectSpotify';

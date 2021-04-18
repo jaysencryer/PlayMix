@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import PlayLists from '../components/PlayLists';
 
 export const generateRandomString = (length) => {
   var text = '';
