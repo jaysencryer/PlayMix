@@ -1,5 +1,5 @@
-import { response } from 'express';
 import fetch from 'node-fetch';
+import PlayLists from '../components/PlayLists';
 
 export const generateRandomString = (length) => {
   var text = '';
@@ -53,6 +53,47 @@ export const getSpotifyProfile = async (accessToken) => {
   } catch (err) {
     console.error(`Access Token Error:\n ${err}`);
     return { error: err, avatar: '/images/blank.png' };
+  }
+};
+
+export const storePlayLists = (jsonData) => {
+  return jsonData.map((pList) => ({
+    name: pList.name,
+    owner: pList.owner.display_name,
+    uri: pList.uri,
+    href: pList.href,
+    images: pList.images[0] ? pList.images[0].url : '',
+    tracks: pList.tracks,
+  }));
+};
+
+export const getSpotifyPlayLists = async (accessToken) => {
+  try {
+    let numOfPlayLists = 0;
+    let playLists = [];
+    let offSetString = '';
+    let offset = 0;
+    let limit = 50;
+
+    do {
+      const data = await spotFetch(
+        `http://api.spotify.com/v1/me/playlists?limit=${limit}${offSetString}`,
+        {
+          headers: { Authorization: 'Bearer ' + accessToken },
+        },
+      );
+      numOfPlayLists = data.total;
+      // console.log(`This user has ${numOfPlayLists} playlists`);
+      offset += 50;
+      limit = offset + limit > numOfPlayLists ? numOfPlayLists - offset : 50;
+      playLists = [...playLists, ...storePlayLists(data.items)];
+      offSetString = `&offset=${offset}`;
+      // console.log(playLists.length, offSetString, limit);
+    } while (playLists.length < numOfPlayLists);
+    return playLists;
+  } catch (err) {
+    console.error(`Loading playlists Error:\n ${err}`);
+    return { error: err };
   }
 };
 

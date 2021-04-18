@@ -8,10 +8,12 @@ import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
+import { testRenderer } from 'renderers/test';
 
 import {
   generateRandomString,
   getSpotifyProfile,
+  getSpotifyPlayLists,
   getSpotifyToken,
   uriEncode,
 } from './utils';
@@ -57,10 +59,11 @@ const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
 
 const stateKey = 'spotify_auth_state';
 const spotifyProfile = {};
+let authorized = false;
 
 app.get('/', async (req, res) => {
   try {
-    const vars = await serverRenderer();
+    const vars = await serverRenderer(authorized, spotifyProfile);
     res.render('index', vars);
   } catch (err) {
     console.error(err);
@@ -125,13 +128,14 @@ app.get('/authorized', async (req, res) => {
   }
 
   console.log(spotifyProfile);
-
-  try {
-    const vars = await serverRenderer(true);
-    res.render('index', vars);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
+  if (error) {
+    console.error(
+      `Spotify connection and initial load failed: ${error.message}`,
+    );
+    res.render('error', { error: error });
+  } else {
+    authorized = true;
+    res.redirect('/');
   }
 });
 
@@ -139,10 +143,21 @@ app.get('/authorized', async (req, res) => {
 app.get('/playlists', async (req, res) => {
   // check to see if we already have playlists loaded.
   if (!spotifyProfile.playLists) {
-    spotifyProfile['playLists'] = await getSpotifyPlayLists;
+    // If not load all users playlists
+
+    spotifyProfile['playLists'] = await getSpotifyPlayLists(
+      spotifyProfile.accessToken,
+    );
   }
-  // If not load all users playlists
   // send back json list of playlists
+  res.send(spotifyProfile.playLists);
+});
+app.get('/test', async (req, res) => {
+  console.log('get test');
+
+  // res.render('error', { error: { message: 'This is a test' } });
+  const vars = await testRenderer();
+  res.render('test', vars);
 });
 
 app.listen(config.port, config.host, () => {
