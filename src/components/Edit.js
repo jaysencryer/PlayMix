@@ -1,5 +1,16 @@
 import React from 'react';
 
-const Edit = ({ onClick }) => <button onClick={onClick}>Edit</button>;
+const style = {
+  borderRadius: '8px',
+  fontSize: '8pt',
+  padding: '3px',
+  margin: '6px',
+};
+
+const Edit = ({ onClick }) => (
+  <button style={style} onClick={onClick}>
+    Edit
+  </button>
+);
 
 export default Edit;
