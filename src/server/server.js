@@ -15,6 +15,8 @@ import {
   getSpotifyPlayLists,
   getSpotifyToken,
   uriEncode,
+  searchSpotify,
+  randomSong,
 } from './utils';
 
 const app = express();
@@ -149,6 +151,27 @@ app.get('/playlists', async (req, res) => {
   }
   // send back json list of playlists
   res.send(spotifyProfile.playLists);
+});
+
+// Search spotify API endpoint
+app.get('/search', async (req, res) => {
+  console.log(req.url);
+  const searchString = [...req.url.matchAll(/search\?query=(\w.*)/g)];
+  console.log(searchString[0][1]);
+  const data = await searchSpotify(
+    spotifyProfile.accessToken,
+    searchString[0][1],
+  );
+  res.send(data);
+});
+
+// Random spotify API endpoint
+app.get('/random', async (req, res) => {
+  console.log(req.url);
+  const searchString = [...req.url.matchAll(/query=(\w.*)/g)];
+  console.log(searchString[0][1]);
+  const data = await randomSong(spotifyProfile.accessToken, searchString[0][1]);
+  res.send(data);
 });
 
 app.listen(config.port, config.host, () => {

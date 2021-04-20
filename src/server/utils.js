@@ -13,8 +13,8 @@ export const generateRandomString = (length) => {
 export const uriEncode = (obj) => {
   let formBody = [];
   for (const property in obj) {
-    var encodedKey = encodeURIComponent(property);
-    var encodedValue = encodeURIComponent(obj[property]);
+    let encodedKey = encodeURIComponent(property);
+    let encodedValue = encodeURIComponent(obj[property]);
     formBody.push(encodedKey + '=' + encodedValue);
   }
   return formBody.join('&');
@@ -67,13 +67,13 @@ export const storePlayLists = (jsonData) => {
 };
 
 export const getSpotifyPlayLists = async (accessToken) => {
-  try {
-    let numOfPlayLists = 0;
-    let playLists = [];
-    let offSetString = '';
-    let offset = 0;
-    let limit = 50;
+  let numOfPlayLists = 0;
+  let playLists = [];
+  let offSetString = '';
+  let offset = 0;
+  let limit = 50;
 
+  try {
     do {
       const data = await spotFetch(
         `http://api.spotify.com/v1/me/playlists?limit=${limit}${offSetString}`,
@@ -92,6 +92,60 @@ export const getSpotifyPlayLists = async (accessToken) => {
     return playLists;
   } catch (err) {
     console.error(`Loading playlists Error:\n ${err}`);
+    return { error: err };
+  }
+};
+
+export const searchSpotify = async (accessToken, searchString) => {
+  const encodedString = encodeURIComponent(searchString);
+  try {
+    const data = await spotFetch(
+      `https://api.spotify.com/v1/search?query=${encodedString}&type=track&limit=50`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(data);
+    const songList = data.tracks.items.map((track) => ({
+      artist: track.artists[0].name,
+      title: track.name,
+    }));
+    return songList;
+  } catch (err) {
+    console.error(`Search Spotify Error:\n ${err}`);
+    return { error: err };
+  }
+};
+
+export const randomSong = async (accessToken, searchString) => {
+  // const encodedString = encodeURIComponent(searchString);
+  let offset = 0;
+  try {
+    let data = await spotFetch(
+      `https://api.spotify.com/v1/search?query=${searchString}&type=track&offset=${offset}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    const totalSongs = data.tracks.total;
+    console.log(`total songs = ${totalSongs}`);
+    const randOffset = totalSongs < 1000 ? totalSongs : 1000;
+    offset = Math.floor(Math.random() * randOffset);
+    console.log(`offset ${offset}`);
+    data = await spotFetch(
+      `https://api.spotify.com/v1/search?query=${searchString}&type=track&offset=${offset}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    const randomTrack = Math.floor(Math.random() * 20);
+    console.log(randomTrack);
+    const song = data.tracks.items.filter(
+      (track, index) => index === randomTrack,
+    );
+    return song[0].name;
+  } catch (err) {
+    console.error(`Random Spotify Error:\n ${err}`);
     return { error: err };
   }
 };
