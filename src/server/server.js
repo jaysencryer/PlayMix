@@ -17,6 +17,7 @@ import {
   uriEncode,
   searchSpotify,
   randomSong,
+  playSpotifySong,
 } from './utils';
 
 const app = express();
@@ -76,7 +77,8 @@ app.get('/connectSpotify', (req, res) => {
   // your application requests authorization
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
-  const scope = 'user-read-private user-read-email playlist-read-private';
+  const scope =
+    'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state';
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
       querystring.stringify({
@@ -172,6 +174,13 @@ app.get('/random', async (req, res) => {
   console.log(searchString[0][1]);
   const data = await randomSong(spotifyProfile.accessToken, searchString[0][1]);
   res.send(data);
+});
+
+app.post('/playsong', async (req, res) => {
+  console.log(req.body);
+  const songUri = req.body.song;
+  const data = await playSpotifySong(spotifyProfile.accessToken, songUri);
+  res.send({ status: 200 });
 });
 
 app.listen(config.port, config.host, () => {

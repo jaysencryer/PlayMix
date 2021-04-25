@@ -133,7 +133,7 @@ export const randomSong = async (accessToken, searchString) => {
     offset = Math.floor(Math.random() * randOffset);
     console.log(`offset ${offset}`);
     data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${searchString}&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${searchString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
@@ -143,9 +143,33 @@ export const randomSong = async (accessToken, searchString) => {
     const song = data.tracks.items.filter(
       (track, index) => index === randomTrack,
     );
-    return song[0].name;
+    return song[0];
   } catch (err) {
     console.error(`Random Spotify Error:\n ${err}`);
+    return { error: err };
+  }
+};
+
+export const playSpotifySong = async (accessToken, uri) => {
+  // const uris = [uri];
+  try {
+    const devices = await spotFetch(
+      'http://api.spotify.com/v1/me/player/devices',
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(devices);
+    const data = await spotFetch('https://api.spotify.com/v1/me/player/play', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      method: 'PUT',
+      body: JSON.stringify({ uris: [uri] }),
+    });
+    console.log(data);
+
+    return data;
+  } catch (err) {
+    console.error(`Play Spotify song Error:\n ${err.message}`);
     return { error: err };
   }
 };
@@ -158,6 +182,7 @@ const spotFetch = async (url, body) => {
     if (data.error) throw data.error;
     return data;
   } catch (err) {
+    console.error(`spotFetch error:\n ${err}`);
     return { error: err };
   }
 };
