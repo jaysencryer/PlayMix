@@ -150,8 +150,7 @@ export const randomSong = async (accessToken, searchString) => {
   }
 };
 
-export const playSpotifySong = async (accessToken, uri) => {
-  // const uris = [uri];
+export const playSpotifySong = async (accessToken, uris) => {
   try {
     const devices = await spotFetch(
       'http://api.spotify.com/v1/me/player/devices',
@@ -163,7 +162,7 @@ export const playSpotifySong = async (accessToken, uri) => {
     const data = await spotFetch('https://api.spotify.com/v1/me/player/play', {
       headers: { Authorization: `Bearer ${accessToken}` },
       method: 'PUT',
-      body: JSON.stringify({ uris: [uri] }),
+      body: JSON.stringify({ uris: uris }),
     });
     console.log(data);
 

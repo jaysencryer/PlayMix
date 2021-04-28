@@ -5,6 +5,7 @@ import Header from './Header';
 import ConnectSpotify from './ConnectSpotify';
 import PlayLists from './PlayLists';
 import RandomSong from './RandomSong';
+import RandomList from './RandomList';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -41,6 +42,9 @@ export function App({ initialData }) {
       {viewPlayLists && <PlayLists user={user} />}
       <div>
         <RandomSong />
+      </div>
+      <div>
+        <RandomList />
       </div>
     </div>
   );

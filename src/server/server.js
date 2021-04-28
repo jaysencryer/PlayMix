@@ -178,8 +178,8 @@ app.get('/random', async (req, res) => {
 
 app.post('/playsong', async (req, res) => {
   console.log(req.body);
-  const songUri = req.body.song;
-  const data = await playSpotifySong(spotifyProfile.accessToken, songUri);
+  const songUris = req.body.songs; // array of trck uri's
+  const data = await playSpotifySong(spotifyProfile.accessToken, songUris);
   res.send({ status: 200 });
 });
 
