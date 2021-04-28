@@ -96,21 +96,29 @@ export const getSpotifyPlayLists = async (accessToken) => {
   }
 };
 
-export const searchSpotify = async (accessToken, searchString) => {
+export const searchSpotify = async (accessToken, searchString, type) => {
   const encodedString = encodeURIComponent(searchString);
   try {
     const data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${encodedString}&type=track&limit=50`,
+      `https://api.spotify.com/v1/search?query=${encodedString}&type=${type}&limit=50`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
     console.log(data);
-    const songList = data.tracks.items.map((track) => ({
-      artist: track.artists[0].name,
-      title: track.name,
-    }));
-    return songList;
+    if (type === 'track') {
+      const songList = data.tracks.items.map((track) => ({
+        artist: track.artists[0].name,
+        title: track.name,
+      }));
+      return songList;
+    }
+    if (type === 'artist') {
+      const artistList = data.artists.items.map((artist) => ({
+        name: artist.name,
+      }));
+      return artistList;
+    }
   } catch (err) {
     console.error(`Search Spotify Error:\n ${err}`);
     return { error: err };
@@ -164,7 +172,6 @@ export const playSpotifySong = async (accessToken, uris) => {
       method: 'PUT',
       body: JSON.stringify({ uris: uris }),
     });
-    console.log(data);
 
     return data;
   } catch (err) {
@@ -177,11 +184,15 @@ export const playSpotifySong = async (accessToken, uris) => {
 const spotFetch = async (url, body) => {
   try {
     const response = await fetch(url, body);
+    if (response.status === 204) {
+      // This is returned by Spotify Player with no Json data.
+      return { message: 'Player successful' };
+    }
     const data = await response.json();
     if (data.error) throw data.error;
     return data;
   } catch (err) {
-    console.error(`spotFetch error:\n ${err}`);
+    console.error(`spotFetch error:\n ${err.message}`);
     return { error: err };
   }
 };

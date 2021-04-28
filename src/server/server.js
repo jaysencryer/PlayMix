@@ -163,8 +163,25 @@ app.get('/search', async (req, res) => {
   const data = await searchSpotify(
     spotifyProfile.accessToken,
     searchString[0][1],
+    'track',
   );
   res.send(data);
+});
+
+app.get('/search/:type', async (req, res) => {
+  console.log(req.params.type);
+  console.log(req.query.q);
+  const data = await searchSpotify(
+    spotifyProfile.accessToken,
+    req.query.q,
+    req.params.type,
+  );
+
+  res.send({
+    message: `param was ${req.params.type}`,
+    param: `query was ${req.query.q}`,
+    data,
+  });
 });
 
 // Random spotify API endpoint

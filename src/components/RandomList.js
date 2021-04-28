@@ -4,19 +4,22 @@ import { getRandomSong } from './RandomSong';
 
 const RandomList = () => {
   const [songUris, setSongUris] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const clickHandler = async () => {
     let existingUris = [];
+    setIsLoading(true);
     for (let i = 0; i < 20; i++) {
       let randSong = await getRandomSong();
       existingUris.push(randSong.uri);
     }
+    setIsLoading(false);
     setSongUris(existingUris);
   };
 
   const playSongs = async () => {
     const data = await axios.post('/playsong', { songs: songUris });
-    if (data.status === 200) {
+    if (!data.error) {
       console.log('no error?');
     }
   };
@@ -25,9 +28,11 @@ const RandomList = () => {
       <button onClick={() => clickHandler()}>Make Random PLayList</button>
       {songUris && (
         <div onClick={() => playSongs()}>
-          {songUris.map((song, index) => (
-            <div key={index}>{song}</div>
-          ))}
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            songUris.map((song, index) => <div key={index}>{song}</div>)
+          )}
         </div>
       )}
     </div>
