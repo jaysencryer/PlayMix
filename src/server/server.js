@@ -11,6 +11,7 @@ import { serverRenderer } from 'renderers/server';
 
 import {
   generateRandomString,
+  generateRandomSearch,
   getSpotifyProfile,
   getSpotifyPlayLists,
   getSpotifyToken,
@@ -169,8 +170,6 @@ app.get('/search', async (req, res) => {
 });
 
 app.get('/search/:type', async (req, res) => {
-  console.log(req.params.type);
-  console.log(req.query.q);
   const data = await searchSpotify(
     spotifyProfile.accessToken,
     req.query.q,
@@ -178,18 +177,34 @@ app.get('/search/:type', async (req, res) => {
   );
 
   res.send({
-    message: `param was ${req.params.type}`,
-    param: `query was ${req.query.q}`,
+    type: req.params.type,
     data,
   });
 });
 
+app.get('/random/:type', async (req, res) => {
+  const randSearchTerm = generateRandomString(2);
+  let data;
+  if (req.params.type === 'track') {
+    data = await randomSong(spotifyProfile.accessToken, randSearchTerm);
+  } else if (req.params.type === 'artist') {
+    const artist = req.query.name;
+    do {
+      data = await randomSong(spotifyProfile.accessToken, artist);
+      console.log(
+        `found artist - ${data.artists[0].name} looking for ${artist}`,
+      );
+    } while (data.artists[0].name.toLowerCase() !== artist.toLowerCase());
+    // data = { message: 'Random song from artist not implemented yet' };
+  }
+  res.send(data);
+});
+
 // Random spotify API endpoint
 app.get('/random', async (req, res) => {
-  console.log(req.url);
-  const searchString = [...req.url.matchAll(/query=(\w.*)/g)];
-  console.log(searchString[0][1]);
-  const data = await randomSong(spotifyProfile.accessToken, searchString[0][1]);
+  // console.log(req.url);
+  // console.log(searchString[0][1]);
+  const data = await randomSong(spotifyProfile.accessToken, req.query.query);
   res.send(data);
 });
 

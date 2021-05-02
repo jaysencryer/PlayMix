@@ -1,5 +1,12 @@
 import fetch from 'node-fetch';
 
+export const generateRandomSearch = () => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  const randVowel = Math.floor(Math.random() * 4);
+  const randSecondLetter = Math.floor(Math.random() * 26) + 97;
+  return `${vowels[randVowel]}${String.fromCharCode(randSecondLetter)}`;
+};
+
 export const generateRandomString = (length) => {
   var text = '';
   var possible =
@@ -131,14 +138,14 @@ export const randomSong = async (accessToken, searchString) => {
   let offset = 0;
   try {
     let data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${searchString}&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${searchString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
     const totalSongs = data.tracks.total;
     console.log(`total songs = ${totalSongs}`);
-    const randOffset = totalSongs < 1000 ? totalSongs : 1000;
+    const randOffset = totalSongs < 1000 ? totalSongs : 980;
     offset = Math.floor(Math.random() * randOffset);
     console.log(`offset ${offset}`);
     data = await spotFetch(
@@ -183,6 +190,7 @@ export const playSpotifySong = async (accessToken, uris) => {
 
 // Custom fetch method to deal with Json-ing and error handling
 const spotFetch = async (url, body) => {
+  console.log(url);
   try {
     const response = await fetch(url, body);
     if (response.status === 204) {
@@ -191,6 +199,7 @@ const spotFetch = async (url, body) => {
     }
     const data = await response.json();
     if (data.error) throw data.error;
+    console.log(data);
     return data;
   } catch (err) {
     console.error(`spotFetch error:\n ${err.message}`);
