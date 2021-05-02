@@ -1,4 +1,5 @@
 import React from 'react';
+import { PlayMixCSS } from '../styles/styles.js';
 
 const Header = ({ user, avatar, setViewPlayLists }) => {
   const clickHandler = (option) => {
@@ -15,7 +16,7 @@ const Header = ({ user, avatar, setViewPlayLists }) => {
         {user && (
           <li>
             {user}
-            <img src={avatar}></img>
+            <img style={PlayMixCSS} src={avatar}></img>
           </li>
         )}
         <li>

@@ -19,6 +19,7 @@ export async function serverRenderer(authToken = false, spotifyProfile = {}) {
     initialMarkup: ReactDOMServer.renderToString(
       <App initialData={initialData} />,
     ),
+
     pageData,
   });
 }

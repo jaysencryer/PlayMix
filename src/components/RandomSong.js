@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import Song from './Song';
 
 export const getRandomSong = async () => {
   const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -20,17 +21,10 @@ const RandomSong = () => {
     setSong(randSong);
   };
 
-  const playSong = async () => {
-    const data = await axios.post('/playsong', { songs: [song.uri] });
-    if (data.status === 200) {
-      console.log('no error?');
-    }
-  };
-
   return (
     <div>
       <button onClick={() => clickHandler()}>Pick Random Song</button>
-      {song && <div onClick={() => playSong()}>{song.name}</div>}
+      {song && <Song name={song.name} uri={song.uri} />}
     </div>
   );
 };

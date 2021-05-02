@@ -110,6 +110,7 @@ export const searchSpotify = async (accessToken, searchString, type) => {
       const songList = data.tracks.items.map((track) => ({
         artist: track.artists[0].name,
         title: track.name,
+        uri: track.uri,
       }));
       return songList;
     }
