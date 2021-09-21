@@ -1,4 +1,9 @@
 export const PlayMixCSS = {
-  width: '50px',
-  height: '50px',
+  nav_menu: {
+    display: 'inline block',
+  },
+  avatar: {
+    width: '50px',
+    height: '50px',
+  },
 };

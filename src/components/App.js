@@ -8,6 +8,7 @@ import RandomSong from './RandomSong';
 import RandomList from './RandomList';
 import SpotifySearchBar from './SpotifySearchBar';
 import Song from './Song';
+import Create from './Create';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -15,7 +16,7 @@ export function App({ initialData }) {
 
   const [user, setUser] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [viewPlayLists, setViewPlayLists] = useState(false);
+  const [view, setView] = useState('testing');
   const [songName, setSongName] = useState('');
   const [songUri, setSongUri] = useState('');
 
@@ -40,28 +41,29 @@ export function App({ initialData }) {
       )}
       {spotAuthorized && (
         <>
-          <Header
-            user={user}
-            avatar={avatar}
-            setViewPlayLists={setViewPlayLists}
-          />
+          <Header user={user} avatar={avatar} setView={setView} />
           <p>Yay! Spotify connected. Welcome to PlayMix {user}</p>
+          {view === 'playlists' && <PlayLists user={user} />}
+          {view === 'create' && <Create user={user} />}
+          {view === 'testing' && (
+            <>
+              <div>
+                <RandomSong />
+              </div>
+              <div>
+                <RandomList />
+                <Song name={songName} uri={songUri} />
+                Search For a Track{' '}
+                <SpotifySearchBar
+                  onSelect={(selected) => handleSelection(selected)}
+                  type="track"
+                />
+                Search For an Artist <SpotifySearchBar type="artist" />
+              </div>
+            </>
+          )}
         </>
       )}
-      {viewPlayLists && <PlayLists user={user} />}
-      <div>
-        <RandomSong />
-      </div>
-      <div>
-        <RandomList />
-        <Song name={songName} uri={songUri} />
-        Search For a Track{' '}
-        <SpotifySearchBar
-          onSelect={(selected) => handleSelection(selected)}
-          type="track"
-        />
-        Search For an Artist <SpotifySearchBar type="artist" />
-      </div>
     </div>
   );
 }

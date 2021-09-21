@@ -54,8 +54,9 @@ export const getSpotifyProfile = async (accessToken) => {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + accessToken },
     });
+    // console.log(data);
 
-    return { user: data.display_name, avatar: data.images[0].url };
+    return { id: data.id, user: data.display_name, avatar: data.images[0].url };
   } catch (err) {
     console.error(`Access Token Error:\n ${err}`);
     return { error: err, avatar: '/images/blank.png' };
@@ -143,6 +144,12 @@ export const randomSong = async (accessToken, searchString) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
+    if (data.error) {
+      if (data.error.message === 'Invalid access token') {
+        // TODO - refresh logic
+        console.log('refresh token and try again');
+      }
+    }
     const totalSongs = data.tracks.total;
     console.log(`total songs = ${totalSongs}`);
     const randOffset = totalSongs < 1000 ? totalSongs : 980;
@@ -154,6 +161,7 @@ export const randomSong = async (accessToken, searchString) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
+
     const randomTrack = Math.floor(Math.random() * 20);
     console.log(randomTrack);
     const song = data.tracks.items.filter(
@@ -188,6 +196,44 @@ export const playSpotifySong = async (accessToken, uris) => {
   }
 };
 
+export const addSpotifyPlayList = async (
+  accessToken,
+  userId,
+  playListName,
+  uris,
+) => {
+  console.log(`${accessToken}`);
+  try {
+    const response = await spotFetch(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ name: playListName, public: true }),
+      },
+    );
+    console.log(response);
+    const playId = response.id;
+    const addsongs = await spotFetch(
+      `https://api.spotify.com/v1/playlists/${playId}/tracks`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({ uris: uris }),
+      },
+    );
+    console.log(addsongs);
+  } catch (err) {
+    console.error(`add Spotify PlayList Error:\n ${err.message}`);
+    return { error: err };
+  }
+};
+
 // Custom fetch method to deal with Json-ing and error handling
 const spotFetch = async (url, body) => {
   console.log(url);
@@ -199,7 +245,6 @@ const spotFetch = async (url, body) => {
     }
     const data = await response.json();
     if (data.error) throw data.error;
-    console.log(data);
     return data;
   } catch (err) {
     console.error(`spotFetch error:\n ${err.message}`);

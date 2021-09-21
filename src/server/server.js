@@ -19,6 +19,7 @@ import {
   searchSpotify,
   randomSong,
   playSpotifySong,
+  addSpotifyPlayList,
 } from './utils';
 
 const app = express();
@@ -79,7 +80,7 @@ app.get('/connectSpotify', (req, res) => {
   const state = generateRandomString(16);
   res.cookie(stateKey, state);
   const scope =
-    'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state';
+    'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state playlist-modify-public';
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
       querystring.stringify({
@@ -125,6 +126,7 @@ app.get('/authorized', async (req, res) => {
 
     // Get spotify profile data
     ({
+      id: spotifyProfile.id,
       user: spotifyProfile.user,
       avatar: spotifyProfile.avatar,
       error: error,
@@ -197,6 +199,7 @@ app.get('/random/:type', async (req, res) => {
     } while (data.artists[0].name.toLowerCase() !== artist.toLowerCase());
     // data = { message: 'Random song from artist not implemented yet' };
   }
+
   res.send(data);
 });
 
@@ -205,6 +208,7 @@ app.get('/random', async (req, res) => {
   // console.log(req.url);
   // console.log(searchString[0][1]);
   const data = await randomSong(spotifyProfile.accessToken, req.query.query);
+
   res.send(data);
 });
 
@@ -212,6 +216,21 @@ app.post('/playsong', async (req, res) => {
   console.log(req.body);
   const songUris = req.body.songs; // array of trck uri's
   const data = await playSpotifySong(spotifyProfile.accessToken, songUris);
+  res.send({ status: 200 });
+});
+
+app.post('/playlist', async (req, res) => {
+  // TO DO
+  // Body contains - song uris, playlist id (if adding or modifying)
+  console.log(req.body);
+  // create the new playlist - if no playlist id given
+  const data = await addSpotifyPlayList(
+    spotifyProfile.accessToken,
+    spotifyProfile.id,
+    req.body.name,
+    req.body.uris,
+  );
+  // upload song uris
   res.send({ status: 200 });
 });
 
