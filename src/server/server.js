@@ -20,6 +20,7 @@ import {
   randomSong,
   playSpotifySong,
   addSpotifyPlayList,
+  getSpotifyTracks,
 } from './utils';
 
 const app = express();
@@ -232,6 +233,13 @@ app.post('/playlist', async (req, res) => {
   );
   // upload song uris
   res.send({ status: 200 });
+});
+
+app.get('/playlist/tracks', async (req, res) => {
+  const url = req.query.url;
+  console.log(url);
+  const data = await getSpotifyTracks(url, spotifyProfile.accessToken);
+  res.send(data);
 });
 
 app.listen(config.port, config.host, () => {

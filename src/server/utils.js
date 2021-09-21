@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import axios from 'axios';
 
 export const generateRandomSearch = () => {
   const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -250,4 +251,35 @@ const spotFetch = async (url, body) => {
     console.error(`spotFetch error:\n ${err.message}`);
     return { error: err };
   }
+};
+
+export const getSpotifyTracks = async (url, accessToken) => {
+  try {
+    // GET the track listing from Spotify
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const data = await response.json();
+    return { response: response, data: data };
+  } catch (err) {
+    console.error(`Loading tracks Error:\n ${err}`);
+    return { error: err };
+  }
+};
+
+export const getRandomSong = async (type = {}) => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  const randVowel = Math.floor(Math.random() * 4);
+  const randSecondLetter = Math.floor(Math.random() * 26) + 97;
+  const randSearchTerm = `${vowels[randVowel]}${String.fromCharCode(
+    randSecondLetter,
+  )}`;
+  let randSong;
+  if ('artist' in type) {
+    randSong = await axios.get(`/random/artist?name=${type.artist}`);
+  } else {
+    randSong = await axios.get(`/random?query=${randSearchTerm}`);
+  }
+  return randSong.data;
 };

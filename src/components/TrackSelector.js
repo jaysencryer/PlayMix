@@ -1,0 +1,80 @@
+import React, { useState } from 'react';
+
+import SpotifySearchBar from './SpotifySearchBar';
+import PlaylistSelector from './PlayListSelector';
+
+const TrackSelector = ({ saveTrack }) => {
+  const [trackType, setTrackType] = useState('select');
+  const [trackName, setTrackName] = useState();
+  const [randomMode, setRandomMode] = useState('spotify');
+  const [artistName, setArtistName] = useState('');
+
+  const typeSelectHandler = (event) => {
+    const { target } = event;
+    console.log(target.value);
+    if (target.value === 'random') {
+      setTrackName({ label: 'random', uri: randomMode });
+    }
+    setTrackType(target.value);
+  };
+
+  const addTrackHandler = () => {
+    console.log(
+      `type: ${trackType} name: ${trackName.label} artist: ${artistName}`,
+    );
+    saveTrack({ type: trackType, name: trackName, artist: artistName });
+  };
+
+  return (
+    <div>
+      <select
+        name="type"
+        id="trackType"
+        value={trackType}
+        onChange={typeSelectHandler}
+      >
+        <option value="select" disabled hidden>
+          Select Track Type
+        </option>
+        <option value="song">Song</option>
+        <option value="random">Random</option>
+      </select>
+      {trackType === 'song' && (
+        <SpotifySearchBar
+          onSelect={(selected) => setTrackName(selected)}
+          type="track"
+          library="spotify"
+        />
+      )}
+      {trackType === 'random' && (
+        <>
+          <select
+            name="randomMode"
+            id="randomMode"
+            value={randomMode}
+            onChange={(event) => setRandomMode(event.target.value)}
+          >
+            <option value="playlist">Play List</option>
+            <option value="spotify">Spotify</option>
+            <option value="artist">Artist</option>
+          </select>
+          {randomMode === 'playlist' && <PlaylistSelector />}
+          {randomMode === 'artist' && (
+            <SpotifySearchBar
+              onSelect={(selected) => setArtistName(selected.label)}
+              type="artist"
+              library="spotify"
+            />
+          )}
+        </>
+      )}
+      {(trackType === 'random' || (trackType === 'song' && trackName)) && (
+        <button type="button" onClick={addTrackHandler}>
+          Add it!
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default TrackSelector;

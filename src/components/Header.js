@@ -18,7 +18,8 @@ const Header = ({ user, avatar, setView }) => {
         )}
         <div onClick={() => clickHandler('playlists')}>Play Lists</div>
         <div onClick={() => clickHandler('testing')}>Testing</div>
-        <div onClick={() => clickHandler('create')}>Creat Play List</div>
+        <div onClick={() => clickHandler('create')}>Create Play List</div>
+        <div onClick={() => clickHandler('playmix')}>Create PlayMix</div>
       </NavMenu>
     </div>
   );

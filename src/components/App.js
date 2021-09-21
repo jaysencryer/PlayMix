@@ -9,6 +9,8 @@ import RandomList from './RandomList';
 import SpotifySearchBar from './SpotifySearchBar';
 import Song from './Song';
 import Create from './Create';
+import PlayMix from './PlayMix';
+import PlayListSelector from './PlayListSelector';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -59,9 +61,12 @@ export function App({ initialData }) {
                   type="track"
                 />
                 Search For an Artist <SpotifySearchBar type="artist" />
+                Select a PlayList
+                <PlayListSelector />
               </div>
             </>
           )}
+          {view === 'playmix' && <PlayMix />}
         </>
       )}
     </div>
