@@ -1,11 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import PlayListTrackSelector from './PlayListTrackSelector';
 
-const PlayListSelector = () => {
+const PlayListSelector = ({ setTracks }) => {
   const [playListOption, setPlayListOption] = useState('default');
   const [options, setOptions] = useState([{ label: 'test' }]);
-  const [tracks, setTracks] = useState('');
 
   const getPlayLists = async () => {
     const { data: response } = await axios.get('/playlists');
@@ -48,11 +46,8 @@ const PlayListSelector = () => {
               </option>
             ))}
           </select>
-          {tracks && <PlayListTrackSelector tracks={tracks} />}
         </>
       )}
-      {playListOption}
-      {tracks}
     </>
   );
 };

@@ -14,7 +14,7 @@ const PlayMix = () => {
     console.log(type);
     console.log(name);
     setAddTrack(false);
-    if (type === 'random') {
+    if (type === 'random' && newTrack.uri === 'spotify') {
       let song;
       if (artist) {
         song = await getRandomSong({ artist: artist });
