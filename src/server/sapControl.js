@@ -11,7 +11,10 @@ export function sapSongBuilder() {
       return this;
     },
 
-    useUri: function (uri) {
+    songData: function (type, label, artist, uri) {
+      this.type = type;
+      this.label = label;
+      this.artist = artist;
       this.uri = uri;
       return this;
     },
@@ -33,4 +36,39 @@ function sapSong(streamer, sapProfile, uri) {
     // should use the streamers play function
     this.streamer.play(this.uri);
   };
+}
+
+export function spotifyBuilder() {
+  return {
+    build: function () {
+        return new spotifyStreamer()
+    }
+  };
+}
+
+function spotifyStreamer() {
+
+    this.getToken = async function (formBody, authBuffer) {
+        try {
+          const data = await spotFetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            body: formBody,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+              'Authorization': `Basic ${authBuffer}`,
+            },
+          });
+      
+          return {
+            access_token: data.access_token,
+            refresh_token: data.refresh_token,
+          };
+        } catch (err) {
+          console.error(`getSpotifyToken: Error occured\n${err}`);
+          return { error: err };
+        }
+      };
+    this.getProfile = function () {
+        this.
+    }
 }
