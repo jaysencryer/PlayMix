@@ -1,74 +1,91 @@
-export function sapSongBuilder() {
+import { sapAuthorize, sapToken } from './streamerConfig';
+
+// export function sapSongBuilder() {
+//   return {
+//     // determine streaming service this song is for
+//     forStreamer: function (streamer) {
+//       this.streamer = streamer;
+//       return this;
+//     },
+
+//     useProfile: function (sapProfile) {
+//       this.sapProfile = sapProfile;
+//       return this;
+//     },
+
+//     songData: function (type, label, artist, uri) {
+//       this.type = type;
+//       this.label = label;
+//       this.artist = artist;
+//       this.uri = uri;
+//       return this;
+//     },
+
+//     build: function () {
+//       return new sapSong(this.streamer, this.sapProfile, this.uri);
+//     },
+//   };
+// }
+
+// function sapSong(streamer, sapProfile, uri) {
+//   this.streamer = streamer;
+//   this.sapProfile = sapProfile;
+//   this.uri = uri;
+
+//   // What functions do we want a song to do?
+
+//   this.play = function () {
+//     // should use the streamers play function
+//     this.streamer.play(this.uri);
+//   };
+// }
+
+export function SapControlBuilder() {
   return {
-    // determine streaming service this song is for
-    forStreamer: function (streamer) {
+    useStreamer: function (streamer) {
       this.streamer = streamer;
       return this;
     },
-
-    useProfile: function (sapProfile) {
-      this.sapProfile = sapProfile;
+    useAuth: function (clientId, clientSecret) {
+      this.clientId = clientId;
+      this.clientSecret = clientSecret;
       return this;
     },
-
-    songData: function (type, label, artist, uri) {
-      this.type = type;
-      this.label = label;
-      this.artist = artist;
-      this.uri = uri;
+    redirect: function (redirectUrl) {
+      this.redirectUrl = redirectUrl;
       return this;
     },
 
     build: function () {
-      return new sapSong(this.streamer, this.sapProfile, this.uri);
+      return new sapControl(
+        this.streamer,
+        this.clientId,
+        this.clientSecret,
+        this.redirectUrl,
+      );
     },
   };
 }
 
-function sapSong(streamer, sapProfile, uri) {
-  this.streamer = streamer;
-  this.sapProfile = sapProfile;
-  this.uri = uri;
-
-  // What functions do we want a song to do?
-
-  this.play = function () {
-    // should use the streamers play function
-    this.streamer.play(this.uri);
+function sapControl(streamer, clientId, clientSecret, redirectUrl) {
+  this.authorize = sapAuthorize[streamer](clientId, clientSecret, redirectUrl);
+  //   console.log(this.authorize);
+  this.getAuth = function () {
+    return {
+      stateKey: this.authorize.stateKey,
+      state: this.authorize.state,
+      authUrl: this.authorize.authUrl,
+      authBuffer: this.authorize.authBuffer,
+    };
   };
-}
 
-export function spotifyBuilder() {
-  return {
-    build: function () {
-        return new spotifyStreamer()
-    }
+  this.getToken = function (code) {
+    return sapToken[streamer](
+      code,
+      this.authorize.redirectUrl,
+      this.authorize.authBuffer,
+    );
   };
-}
 
-function spotifyStreamer() {
-
-    this.getToken = async function (formBody, authBuffer) {
-        try {
-          const data = await spotFetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            body: formBody,
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-              'Authorization': `Basic ${authBuffer}`,
-            },
-          });
-      
-          return {
-            access_token: data.access_token,
-            refresh_token: data.refresh_token,
-          };
-        } catch (err) {
-          console.error(`getSpotifyToken: Error occured\n${err}`);
-          return { error: err };
-        }
-      };
-    this.getProfile = function () {
-        this.
-    }
+  // // this.token = getToken[streamer];
 }

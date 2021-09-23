@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
+import { SapControlBuilder } from './sapControl';
 
 import {
   generateRandomString,
@@ -62,7 +63,12 @@ const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
   'base64',
 );
 
-const stateKey = 'spotify_auth_state';
+const spotifyControl = SapControlBuilder()
+  .useStreamer('spotify')
+  .useAuth(client_id, client_secret)
+  .redirect(redirect_uri)
+  .build();
+
 const spotifyProfile = {};
 let authorized = false;
 
@@ -77,25 +83,14 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/connectSpotify', (req, res) => {
-  // your application requests authorization
-  const state = generateRandomString(16);
+  const { state, stateKey, authUrl } = spotifyControl.getAuth();
   res.cookie(stateKey, state);
-  const scope =
-    'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state playlist-modify-public';
-  res.redirect(
-    'https://accounts.spotify.com/authorize?' +
-      querystring.stringify({
-        response_type: 'code',
-        client_id: client_id,
-        scope: scope,
-        state: state,
-        redirect_uri: redirect_uri,
-      }),
-  );
+  res.redirect(authUrl);
 });
 
 // When Spotify is successfully connected it will fire back to this route
 app.get('/authorized', async (req, res) => {
+  const { stateKey } = spotifyControl.getAuth();
   // check that we are correctly verified
   const code = req.query.code || null;
   const state = req.query.state || null;
@@ -110,21 +105,28 @@ app.get('/authorized', async (req, res) => {
   } else {
     // All authenticated
     // Now we need to get our spotify token - and user info
-    const spotifyTokenBody = {
-      code,
-      redirect_uri,
-      grant_type: 'authorization_code',
-    };
 
-    const formBody = uriEncode(spotifyTokenBody);
+    // build our spotify profile
+    // spotifyControl.getToken(code);
 
-    // Get Spotify Access Tokens
+    // const sapProfile = spotifyControl.getProfile();
+
+    // const spotifyTokenBody = {
+    //   code,
+    //   redirect_uri,
+    //   grant_type: 'authorization_code',
+    // };
+
+    // const formBody = uriEncode(spotifyTokenBody);
+
+    // // Get Spotify Access Tokens
     ({
       access_token: spotifyProfile.accessToken,
       refresh_token: spotifyProfile.refreshToken,
       error: error,
-    } = await getSpotifyToken(formBody, authBuffer));
-
+    } = await spotifyControl.getToken(code));
+    // getSpotifyToken(formBody, authBuffer));
+    console.log(`access token = ${spotifyProfile.accessToken}`);
     // Get spotify profile data
     ({
       id: spotifyProfile.id,

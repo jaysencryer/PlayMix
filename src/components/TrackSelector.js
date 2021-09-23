@@ -9,13 +9,11 @@ const TrackSelector = ({ saveTrack }) => {
   const [trackName, setTrackName] = useState();
   const [randomMode, setRandomMode] = useState('spotify');
   const [artistName, setArtistName] = useState('');
-  const [playListSongs, setPlayListSongs] = useState([
-    { label: '', uri: 'spotify' },
-  ]);
+  const [playListSongs, setPlayListSongs] = useState('');
 
   const typeSelectHandler = (event) => {
     const { target } = event;
-    console.log(target.value);
+    console.log(`randomMode = ${randomMode}`);
     if (target.value === 'random') {
       setTrackName({ label: 'random', uri: randomMode });
     }
@@ -42,11 +40,7 @@ const TrackSelector = ({ saveTrack }) => {
   };
 
   useEffect(() => {
-    if (
-      trackType === 'random' &&
-      randomMode === 'playlist' &&
-      playListSongs.label
-    ) {
+    if (trackType === 'random' && randomMode === 'playlist' && playListSongs) {
       getRandomUri(playListSongs);
     }
   }, [randomMode, trackType, playListSongs]);

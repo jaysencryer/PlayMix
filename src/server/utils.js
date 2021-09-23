@@ -29,6 +29,7 @@ export const uriEncode = (obj) => {
 };
 
 export const getSpotifyToken = async (formBody, authBuffer) => {
+  console.log(`In getSpotifyToken ${formBody} ${authBuffer}`);
   try {
     const data = await spotFetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
@@ -237,13 +238,14 @@ export const addSpotifyPlayList = async (
 
 // Custom fetch method to deal with Json-ing and error handling
 const spotFetch = async (url, body) => {
-  console.log(url);
+  console.log(body);
   try {
     const response = await fetch(url, body);
     if (response.status === 204) {
       // This is returned by Spotify Player with no Json data.
       return { message: 'Player successful' };
     }
+    console.log(response);
     const data = await response.json();
     if (data.error) throw data.error;
     return data;
