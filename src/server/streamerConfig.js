@@ -1,9 +1,5 @@
 import { generateRandomString, getSpotifyToken, uriEncode } from './utils';
 
-const authUrl = {
-  spotify: 'https://accounts.spotify.com/authorize',
-};
-
 export const sapAuthorize = {
   spotify: function (clientId, clientSecret, redirectUrl) {
     this.authBuffer = Buffer.from(`${clientId}:${clientSecret}`).toString(
