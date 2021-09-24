@@ -22,10 +22,13 @@ export function App({ initialData }) {
   const [songName, setSongName] = useState('');
   const [songUri, setSongUri] = useState('');
 
-  if (spotifyProfile && user === '') {
-    setUser(spotifyProfile.user);
-    setAvatar(spotifyProfile.avatar);
-  }
+  // console.log(spotifyProfile);
+  React.useEffect(() => {
+    if (spotifyProfile && user === '') {
+      setUser(spotifyProfile.user);
+      setAvatar(spotifyProfile.avatar);
+    }
+  }, []);
 
   const handleSelection = (selectedOption) => {
     setSongName(selectedOption.label);

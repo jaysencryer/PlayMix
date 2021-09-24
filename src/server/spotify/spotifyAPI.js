@@ -31,9 +31,6 @@ export function spotifyAPIBuilder() {
 }
 
 function spotifyAPI(authBuffer, clientId, redirectUrl) {
-  //   this.clientId = clientId;
-  //   const authBuffer = authBuffer;
-  // redirectUrl = redirectUrl;
   const stateKey = 'spotify_auth_state';
   const state = generateRandomString(16);
 
@@ -52,7 +49,9 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
 
   this.accessToken = '';
   this.refreshToken = '';
-  this.profile;
+  this.id = '';
+  this.avatar = '';
+  this.user = '';
 
   this.connect = function (req, res) {
     res.cookie(stateKey, state);
@@ -69,8 +68,6 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     const storedState = req.cookies ? req.cookies[stateKey] : null;
 
     if (state === null || state !== storedState) {
-      // authentication error
-      // TODO: error handling
       console.error('Failed to authenticate spotify');
       return { error: 'Failed to authenticate spotify' };
     }
@@ -82,21 +79,28 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     };
 
     const formBody = uriEncode(tokenBody);
-    console.log('About to get token');
     const spotifyToken = await getSpotifyToken(formBody, authBuffer);
+
     if ('error' in spotifyToken) {
       console.error('Failed to retrieve spotify Token');
       return { error: 'Failed to retrieve spotify Token' };
     }
+
     this.accessToken = spotifyToken.access_token;
     this.refreshToken = spotifyToken.refresh_token;
 
-    // this.profile = await spotifyProfileBuilder()
-    //   .useToken(this.accessToken)
-    //   .build();
+    ({
+      id: this.id,
+      user: this.user,
+      avatar: this.avatar,
+    } = await getSpotifyProfile(this.accessToken));
 
     res.redirect('/spotifycomplete');
   };
+
+  //   async function configureProfile() {
+
+  //   }
 
   this.getProfile = async function () {
     const profile = await getSpotifyProfile(this.accessToken);
@@ -107,24 +111,3 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     };
   };
 }
-
-// export function spotifyProfileBuilder() {
-//   return {
-//     useToken: async function (accessToken) {
-//       this.accessToken = accessToken;
-//       return this;
-//     },
-//     build: function () {
-//       console.log('building profile');
-//       return new spotifyProfile(this.accessToken);
-//     },
-//   };
-// }
-
-// function spotifyProfile(accessToken) {
-//   this.profile = getSpotifyProfile(accessToken);
-//   this.id = profile.id;
-//   this.user = profile.user;
-//   this.avatar = profile.avatar;
-//   this.accessToken = accessToken;
-// }

@@ -74,7 +74,7 @@ let authorized = false;
 
 app.get('/', async (req, res) => {
   try {
-    const vars = await serverRenderer(authorized, spotifyProfile);
+    const vars = await serverRenderer(authorized, spotifyControl);
     res.render('index', vars);
   } catch (err) {
     console.error(err);
@@ -89,85 +89,32 @@ app.get('/', async (req, res) => {
 // });
 
 app.get('/connectSpotify', (req, res) => {
-  spotifyControl.connect(req, res);
+  const response = spotifyControl.connect(req, res);
+  if ('error' in response) {
+    res.render('error', { error: response.error });
+  }
 });
+
 app.get('/authorized', (req, res) => {
-  spotifyControl.authorize(req, res);
+  const response = spotifyControl.authorize(req, res);
+  if ('error' in response) {
+    res.render('error', { error: response.error });
+  }
 });
+
 app.get('/spotifycomplete', async (req, res) => {
   authorized = true;
+
+  // Keep this until all other endpoints rewritten
   ({
     id: spotifyProfile.id,
     user: spotifyProfile.user,
     avatar: spotifyProfile.avatar,
     accessToken: spotifyProfile.accessToken,
   } = await spotifyControl.getProfile());
-  console.log(spotifyProfile);
+  // console.log(spotifyProfile);
   res.redirect('/');
 });
-// When Spotify is successfully connected it will fire back to this route
-// app.get('/authorized', async (req, res) => {
-//   const { stateKey } = spotifyControl.getAuth();
-//   // check that we are correctly verified
-//   const code = req.query.code || null;
-//   const state = req.query.state || null;
-//   const storedState = req.cookies ? req.cookies[stateKey] : null;
-
-//   let error = {};
-
-//   if (state === null || state !== storedState) {
-//     // some error authenticating occurred
-//     error['message'] = 'Initial authorization failed';
-//     res.render('error', { error: error });
-//   } else {
-//     // All authenticated
-//     // Now we need to get our spotify token - and user info
-
-//     // build our spotify profile
-//     // spotifyControl.getToken(code);
-
-//     // const sapProfile = spotifyControl.getProfile();
-
-//     // const spotifyTokenBody = {
-//     //   code,
-//     //   redirect_uri,
-//     //   grant_type: 'authorization_code',
-//     // };
-
-//     // const formBody = uriEncode(spotifyTokenBody);
-//     // const test = await getSpotifyToken(formBody, authBuffer);
-//     // console.log(test);
-//     // // Get Spotify Access Tokens
-
-//     // spotifyControl.buildProfile(code);
-
-// ({
-//   access_token: spotifyProfile.accessToken,
-//   refresh_token: spotifyProfile.refreshToken,
-//   error: error,
-// } = await spotifyControl.getToken(code));
-
-//     // getSpotifyToken(formBody, authBuffer));
-//     console.log(`access token = ${spotifyProfile.accessToken}`);
-//     // Get spotify profile data
-//     ({
-//       id: spotifyProfile.id,
-//       user: spotifyProfile.user,
-//       avatar: spotifyProfile.avatar,
-//       error: error,
-//     } = await getSpotifyProfile(spotifyProfile.accessToken));
-//   }
-
-//   if (error) {
-//     console.error(
-//       `Spotify connection and initial load failed: ${error.message}`,
-//     );
-//     res.render('error', { error: error });
-//   } else {
-//     authorized = true;
-//     res.redirect('/');
-//   }
-// });
 
 // Load spotify playlists for current user
 app.get('/playlists', async (req, res) => {

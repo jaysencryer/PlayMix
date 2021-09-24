@@ -35,37 +35,3 @@ const sapControl = {
       .build();
   },
 };
-
-// function sapControl(streamer, clientId, clientSecret, redirectUrl) {
-//   this.authorize = sapAuthorize[streamer](clientId, clientSecret, redirectUrl);
-//   this.accessToken;
-//   this.refreshToken;
-//   //   console.log(this.authorize);
-//   this.getAuth = function () {
-//     return {
-//       stateKey: this.authorize.stateKey,
-//       state: this.authorize.state,
-//       authUrl: this.authorize.authUrl,
-//       authBuffer: this.authorize.authBuffer,
-//     };
-//   };
-
-//   this.getToken = function (code) {
-//     return sapToken[streamer](
-//       code,
-//       this.authorize.redirectUrl,
-//       this.authorize.authBuffer,
-//     );
-//   };
-
-//   this.buildProfile = async function (code) {
-//     const tokenObject = await sapToken[streamer](
-//       code,
-//       this.authorize.redirectUrl,
-//       this.authorize.authBuffer,
-//     );
-//     if ('error' in tokenObject) return;
-//     this.accessToken = tokenObject.access_token;
-//     this.refreshToken = tokenObject.refresh_token;
-//   };
-// }
