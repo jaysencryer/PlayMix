@@ -279,9 +279,24 @@ export const getRandomSong = async (type = {}) => {
   )}`;
   let randSong;
   if ('artist' in type) {
+    console.log(`Looking for song from Artist ${type.artist}`);
     randSong = await axios.get(`/random/artist?name=${type.artist}`);
+  } else if ('playList' in type) {
+    // TODO: make this cleaner! and error checking?
+    // const uri = type.playList.split(':')[2];
+    const { data: response } = await axios.get(
+      `/playlist/tracks?url=https://api.spotify.com/v1/playlists/${type.playList}`,
+    );
+    console.log(response);
+    const songList = response.data.tracks.items;
+    console.log(songList);
+    const randSelect = Math.floor(Math.random() * songList.length);
+    randSong = { data: songList[randSelect].track };
+    console.log('playlist randSong');
+    console.log(randSong);
   } else {
     randSong = await axios.get(`/random?query=${randSearchTerm}`);
   }
+
   return randSong.data;
 };

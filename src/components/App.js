@@ -69,7 +69,7 @@ export function App({ initialData }) {
               </div>
             </>
           )}
-          {view === 'playmix' && <PlayMix />}
+          {view === 'playmix' && <PlayMix sapControl={spotifyProfile} />}
         </>
       )}
     </div>

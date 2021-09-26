@@ -2,7 +2,6 @@ import express from 'express';
 import morgan from 'morgan';
 import serialize from 'serialize-javascript';
 import dotenv from 'dotenv';
-import querystring from 'querystring';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -12,11 +11,7 @@ import { SapControlBuilder } from './sapControl';
 
 import {
   generateRandomString,
-  generateRandomSearch,
-  getSpotifyProfile,
   getSpotifyPlayLists,
-  getSpotifyToken,
-  uriEncode,
   searchSpotify,
   randomSong,
   playSpotifySong,
@@ -58,10 +53,10 @@ const client_id = process.env.SPOT_CLIENT_ID;
 const client_secret = process.env.SPOT_SECRET;
 const redirect_uri = 'http://localhost:1234/authorized';
 
-// encode the client_id and secret for passing to spotify
-const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
-  'base64',
-);
+// // encode the client_id and secret for passing to spotify
+// const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
+//   'base64',
+// );
 
 const spotifyControl = SapControlBuilder()
   .useStreamer('spotify')
@@ -81,12 +76,6 @@ app.get('/', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
-// app.get('/connectSpotify', (req, res) => {
-//   const { state, stateKey, authUrl } = spotifyControl.getAuth();
-//   res.cookie(stateKey, state);
-//   res.redirect(authUrl);
-// });
 
 app.get('/connectSpotify', (req, res) => {
   const response = spotifyControl.connect(req, res);

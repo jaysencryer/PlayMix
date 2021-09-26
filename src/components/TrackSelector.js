@@ -4,97 +4,108 @@ import axios from 'axios';
 import SpotifySearchBar from './SpotifySearchBar';
 import PlaylistSelector from './PlayListSelector';
 
-const TrackSelector = ({ saveTrack }) => {
-  const [trackType, setTrackType] = useState('select');
-  const [trackName, setTrackName] = useState();
-  const [randomMode, setRandomMode] = useState('spotify');
-  const [artistName, setArtistName] = useState('');
-  const [playListSongs, setPlayListSongs] = useState('');
+import { trackType, trackMode } from '../constants/enums';
 
-  const typeSelectHandler = (event) => {
-    const { target } = event;
-    console.log(`randomMode = ${randomMode}`);
-    if (target.value === 'random') {
-      setTrackName({ label: 'random', uri: randomMode });
-    }
-    setTrackType(target.value);
+const TrackSelector = ({ track, id, saveTrack }) => {
+  const [selectType, setSelectType] = useState(track.type);
+  // const [trackName, setTrackName] = useState();
+  const [randomMode, setRandomMode] = useState(track.mode);
+  // const [artistName, setArtistName] = useState('');
+  // const [playListSongs, setPlayListSongs] = useState('');
+
+  // const typeSelectHandler = (event) => {
+  //   const { target } = event;
+  //   console.log(`randomMode = ${randomMode}`);
+  //   if (target.value === 'random') {
+  //     setTrackName({ label: 'random', uri: randomMode });
+  //   }
+  //   setTrackType(target.value);
+  // };
+
+  // const addTrackHandler = () => {
+  //   console.log(
+  //     `type: ${trackType} name: ${trackName.label} artist: ${artistName}`,
+
+  const selectTrack = ({
+    label,
+    mode = randomMode,
+    uri = 'generate',
+    playId = null,
+  }) => {
+    // we've selected a track
+    saveTrack(id, {
+      type: selectType,
+      mode: mode,
+      label: label,
+      uri: uri,
+    });
   };
 
-  const addTrackHandler = () => {
-    console.log(
-      `type: ${trackType} name: ${trackName.label} artist: ${artistName}`,
-    );
-    saveTrack({ type: trackType, name: trackName, artist: artistName });
-  };
-
-  const getRandomUri = async (songList) => {
-    // choose a random song from the songList
-    const url = songList.split('/tracks')[0];
-    const { data: response } = await axios.get(`/playlist/tracks?url=${url}`);
-    console.log(response);
-    const retrievedList = response.data.tracks.items;
-    const randSelect = Math.floor(Math.random() * retrievedList.length);
-    console.log('random songs');
-    console.log(retrievedList[randSelect].track.uri);
-    setTrackName({ label: 'random', uri: retrievedList[randSelect].track.uri });
-  };
-
-  useEffect(() => {
-    if (trackType === 'random' && randomMode === 'playlist' && playListSongs) {
-      getRandomUri(playListSongs);
-    }
-  }, [randomMode, trackType, playListSongs]);
+  // useEffect(() => {
+  //   if (trackType === 'random' && randomMode === 'playlist' && playListSongs) {
+  //     getRandomUri(playListSongs);
+  //   }
+  // }, [randomMode, trackType, playListSongs]);
 
   return (
     <div>
       <select
         name="type"
-        id="trackType"
-        value={trackType}
-        onChange={typeSelectHandler}
+        id="selectType"
+        value={selectType}
+        onChange={(event) => setSelectType(event.target.value)}
       >
-        <option value="select" disabled hidden>
+        <option value={trackType.DEFAULT} disabled hidden>
           Select Track Type
         </option>
-        <option value="song">Song</option>
-        <option value="random">Random</option>
+        <option value={trackType.SONG}>Song</option>
+        <option value={trackType.RANDOM}>Random</option>
       </select>
-      {trackType === 'song' && (
+      {selectType === trackType.SONG && (
         <SpotifySearchBar
-          onSelect={(selected) => setTrackName(selected)}
+          onSelect={(selected) => selectTrack(selected)}
           type="track"
           library="spotify"
         />
       )}
-      {trackType === 'random' && (
+      {selectType === trackType.RANDOM && (
         <>
           <select
             name="randomMode"
             id="randomMode"
             value={randomMode}
-            onChange={(event) => setRandomMode(event.target.value)}
+            onChange={(event) => {
+              if (event.target.value === trackMode.SPOTIFY) {
+                selectTrack({
+                  mode: trackMode.SPOTIFY,
+                  label: trackMode.SPOTIFY,
+                });
+              }
+              setRandomMode(event.target.value);
+            }}
           >
-            <option value="playlist">Play List</option>
-            <option value="spotify">Spotify</option>
-            <option value="artist">Artist</option>
+            <option value={trackMode.DEFAULT}>select mode</option>
+            <option value={trackMode.PLAYLIST}>Play List</option>
+            <option value={trackMode.SPOTIFY}>Spotify</option>
+            <option value={trackMode.ARTIST}>Artist</option>
           </select>
-          {randomMode === 'playlist' && (
-            <PlaylistSelector setTracks={setPlayListSongs} />
+          {randomMode === trackMode.PLAYLIST && (
+            <PlaylistSelector setTracks={selectTrack} />
           )}
-          {randomMode === 'artist' && (
+          {randomMode === trackMode.ARTIST && (
             <SpotifySearchBar
-              onSelect={(selected) => setArtistName(selected.label)}
+              onSelect={(selected) => selectTrack({ label: selected.label })}
               type="artist"
               library="spotify"
             />
           )}
         </>
       )}
-      {(trackType === 'random' || (trackType === 'song' && trackName)) && (
+      {/* {(trackType === 'random' || (trackType === 'song' && trackName)) && (
         <button type="button" onClick={addTrackHandler}>
           Add it!
         </button>
-      )}
+      )} */}
     </div>
   );
 };
