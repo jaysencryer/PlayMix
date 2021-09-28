@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import TrackSelector from './TrackSelector';
-import MixTracks from './MixTracks';
-import { getRandomSong } from '../server/utils';
-import generateSong from '../helpers/generateSong';
+import TrackSelector from '../TrackSelector/TrackSelector';
+import MixTracks from '../MixTracks';
+import generateSong from '../../helpers/generateSong';
 
-import { trackType, trackMode } from '../constants/enums';
+import { trackType, trackMode } from '../../constants/enums';
 
 const newTrack = {
   type: trackType.DEFAULT,
@@ -60,7 +59,7 @@ const PlayMix = () => {
   };
 
   return (
-    <div>
+    <section id="playmix-screen-container">
       <button
         type="button"
         onClick={() => {
@@ -70,11 +69,11 @@ const PlayMix = () => {
       >
         Add Track
       </button>
+
       {playMixTracks &&
         playMixTracks.map((track, id) => (
-          <section key={`${id}${track.type}`}>
+          <section key={`${id}${track.type}`} className="playmix-track">
             <span>{`${id + 1} `}</span>
-
             <TrackSelector id={id} track={track} saveTrack={saveTrack} />
           </section>
         ))}
@@ -89,9 +88,9 @@ const PlayMix = () => {
           </button>
         </>
       )}
-      {playMixSongs &&
-        playMixSongs.map((song) => <div key={song.uri}>{song.name}</div>)}
-    </div>
+      {/* {playMixSongs &&
+        playMixSongs.map((song) => <div key={song.uri}>{song.name}</div>)} */}
+    </section>
   );
 };
 

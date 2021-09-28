@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import PlayLists from './PlayLists';
 
 const PlayListSelector = ({ setTracks }) => {
-  const [playListOption, setPlayListOption] = useState('default');
+  const [playListOption, setPlayListOption] = useState(['default']);
   const [options, setOptions] = useState([{ label: '', uri: '' }]);
 
   const getPlayLists = async () => {
@@ -25,34 +26,61 @@ const PlayListSelector = ({ setTracks }) => {
     getOptions();
   }, []);
 
+  const selectHandler = (selected) => {
+    const { target } = selected;
+    console.log(selected);
+    // const option = target.value;
+    // console.log(target.selectedOptions);
+    const options = target.selectedOptions;
+    console.log(options);
+    let newOptions = [];
+    let uriList = [];
+
+    for (let option of options) {
+      if (option.value == 1) {
+        // If 'All PlayLists' is selected - just set that one
+        newOptions = [1];
+        uriList = [target[1]?.dataset?.uri];
+        break;
+      }
+      newOptions.push(option.value);
+      const playList = parseInt(option.value);
+      uriList.push(target[playList]?.dataset?.uri);
+    }
+
+    // Set up label for track rendering
+    const extras = newOptions.length > 1 ? ` + ${newOptions.length - 1}` : '';
+    const label = `${target[newOptions[0]].text}${extras}`;
+    // console.log(newOptions);
+    // console.log(label);
+    setPlayListOption(newOptions);
+    setTracks({
+      label,
+      uri: uriList,
+    });
+  };
+
   return (
     <>
       {options && (
         <>
           <select
+            className="playlist-selector"
             name="playListSelector"
             value={playListOption}
-            onChange={(selected) => {
-              const { target } = selected;
-              //   console.log(selected);
-              const option = target.value;
-              const playList = option !== 'all' ? parseInt(option) + 2 : 1;
-
-              //   console.log(target[playList]?.text);
-              setPlayListOption(option);
-              setTracks({
-                label: target[playList].text,
-                uri: target[playList]?.dataset?.uri,
-              });
-              //   setTracks(options[selected.target.value].tracks);
-            }}
+            onChange={selectHandler}
+            multiple
           >
+            {/* size={5} */}
+            {/* defaultValue={['default']} */}
             <option value="default" hidden>
               Select PlayList
             </option>
-            <option value="all">All Playlists</option>
+            <option data-uri="all" value={1}>
+              All Playlists
+            </option>
             {options.map((list, index) => (
-              <option key={index} data-uri={list.uri} value={`${index}`}>
+              <option key={index} data-uri={list.uri} value={`${index + 2}`}>
                 {list.label}
               </option>
             ))}

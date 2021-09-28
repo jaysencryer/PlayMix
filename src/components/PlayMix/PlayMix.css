@@ -1,14 +1,6 @@
-.playlist-selector {
-  font-size: 20px;
-}
-
 .playmix-track {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-}
-
-.track-type-selector-dropdown {
-  width: 200px;
 }

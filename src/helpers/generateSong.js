@@ -14,31 +14,27 @@ const generateSong = async (track) => {
   switch (mode) {
     case trackMode.SPOTIFY: {
       song = await getRandomSong();
-      // console.log('Random spotify');
-      // console.log(song);
       break;
     }
     case trackMode.ARTIST: {
-      console.log('Getting Random Artist song');
       song = await getRandomSong({ artist: label });
       break;
     }
     case trackMode.PLAYLIST: {
       let playListUri;
+      let uriList = [];
       if (label === 'All Playlists') {
         // we need to know users playlists.
         const { data: response } = await axios.get('/playlists');
-        // console.log('play lists');
-        // console.log(response);
         // pick a random number between 0 and total playlists
-        const randomList = Math.floor(Math.random() * response.length);
-        const playList = response[randomList].uri.split(':')[2];
-        // console.log(`in random all playlist with uri ${playList}`);
-        playListUri = playList;
-        // song = await getRandomSong({ playList: playList });
+        uriList = response.map((list) => list.uri.split(':')[2]);
       } else {
-        playListUri = uri.split(':')[2];
+        uriList = uri.map((u) => u.split(':')[2]);
       }
+
+      const randomList = Math.floor(Math.random() * uriList.length);
+      const playList = uriList[randomList];
+      playListUri = playList;
       song = await getRandomSong({ playList: playListUri });
       break;
     }

@@ -1,37 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
-import SpotifySearchBar from './SpotifySearchBar';
-import PlaylistSelector from './PlayListSelector';
+import SpotifySearchBar from '../SpotifySearchBar';
+import PlaylistSelector from '../PlayListSelector';
 
-import { trackType, trackMode } from '../constants/enums';
+import { trackType, trackMode } from '../../constants/enums';
+// import './TrackSelector.css';
 
 const TrackSelector = ({ track, id, saveTrack }) => {
   const [selectType, setSelectType] = useState(track.type);
-  // const [trackName, setTrackName] = useState();
   const [randomMode, setRandomMode] = useState(track.mode);
-  // const [artistName, setArtistName] = useState('');
-  // const [playListSongs, setPlayListSongs] = useState('');
 
-  // const typeSelectHandler = (event) => {
-  //   const { target } = event;
-  //   console.log(`randomMode = ${randomMode}`);
-  //   if (target.value === 'random') {
-  //     setTrackName({ label: 'random', uri: randomMode });
-  //   }
-  //   setTrackType(target.value);
-  // };
-
-  // const addTrackHandler = () => {
-  //   console.log(
-  //     `type: ${trackType} name: ${trackName.label} artist: ${artistName}`,
-
-  const selectTrack = ({
-    label,
-    mode = randomMode,
-    uri = 'generate',
-    playId = null,
-  }) => {
+  const selectTrack = ({ label, mode = randomMode, uri = 'generate' }) => {
     // we've selected a track
     saveTrack(id, {
       type: selectType,
@@ -41,15 +20,10 @@ const TrackSelector = ({ track, id, saveTrack }) => {
     });
   };
 
-  // useEffect(() => {
-  //   if (trackType === 'random' && randomMode === 'playlist' && playListSongs) {
-  //     getRandomUri(playListSongs);
-  //   }
-  // }, [randomMode, trackType, playListSongs]);
-
   return (
     <div>
       <select
+        className="track-type-selector-dropdown"
         name="type"
         id="selectType"
         value={selectType}
@@ -101,11 +75,6 @@ const TrackSelector = ({ track, id, saveTrack }) => {
           )}
         </>
       )}
-      {/* {(trackType === 'random' || (trackType === 'song' && trackName)) && (
-        <button type="button" onClick={addTrackHandler}>
-          Add it!
-        </button>
-      )} */}
     </div>
   );
 };

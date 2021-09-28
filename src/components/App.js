@@ -9,7 +9,7 @@ import RandomList from './RandomList';
 import SpotifySearchBar from './SpotifySearchBar';
 import Song from './Song';
 import Create from './Create';
-import PlayMix from './PlayMix';
+import PlayMix from './PlayMix/PlayMix';
 import PlayListSelector from './PlayListSelector';
 
 export function App({ initialData }) {
