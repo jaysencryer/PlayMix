@@ -2,7 +2,7 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 
-const SpotifySearchBar = ({ type, onSelect, library }) => {
+const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const getOptions = async (inputValue) => {
     if (library === 'spotify') {
       const { data: response } = await axios.get(
@@ -40,6 +40,7 @@ const SpotifySearchBar = ({ type, onSelect, library }) => {
         onChange={onSelect}
         cacheOptions
         loadOptions={promiseOptions}
+        defaultValue={value ?? ''}
       />
     </div>
   );

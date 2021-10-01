@@ -137,11 +137,12 @@ export const searchSpotify = async (accessToken, searchString, type) => {
 };
 
 export const randomSong = async (accessToken, searchString) => {
-  // const encodedString = encodeURIComponent(searchString);
+  const encodedString = encodeURIComponent(searchString);
+  console.log(encodedString);
   let offset = 0;
   try {
     let data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${searchString}%20NOT%20karaoke&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
@@ -158,7 +159,7 @@ export const randomSong = async (accessToken, searchString) => {
     offset = Math.floor(Math.random() * randOffset);
     console.log(`offset ${offset}`);
     data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${searchString}%20NOT%20karaoke&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
@@ -238,14 +239,14 @@ export const addSpotifyPlayList = async (
 
 // Custom fetch method to deal with Json-ing and error handling
 const spotFetch = async (url, body) => {
-  console.log(body);
+  // console.log(body);
   try {
     const response = await fetch(url, body);
     if (response.status === 204) {
       // This is returned by Spotify Player with no Json data.
       return { message: 'Player successful' };
     }
-    console.log(response);
+    // console.log(response);
     const data = await response.json();
     if (data.error) throw data.error;
     return data;

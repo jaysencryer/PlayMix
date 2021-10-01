@@ -9,15 +9,29 @@ import { trackType, trackMode } from '../../constants/enums';
 const TrackSelector = ({ track, id, saveTrack }) => {
   const [selectType, setSelectType] = useState(track.type);
   const [randomMode, setRandomMode] = useState(track.mode);
+  const [repeat, setRepeat] = useState(false);
+  const [repeatTimes, setRepeatTimes] = useState(1);
 
-  const selectTrack = ({ label, mode = randomMode, uri = 'generate' }) => {
+  console.log(track.label);
+
+  const selectTrack = ({
+    label,
+    mode = randomMode,
+    uri = 'generate',
+    option = null,
+  }) => {
     // we've selected a track
-    saveTrack(id, {
-      type: selectType,
-      mode: mode,
-      label: label,
-      uri: uri,
-    });
+    saveTrack(
+      id,
+      {
+        type: selectType,
+        mode: mode,
+        label: label,
+        option: option,
+        uri: uri,
+      },
+      repeatTimes,
+    );
   };
 
   return (
@@ -71,9 +85,25 @@ const TrackSelector = ({ track, id, saveTrack }) => {
               onSelect={(selected) => selectTrack({ label: selected.label })}
               type="artist"
               library="spotify"
+              value={track.label ?? ''}
             />
           )}
         </>
+      )}
+      <input
+        type="checkbox"
+        checked={repeat}
+        onChange={() => setRepeat(!repeat)}
+      />
+      {repeat && (
+        <input
+          type="number"
+          value={repeatTimes}
+          onChange={(e) => {
+            console.log(e.target);
+            setRepeatTimes(e.target.value);
+          }}
+        />
       )}
     </div>
   );

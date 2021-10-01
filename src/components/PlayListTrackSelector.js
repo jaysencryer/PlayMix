@@ -12,7 +12,7 @@ const PlayListTrackSelector = ({ tracks }) => {
     return response.data.tracks.items.map((song) => ({
       label: song.track.name,
       uri: song.track.uri,
-    })); // Probably need track list too.
+    }));
   };
 
   useEffect(() => {
