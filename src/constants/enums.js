@@ -10,3 +10,9 @@ export const trackMode = {
   ARTIST: 'artist',
   PLAYLIST: 'playlist',
 };
+
+export const searchType = {
+  ALBUM: 'album',
+  ARTIST: 'artist',
+  TRACK: 'track',
+};

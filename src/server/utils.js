@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 import axios from 'axios';
 
+import { searchType } from '../constants/enums';
+
 export const generateRandomSearch = () => {
   const vowels = ['a', 'e', 'i', 'o', 'u'];
   const randVowel = Math.floor(Math.random() * 4);
@@ -136,14 +138,21 @@ export const searchSpotify = async (accessToken, searchString, type) => {
   }
 };
 
-export const randomSong = async (accessToken, searchString, searchType) => {
-  const encodedString = encodeURIComponent(`"${searchString}"`);
+export const randomSong = async (
+  accessToken,
+  searchString,
+  type = searchType.TRACK,
+) => {
+  const encodedString =
+    type === searchType.ARTIST
+      ? encodeURIComponent(`"${searchString}"`)
+      : encodeURIComponent(searchString);
   // console.log(accessToken);
-  console.log(searchString, encodedString, searchType);
+  console.log(searchString, encodedString, type);
   let offset = 0;
   try {
     let data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${searchType}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${type}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
@@ -162,16 +171,21 @@ export const randomSong = async (accessToken, searchString, searchType) => {
       offset = Math.floor(Math.random() * randOffset);
       console.log(`offset ${offset}`);
       data = await spotFetch(
-        `https://api.spotify.com/v1/search?query=${searchType}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
+        `https://api.spotify.com/v1/search?query=${type}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },
       );
 
-      songList = data.tracks.items.filter(
-        (track) => track.artists[0].name === searchString,
-      );
-      // console.log(songList);
+      // console.table(data.tracks.items);
+
+      songList =
+        type === searchType.ARTIST
+          ? data.tracks.items.filter(
+              (track) => track.artists[0].name === searchString,
+            )
+          : data.tracks.items;
+      // console.log(songList.length);
     } while (songList.length === 0);
     const randomTrack = Math.floor(Math.random() * songList.length);
     // console.log(randomTrack);

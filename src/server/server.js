@@ -18,6 +18,7 @@ import {
   addSpotifyPlayList,
   getSpotifyTracks,
 } from './utils';
+import { searchType } from '../constants/enums';
 
 const app = express();
 app.enable('trust proxy');
@@ -148,16 +149,20 @@ app.get('/search/:type', async (req, res) => {
 app.get('/random/:type', async (req, res) => {
   const randSearchTerm = generateRandomString(2);
   let data;
-  if (req.params.type === 'track') {
+  if (req.params.type === searchType.TRACK) {
     data = await randomSong(
       spotifyProfile.accessToken,
       randSearchTerm,
-      'track',
+      searchType.TRACK,
     );
-  } else if (req.params.type === 'artist') {
+  } else if (req.params.type === searchType.ARTIST) {
     const artist = req.query.name;
     do {
-      data = await randomSong(spotifyProfile.accessToken, artist, 'artist');
+      data = await randomSong(
+        spotifyProfile.accessToken,
+        artist,
+        searchType.ARTIST,
+      );
       console.log(
         `found artist - ${data.artists[0].name} looking for ${artist}`,
       );
