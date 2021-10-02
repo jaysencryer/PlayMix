@@ -31,6 +31,7 @@ const PlayMix = () => {
       newTrackList.push({ ...track });
     }
     const oldTrackList = [...playMixTracks];
+
     // add the new track into the list
     oldTrackList.splice(id, 1, ...newTrackList);
     console.table(oldTrackList);

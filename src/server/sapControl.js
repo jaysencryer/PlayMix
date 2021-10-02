@@ -1,5 +1,4 @@
 import { spotifyAPIBuilder } from './spotify/spotifyAPI';
-import { sapAuthorize, sapToken } from './streamerConfig';
 
 export function SapControlBuilder() {
   return {

@@ -109,15 +109,16 @@ app.get('/spotifycomplete', async (req, res) => {
 // Load spotify playlists for current user
 app.get('/playlists', async (req, res) => {
   // check to see if we already have playlists loaded.
-  if (!spotifyProfile.playLists) {
+  if (!spotifyControl.playLists) {
     // If not load all users playlists
-
-    spotifyProfile['playLists'] = await getSpotifyPlayLists(
-      spotifyProfile.accessToken,
-    );
+    spotifyProfile['playLists'] = await spotifyControl.getPlayLists();
   }
   // send back json list of playlists
-  res.send(spotifyProfile.playLists);
+  res.send(spotifyControl.playLists);
+});
+
+app.get('/sapinfo', (req, res) => {
+  res.send(spotifyControl);
 });
 
 // Search spotify API endpoint
