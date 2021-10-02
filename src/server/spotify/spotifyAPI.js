@@ -31,7 +31,10 @@ export function spotifyAPIBuilder() {
 }
 
 function spotifyAPI(authBuffer, clientId, redirectUrl) {
-  const stateKey = 'spotify_auth_state';
+  this.authBuffer = authBuffer;
+  this.redirectUrl = redirectUrl;
+
+  this.stateKey = 'spotify_auth_state';
   const state = generateRandomString(16);
 
   const scope =
@@ -54,7 +57,7 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
   this.user = '';
 
   this.connect = function (req, res) {
-    res.cookie(stateKey, state);
+    res.cookie(this.stateKey, state);
     res.redirect(url);
   };
 
@@ -62,52 +65,97 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
   //     return { stateKey: this.authorize.stateKey, state: this.authorize.state };
   //   };
 
-  this.authorize = async function (req, res) {
-    const code = req.query.code || null;
-    const state = req.query.state || null;
-    const storedState = req.cookies ? req.cookies[stateKey] : null;
+  // this.authorize = async function (req, res) {
+  //   const code = req.query.code || null;
+  //   const state = req.query.state || null;
+  //   const storedState = req.cookies ? req.cookies[stateKey] : null;
 
-    if (state === null || state !== storedState) {
-      console.error('Failed to authenticate spotify');
-      return { error: 'Failed to authenticate spotify' };
-    }
+  //   if (state === null || state !== storedState) {
+  //     console.error('Failed to authenticate spotify');
+  //     return { error: 'Failed to authenticate spotify' };
+  //   }
 
-    const tokenBody = {
-      code,
-      redirect_uri: redirectUrl,
-      grant_type: 'authorization_code',
-    };
+  //   const tokenBody = {
+  //     code,
+  //     redirect_uri: redirectUrl,
+  //     grant_type: 'authorization_code',
+  //   };
 
-    const formBody = uriEncode(tokenBody);
-    const spotifyToken = await getSpotifyToken(formBody, authBuffer);
+  //   const formBody = uriEncode(tokenBody);
+  //   const spotifyToken = await getSpotifyToken(formBody, authBuffer);
 
-    if ('error' in spotifyToken) {
-      console.error('Failed to retrieve spotify Token');
-      return { error: 'Failed to retrieve spotify Token' };
-    }
+  //   if ('error' in spotifyToken) {
+  //     console.error('Failed to retrieve spotify Token');
+  //     return { error: 'Failed to retrieve spotify Token' };
+  //   }
 
-    this.accessToken = spotifyToken.access_token;
-    this.refreshToken = spotifyToken.refresh_token;
+  //   this.accessToken = spotifyToken.access_token;
+  //   this.refreshToken = spotifyToken.refresh_token;
 
-    ({
-      id: this.id,
-      user: this.user,
-      avatar: this.avatar,
-    } = await getSpotifyProfile(this.accessToken));
+  //   ({
+  //     id: this.id,
+  //     user: this.user,
+  //     avatar: this.avatar,
+  //   } = await getSpotifyProfile(this.accessToken));
 
-    res.redirect('/spotifycomplete');
-  };
+  //   res.redirect('/spotifycomplete');
+  // };
 
   //   async function configureProfile() {
 
   //   }
 
-  this.getProfile = async function () {
-    const profile = await getSpotifyProfile(this.accessToken);
-    return {
-      ...profile,
-      accessToken: this.accessToken,
-      refreshToken: this.refreshToken,
-    };
-  };
+  // this.getProfile = async function () {
+  //   const profile = await getSpotifyProfile(this.accessToken);
+  //   return {
+  //     ...profile,
+  //     accessToken: this.accessToken,
+  //     refreshToken: this.refreshToken,
+  //   };
+  // };
 }
+
+spotifyAPI.prototype.getProfile = async function () {
+  const profile = await getSpotifyProfile(this.accessToken);
+  return {
+    ...profile,
+    accessToken: this.accessToken,
+    refreshToken: this.refreshToken,
+  };
+};
+
+spotifyAPI.prototype.authorize = async function (req, res) {
+  const code = req.query.code || null;
+  const state = req.query.state || null;
+  const storedState = req.cookies ? req.cookies[this.stateKey] : null;
+
+  if (state === null || state !== storedState) {
+    console.error('Failed to authenticate spotify');
+    return { error: 'Failed to authenticate spotify' };
+  }
+
+  const tokenBody = {
+    code,
+    redirect_uri: this.redirectUrl,
+    grant_type: 'authorization_code',
+  };
+
+  const formBody = uriEncode(tokenBody);
+  const spotifyToken = await getSpotifyToken(formBody, this.authBuffer);
+
+  if ('error' in spotifyToken) {
+    console.error('Failed to retrieve spotify Token');
+    return { error: 'Failed to retrieve spotify Token' };
+  }
+
+  this.accessToken = spotifyToken.access_token;
+  this.refreshToken = spotifyToken.refresh_token;
+
+  ({
+    id: this.id,
+    user: this.user,
+    avatar: this.avatar,
+  } = await getSpotifyProfile(this.accessToken));
+
+  res.redirect('/spotifycomplete');
+};

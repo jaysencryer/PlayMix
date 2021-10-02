@@ -149,11 +149,15 @@ app.get('/random/:type', async (req, res) => {
   const randSearchTerm = generateRandomString(2);
   let data;
   if (req.params.type === 'track') {
-    data = await randomSong(spotifyProfile.accessToken, randSearchTerm);
+    data = await randomSong(
+      spotifyProfile.accessToken,
+      randSearchTerm,
+      'track',
+    );
   } else if (req.params.type === 'artist') {
     const artist = req.query.name;
     do {
-      data = await randomSong(spotifyProfile.accessToken, artist);
+      data = await randomSong(spotifyProfile.accessToken, artist, 'artist');
       console.log(
         `found artist - ${data.artists[0].name} looking for ${artist}`,
       );

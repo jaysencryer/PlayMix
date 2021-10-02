@@ -136,13 +136,14 @@ export const searchSpotify = async (accessToken, searchString, type) => {
   }
 };
 
-export const randomSong = async (accessToken, searchString) => {
-  const encodedString = encodeURIComponent(searchString);
-  console.log(encodedString);
+export const randomSong = async (accessToken, searchString, searchType) => {
+  const encodedString = encodeURIComponent(`"${searchString}"`);
+  // console.log(accessToken);
+  console.log(searchString, encodedString, searchType);
   let offset = 0;
   try {
     let data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
+      `https://api.spotify.com/v1/search?query=${searchType}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
@@ -155,22 +156,30 @@ export const randomSong = async (accessToken, searchString) => {
     }
     const totalSongs = data.tracks.total;
     console.log(`total songs = ${totalSongs}`);
-    const randOffset = totalSongs < 1000 ? totalSongs : 980;
-    offset = Math.floor(Math.random() * randOffset);
-    console.log(`offset ${offset}`);
-    data = await spotFetch(
-      `https://api.spotify.com/v1/search?query=${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    );
+    let songList = [];
+    do {
+      const randOffset = totalSongs < 1000 ? totalSongs : 980;
+      offset = Math.floor(Math.random() * randOffset);
+      console.log(`offset ${offset}`);
+      data = await spotFetch(
+        `https://api.spotify.com/v1/search?query=${searchType}%3A${encodedString}%20NOT%20karaoke&type=track&offset=${offset}`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
 
-    const randomTrack = Math.floor(Math.random() * 20);
-    console.log(randomTrack);
-    const song = data.tracks.items.filter(
-      (track, index) => index === randomTrack,
-    );
-    return song[0];
+      songList = data.tracks.items.filter(
+        (track) => track.artists[0].name === searchString,
+      );
+      // console.log(songList);
+    } while (songList.length === 0);
+    const randomTrack = Math.floor(Math.random() * songList.length);
+    // console.log(randomTrack);
+
+    // const song = data.tracks.items.filter(
+    //   (track, index) => index === randomTrack,
+    // );
+    return songList[randomTrack];
   } catch (err) {
     console.error(`Random Spotify Error:\n ${err}`);
     return { error: err };
