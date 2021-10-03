@@ -16,3 +16,8 @@ export const searchType = {
   ARTIST: 'artist',
   TRACK: 'track',
 };
+
+export const source = {
+  PLAYLIST: 'playlist',
+  ALBUM: 'album',
+};

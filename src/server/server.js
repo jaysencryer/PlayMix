@@ -18,7 +18,7 @@ import {
   addSpotifyPlayList,
   getSpotifyTracks,
 } from './utils';
-import { searchType } from '../constants/enums';
+import { searchType, source } from '../constants/enums';
 
 const app = express();
 app.enable('trust proxy');
@@ -79,10 +79,7 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/connectSpotify', (req, res) => {
-  const response = spotifyControl.connect(req, res);
-  if ('error' in response) {
-    res.render('error', { error: response.error });
-  }
+  spotifyControl.connect(req, res);
 });
 
 app.get('/authorized', (req, res) => {
@@ -109,7 +106,9 @@ app.get('/spotifycomplete', async (req, res) => {
 // Load spotify playlists for current user
 app.get('/playlists', async (req, res) => {
   // check to see if we already have playlists loaded.
-  if (!spotifyControl.playLists) {
+  // console.log(spotifyControl.playLists);
+  if (spotifyControl.playLists.length === 0) {
+    console.log('getting playlists');
     // If not load all users playlists
     spotifyProfile['playLists'] = await spotifyControl.getPlayLists();
   }
@@ -176,18 +175,19 @@ app.get('/random/:type', async (req, res) => {
 
 // Random spotify API endpoint
 app.get('/random', async (req, res) => {
-  // console.log(req.url);
-  // console.log(searchString[0][1]);
   const data = await randomSong(spotifyProfile.accessToken, req.query.query);
-
   res.send(data);
 });
 
 app.post('/playsong', async (req, res) => {
-  console.log(req.body);
-  const songUris = req.body.songs; // array of trck uri's
-  const data = await playSpotifySong(spotifyProfile.accessToken, songUris);
-  res.send({ status: 200 });
+  const songUris = req.body.songs; // array of song uri's
+  try {
+    const data = await spotifyControl.playSong(songUris);
+    res.send(data.status);
+  } catch (err) {
+    console.log(err);
+    res.send({ error: err, status: 400 });
+  }
 });
 
 app.post('/playlist', async (req, res) => {
@@ -205,11 +205,18 @@ app.post('/playlist', async (req, res) => {
   res.send({ status: 200 });
 });
 
-app.get('/playlist/tracks', async (req, res) => {
-  const url = req.query.url;
-  console.log(url);
-  const data = await getSpotifyTracks(url, spotifyProfile.accessToken);
-  res.send(data);
+app.get('/tracks', async (req, res) => {
+  const uri = req.query.uri;
+  const trackSource = req.query.source;
+  try {
+    // const data = await getSpotifyTracks(url, spotifyProfile.accessToken);
+    const data = await spotifyControl.getTracks(trackSource, uri);
+    res.send(data);
+  } catch (err) {
+    console.log(err.message);
+    console.log('fail');
+    res.send('too bad');
+  }
 });
 
 app.listen(config.port, config.host, () => {

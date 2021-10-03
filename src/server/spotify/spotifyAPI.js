@@ -1,4 +1,6 @@
 import axios from 'axios';
+import ContentSort from 'material-ui/svg-icons/content/sort';
+import { source } from '../../constants/enums';
 import {
   uriEncode,
   generateRandomString,
@@ -60,6 +62,11 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
 
   this.playLists = [];
 
+  this.spotAxios = axios.create({
+    baseURL: 'https://api.spotify.com/v1',
+  });
+
+  // headers: { Authorization: `Bearer ${this.accessToken}` },
   this.connect = function (req, res) {
     res.cookie(this.stateKey, state);
     res.redirect(url);
@@ -73,21 +80,6 @@ spotifyAPI.prototype.getProfile = async function () {
     accessToken: this.accessToken,
     refreshToken: this.refreshToken,
   };
-};
-
-spotifyAPI.prototype.spotifyGet = async function (url) {
-  const spotAxios = axios.create({
-    headers: { Authorization: `Bearer ${this.accessToken}` },
-  });
-  try {
-    const response = await spotAxios.get(url);
-    // console.log(response);
-    // if (response.error) throw response.error;
-    return response;
-  } catch (err) {
-    console.error(`spotifyGet error:\n ${err.message}`);
-    return { error: err };
-  }
 };
 
 spotifyAPI.prototype.authorize = async function (req, res) {
@@ -116,6 +108,9 @@ spotifyAPI.prototype.authorize = async function (req, res) {
 
   this.accessToken = spotifyToken.access_token;
   this.refreshToken = spotifyToken.refresh_token;
+  this.spotAxios.defaults.headers.common[
+    'Authorization'
+  ] = `Bearer ${this.accessToken}`;
 
   ({
     id: this.id,
@@ -128,9 +123,7 @@ spotifyAPI.prototype.authorize = async function (req, res) {
 
 spotifyAPI.prototype.playSong = async function (uriList) {
   try {
-    this.spotifyPut('player/play', {
-      body: JSON.stringify({ uris: uriList }),
-    });
+    this.spotAxios.put('/me/player/play', { uris: uriList });
   } catch (err) {
     console.error(`Play Spotify song Error:\n ${err.message}`);
     return { error: err };
@@ -142,12 +135,11 @@ spotifyAPI.prototype.getPlayLists = async function () {
   let offsetParm = '';
   let offset = 0;
   let limit = 50;
-  const baseUrl = 'http://api.spotify.com/v1/me/playlists?';
-
+  console.log('Getting PlayLists');
   try {
     do {
-      const response = await this.spotifyGet(
-        `${baseUrl}limit=${limit}${offsetParm}`,
+      const response = await this.spotAxios.get(
+        `/me/playlists?limit=${limit}${offsetParm}`,
       );
       // TODO error checking?
       const { data } = response;
@@ -162,6 +154,29 @@ spotifyAPI.prototype.getPlayLists = async function () {
   } catch (err) {
     console.error(`Error retrieving playLists`);
     console.error(err);
+    return { error: err };
+  }
+};
+
+spotifyAPI.prototype.getTracks = async function (trackSource, uri) {
+  console.log(trackSource);
+  // Just doing playlists right now
+  let url;
+  switch (trackSource) {
+    case source.PLAYLIST:
+      url = `/playlists/${uri}/tracks`;
+      break;
+    default:
+      throw 'Unknown Source';
+  }
+  console.log(url);
+  try {
+    const response = await this.spotAxios.get(url);
+    // console.log(response.data);
+    // console.log(response.config);
+    return response.data;
+  } catch (err) {
+    console.error(`Error getting ${source} tracks\n${err.message}`);
     return { error: err };
   }
 };

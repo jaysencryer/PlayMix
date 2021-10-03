@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import axios from 'axios';
 
-import { searchType } from '../constants/enums';
+import { searchType, source } from '../constants/enums';
 
 export const generateRandomSearch = () => {
   const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -78,35 +78,35 @@ export const storePlayLists = (jsonData) => {
   }));
 };
 
-export const getSpotifyPlayLists = async (accessToken) => {
-  let numOfPlayLists = 0;
-  let playLists = [];
-  let offSetString = '';
-  let offset = 0;
-  let limit = 50;
+// export const getSpotifyPlayLists = async (accessToken) => {
+//   let numOfPlayLists = 0;
+//   let playLists = [];
+//   let offSetString = '';
+//   let offset = 0;
+//   let limit = 50;
 
-  try {
-    do {
-      const data = await spotFetch(
-        `http://api.spotify.com/v1/me/playlists?limit=${limit}${offSetString}`,
-        {
-          headers: { Authorization: 'Bearer ' + accessToken },
-        },
-      );
-      numOfPlayLists = data.total;
-      // console.log(`This user has ${numOfPlayLists} playlists`);
-      offset += 50;
-      limit = offset + limit > numOfPlayLists ? numOfPlayLists - offset : 50;
-      playLists = [...playLists, ...storePlayLists(data.items)];
-      offSetString = `&offset=${offset}`;
-      // console.log(playLists.length, offSetString, limit);
-    } while (playLists.length < numOfPlayLists);
-    return playLists;
-  } catch (err) {
-    console.error(`Loading playlists Error:\n ${err}`);
-    return { error: err };
-  }
-};
+//   try {
+//     do {
+//       const data = await spotFetch(
+//         `http://api.spotify.com/v1/me/playlists?limit=${limit}${offSetString}`,
+//         {
+//           headers: { Authorization: 'Bearer ' + accessToken },
+//         },
+//       );
+//       numOfPlayLists = data.total;
+//       // console.log(`This user has ${numOfPlayLists} playlists`);
+//       offset += 50;
+//       limit = offset + limit > numOfPlayLists ? numOfPlayLists - offset : 50;
+//       playLists = [...playLists, ...storePlayLists(data.items)];
+//       offSetString = `&offset=${offset}`;
+//       // console.log(playLists.length, offSetString, limit);
+//     } while (playLists.length < numOfPlayLists);
+//     return playLists;
+//   } catch (err) {
+//     console.error(`Loading playlists Error:\n ${err}`);
+//     return { error: err };
+//   }
+// };
 
 export const searchSpotify = async (accessToken, searchString, type) => {
   const encodedString = encodeURIComponent(searchString);
@@ -200,27 +200,27 @@ export const randomSong = async (
   }
 };
 
-export const playSpotifySong = async (accessToken, uris) => {
-  try {
-    const devices = await spotFetch(
-      'http://api.spotify.com/v1/me/player/devices',
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    );
-    console.log(devices);
-    const data = await spotFetch('https://api.spotify.com/v1/me/player/play', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      method: 'PUT',
-      body: JSON.stringify({ uris: uris }),
-    });
+// export const playSpotifySong = async (accessToken, uris) => {
+//   try {
+//     const devices = await spotFetch(
+//       'http://api.spotify.com/v1/me/player/devices',
+//       {
+//         headers: { Authorization: `Bearer ${accessToken}` },
+//       },
+//     );
+//     console.log(devices);
+//     const data = await spotFetch('https://api.spotify.com/v1/me/player/play', {
+//       headers: { Authorization: `Bearer ${accessToken}` },
+//       method: 'PUT',
+//       body: JSON.stringify({ uris: uris }),
+//     });
 
-    return data;
-  } catch (err) {
-    console.error(`Play Spotify song Error:\n ${err.message}`);
-    return { error: err };
-  }
-};
+//     return data;
+//   } catch (err) {
+//     console.error(`Play Spotify song Error:\n ${err.message}`);
+//     return { error: err };
+//   }
+// };
 
 export const addSpotifyPlayList = async (
   accessToken,
@@ -279,20 +279,20 @@ const spotFetch = async (url, body) => {
   }
 };
 
-export const getSpotifyTracks = async (url, accessToken) => {
-  try {
-    // GET the track listing from Spotify
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const data = await response.json();
-    return { response: response, data: data };
-  } catch (err) {
-    console.error(`Loading tracks Error:\n ${err}`);
-    return { error: err };
-  }
-};
+// export const getSpotifyTracks = async (url, accessToken) => {
+//   try {
+//     // GET the track listing from Spotify
+//     const response = await fetch(url, {
+//       method: 'GET',
+//       headers: { Authorization: `Bearer ${accessToken}` },
+//     });
+//     const data = await response.json();
+//     return { response: response, data: data };
+//   } catch (err) {
+//     console.error(`Loading tracks Error:\n ${err}`);
+//     return { error: err };
+//   }
+// };
 
 export const getRandomSong = async (type = {}) => {
   const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -308,12 +308,12 @@ export const getRandomSong = async (type = {}) => {
   } else if ('playList' in type) {
     // TODO: make this cleaner! and error checking?
     // const uri = type.playList.split(':')[2];
-    const { data: response } = await axios.get(
-      `/playlist/tracks?url=https://api.spotify.com/v1/playlists/${type.playList}`,
+    const response = await axios.get(
+      `/tracks?source=${source.PLAYLIST}&uri=${type.playList}`,
     );
     console.log(response);
-    const songList = response.data.tracks.items;
-    console.log(songList);
+    const songList = response.data.items;
+    // console.log(songList);
     const randSelect = Math.floor(Math.random() * songList.length);
     randSong = { data: songList[randSelect].track };
     console.log('playlist randSong');
