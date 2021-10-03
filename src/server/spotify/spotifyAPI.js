@@ -1,5 +1,4 @@
 import axios from 'axios';
-import ContentSort from 'material-ui/svg-icons/content/sort';
 import { source } from '../../constants/enums';
 import {
   uriEncode,
@@ -74,9 +73,10 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
 }
 
 spotifyAPI.prototype.getProfile = async function () {
-  const profile = await getSpotifyProfile(this.accessToken);
   return {
-    ...profile,
+    id: this.id,
+    user: this.user,
+    avatar: this.avatar,
     accessToken: this.accessToken,
     refreshToken: this.refreshToken,
   };
@@ -112,11 +112,9 @@ spotifyAPI.prototype.authorize = async function (req, res) {
     'Authorization'
   ] = `Bearer ${this.accessToken}`;
 
-  ({
-    id: this.id,
-    user: this.user,
-    avatar: this.avatar,
-  } = await getSpotifyProfile(this.accessToken));
+  const profile = await this.spotAxios.get('/me');
+  ({ id: this.id, display_name: this.user } = profile.data);
+  this.avatar = profile.data.images[0].url;
 
   res.redirect('/spotifycomplete');
 };

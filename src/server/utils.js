@@ -52,20 +52,20 @@ export const getSpotifyToken = async (formBody, authBuffer) => {
   }
 };
 
-export const getSpotifyProfile = async (accessToken) => {
-  try {
-    const data = await spotFetch('https://api.spotify.com/v1/me', {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + accessToken },
-    });
-    // console.log(data);
+// export const getSpotifyProfile = async (accessToken) => {
+//   try {
+//     const data = await spotFetch('https://api.spotify.com/v1/me', {
+//       method: 'GET',
+//       headers: { Authorization: 'Bearer ' + accessToken },
+//     });
+//     // console.log(data);
 
-    return { id: data.id, user: data.display_name, avatar: data.images[0].url };
-  } catch (err) {
-    console.error(`Access Token Error:\n ${err}`);
-    return { error: err, avatar: '/images/blank.png' };
-  }
-};
+//     return { id: data.id, user: data.display_name, avatar: data.images[0].url };
+//   } catch (err) {
+//     console.error(`Access Token Error:\n ${err}`);
+//     return { error: err, avatar: '/images/blank.png' };
+//   }
+// };
 
 export const storePlayLists = (jsonData) => {
   return jsonData.map((pList) => ({
