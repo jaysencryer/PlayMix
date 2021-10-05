@@ -17,6 +17,9 @@ export function SapControlBuilder() {
     },
 
     build: function () {
+      if (!(this.streamer in sapControl)) {
+        throw 'Invalid streamer in SapControlBuilder()';
+      }
       return new sapControl[this.streamer](
         this.clientId,
         this.clientSecret,

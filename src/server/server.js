@@ -7,11 +7,11 @@ import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
-import { SapControlBuilder } from './sapControl';
+import { SapControlBuilder } from '../sapControl/sapControl';
 
 import {
   generateRandomString,
-  getSpotifyPlayLists,
+  // getSpotifyPlayLists,
   searchSpotify,
   randomSong,
   playSpotifySong,

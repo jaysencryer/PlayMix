@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 import TrackSelector from '../TrackSelector/TrackSelector';
-import MixTracks from '../MixTracks';
 import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../constants/enums';

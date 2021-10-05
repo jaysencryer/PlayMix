@@ -6,7 +6,7 @@ import {
   getSpotifyToken,
   getSpotifyProfile,
   storePlayLists,
-} from '../utils';
+} from '../../server/utils';
 
 const authUrl = {
   spotify: 'https://accounts.spotify.com/authorize',
@@ -34,6 +34,12 @@ export function spotifyAPIBuilder() {
 }
 
 function spotifyAPI(authBuffer, clientId, redirectUrl) {
+  if (!clientId) {
+    throw 'spotifyAPI cannot build object - clientId undefined or null.  Did you specify a clientId & clientSecret? with useCredentials()';
+  }
+  if (!redirectUrl) {
+    throw 'spotifyAPI cannot build object - redirectUrl not defined or null.  Did you specify a redirectUrl with useRedirect()';
+  }
   this.authBuffer = authBuffer;
   this.redirectUrl = redirectUrl;
 
