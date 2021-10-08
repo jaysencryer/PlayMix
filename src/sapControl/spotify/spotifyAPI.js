@@ -139,7 +139,7 @@ spotifyAPI.prototype.getPlayLists = async function () {
   let offsetParm = '';
   let offset = 0;
   let limit = 50;
-  console.log('Getting PlayLists');
+
   try {
     do {
       const response = await this.spotAxios.get(
@@ -154,6 +154,7 @@ spotifyAPI.prototype.getPlayLists = async function () {
       this.playLists = [...this.playLists, ...storePlayLists(data?.items)];
       offsetParm = `&offset=${offset}`;
     } while (this.playLists.length < totalPlaylists);
+
     return this.playLists;
   } catch (err) {
     console.error(`Error retrieving playLists`);
@@ -170,8 +171,9 @@ spotifyAPI.prototype.getTracks = async function (trackSource, uri) {
     case source.PLAYLIST:
       url = `/playlists/${uri}/tracks`;
       break;
-    default:
+    default: {
       throw 'Unknown Source';
+    }
   }
   console.log(url);
   try {

@@ -1,5 +1,5 @@
 import { spotifyAPIBuilder } from './spotifyAPI';
-// import { getSpotifyToken } from '../../server/utils';
+import { source } from '../../constants/enums';
 
 jest.mock('../../server/utils', () => {
   const originalModule = jest.requireActual('../../server/utils');
@@ -34,108 +34,197 @@ const mockRes = {
   redirect: jest.fn(),
 };
 
-test('We can build a spotifyAPI object', () => {
+describe('spotifyAPIBuilder() tests', () => {
+  test('We can build a spotifyAPI object', () => {
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials(mockId, mockSecret)
+      .useRedirect(mockUrl)
+      .build();
+
+    expect(testSpotify.redirectUrl).toBe(mockUrl);
+  });
+
+  test('useCredentials encodes id and secret', () => {
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials(mockId, mockSecret)
+      .useRedirect(mockUrl)
+      .build();
+
+    expect(testSpotify.authBuffer).toBe(mockAuthBuffer);
+  });
+
+  test('not using credentials throws an error', () => {
+    expect(() => spotifyAPIBuilder().build()).toThrowError(
+      'spotifyAPI cannot build object - clientId undefined or null.  Did you specify a clientId & clientSecret? with useCredentials()',
+    );
+  });
+
+  test('not using useRedirect throws an error', () => {
+    expect(() =>
+      spotifyAPIBuilder().useCredentials(mockId, mockSecret).build(),
+    ).toThrowError(
+      'spotifyAPI cannot build object - redirectUrl not defined or null.  Did you specify a redirectUrl with useRedirect()',
+    );
+  });
+});
+
+describe('spotifyAPI.authorize() tests', () => {
+  test('on spotifyAPI authorize success redirect to /spotifycomplete', async () => {
+    const mockReq = {
+      query: { code: 'code', state: 'state' },
+      cookies: { spotify_auth_state: 'state' },
+    };
+    const mockRes = {
+      redirect: jest.fn(),
+    };
+
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials(mockId, mockSecret)
+      .useRedirect(mockUrl)
+      .build();
+
+    testSpotify.spotAxios.get = () => {
+      return mockProfileinfo;
+    };
+
+    await testSpotify.authorize(mockReq, mockRes);
+
+    expect(mockRes.redirect).toBeCalledWith('/spotifycomplete');
+  });
+
+  test('mismatching state causes authorize error', async () => {
+    const mockReq = {
+      query: { code: 'code', state: 'mis matched state' },
+      cookies: { spotify_auth_state: 'state' },
+    };
+    const mockRes = {
+      redirect: jest.fn(),
+    };
+
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials(mockId, mockSecret)
+      .useRedirect(mockUrl)
+      .build();
+
+    const response = await testSpotify.authorize(mockReq, mockRes);
+    expect(response.error).toBe('Failed to authenticate spotify');
+  });
+
+  test('null returned state causes authorize error', async () => {
+    const mockReq = {
+      query: { code: 'code', state: null },
+      cookies: { spotify_auth_state: 'state' },
+    };
+    const mockRes = {
+      redirect: jest.fn(),
+    };
+
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials(mockId, mockSecret)
+      .useRedirect(mockUrl)
+      .build();
+
+    const response = await testSpotify.authorize(mockReq, mockRes);
+    expect(response.error).toBe('Failed to authenticate spotify');
+  });
+
+  test('spotifyToken fails', async () => {
+    const mockReq = {
+      query: { code: 'code', state: 'state' },
+      cookies: { spotify_auth_state: 'state' },
+    };
+
+    const testSpotify = spotifyAPIBuilder()
+      .useCredentials('fail', 'fail')
+      .useRedirect(mockUrl)
+      .build();
+
+    const response = await testSpotify.authorize(mockReq, mockRes);
+    expect(response.error).toBe('Failed to retrieve spotify Token');
+  });
+});
+
+describe('spotifyAPI.getPlayLists() tests', () => {
+  const mockPlayListsFirst50 = [
+    { name: '1' },
+    { name: '2' },
+    { name: '3' },
+    { name: '4' },
+    { name: '5' },
+  ];
+  const mockPlayListsSecond50 = [
+    { name: '6' },
+    { name: '7' },
+    { name: '8' },
+    { name: '9' },
+    { name: '10' },
+  ];
+
   const testSpotify = spotifyAPIBuilder()
     .useCredentials(mockId, mockSecret)
     .useRedirect(mockUrl)
     .build();
 
-  expect(testSpotify.redirectUrl).toBe(mockUrl);
+  testSpotify.spotAxios.get = jest.fn((url) => {
+    const queryString = new URLSearchParams(url.split('?')[1]);
+    const offset = queryString.get('offset');
+    if (!offset) {
+      return { data: { total: 10, items: mockPlayListsFirst50 } };
+    }
+    return { data: { total: 10, items: mockPlayListsSecond50 } };
+  });
+
+  test('All playlists can be retrieved', async () => {
+    const response = await testSpotify.getPlayLists();
+    expect(response.length).toBe(10);
+    expect(response[0]?.name).toEqual(mockPlayListsFirst50[0]?.name);
+    expect(response[9]?.name).toEqual(mockPlayListsSecond50[4]?.name);
+  });
+
+  test('If we already have all playlists, return early', async () => {
+    jest.clearAllMocks();
+    testSpotify.playLists = [...mockPlayListsFirst50, ...mockPlayListsSecond50];
+    await testSpotify.getPlayLists();
+
+    expect(testSpotify.spotAxios.get).toBeCalledTimes(1);
+  });
+
+  test('If there is an error getting playlists return error', async () => {
+    jest.resetAllMocks();
+    const response = await testSpotify.getPlayLists();
+    expect(response.error).toBeDefined();
+  });
 });
 
-test('useCredentials encodes id and secret', () => {
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials(mockId, mockSecret)
-    .useRedirect(mockUrl)
-    .build();
-
-  expect(testSpotify.authBuffer).toBe(mockAuthBuffer);
-});
-
-test('not using credentials throws an error', () => {
-  expect(() => spotifyAPIBuilder().build()).toThrowError(
-    'spotifyAPI cannot build object - clientId undefined or null.  Did you specify a clientId & clientSecret? with useCredentials()',
-  );
-});
-
-test('not using useRedirect throws an error', () => {
-  expect(() =>
-    spotifyAPIBuilder().useCredentials(mockId, mockSecret).build(),
-  ).toThrowError(
-    'spotifyAPI cannot build object - redirectUrl not defined or null.  Did you specify a redirectUrl with useRedirect()',
-  );
-});
-
-test('on spotifyAPI authorize success redirect to /spotifycomplete', async () => {
-  const mockReq = {
-    query: { code: 'code', state: 'state' },
-    cookies: { spotify_auth_state: 'state' },
-  };
-  const mockRes = {
-    redirect: jest.fn(),
-  };
-
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials(mockId, mockSecret)
-    .useRedirect(mockUrl)
-    .build();
-
-  testSpotify.spotAxios.get = () => {
-    return mockProfileinfo;
-  };
-
-  await testSpotify.authorize(mockReq, mockRes);
-
-  expect(mockRes.redirect).toBeCalledWith('/spotifycomplete');
-});
-
-test('mismatching state causes authorize error', async () => {
-  const mockReq = {
-    query: { code: 'code', state: 'mis matched state' },
-    cookies: { spotify_auth_state: 'state' },
-  };
-  const mockRes = {
-    redirect: jest.fn(),
-  };
+describe('spotifyAPI.getTracks', () => {
+  // jest.resetAllMocks();
+  const mockTrackList = [1, 2, 3, 4, 5];
 
   const testSpotify = spotifyAPIBuilder()
     .useCredentials(mockId, mockSecret)
     .useRedirect(mockUrl)
     .build();
 
-  const response = await testSpotify.authorize(mockReq, mockRes);
-  expect(response.error).toBe('Failed to authenticate spotify');
-});
+  test('successfully return a playlists tracks', async () => {
+    jest.resetAllMocks();
+    testSpotify.spotAxios.get = jest.fn(() => {
+      return { data: mockTrackList };
+    });
+    const response = await testSpotify.getTracks(source.PLAYLIST, 'uri');
+    expect(response).toEqual(mockTrackList);
+  });
 
-test('null returned state causes authorize error', async () => {
-  const mockReq = {
-    query: { code: 'code', state: null },
-    cookies: { spotify_auth_state: 'state' },
-  };
-  const mockRes = {
-    redirect: jest.fn(),
-  };
+  test('throw error if unknown source used', async () => {
+    try {
+      await testSpotify.getTracks();
+    } catch (err) {
+      expect(err).toBe('Unknown Source');
+    }
+  });
 
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials(mockId, mockSecret)
-    .useRedirect(mockUrl)
-    .build();
-
-  const response = await testSpotify.authorize(mockReq, mockRes);
-  expect(response.error).toBe('Failed to authenticate spotify');
-});
-
-test('spotifyToken fails', async () => {
-  const mockReq = {
-    query: { code: 'code', state: 'state' },
-    cookies: { spotify_auth_state: 'state' },
-  };
-
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials('fail', 'fail')
-    .useRedirect(mockUrl)
-    .build();
-
-  const response = await testSpotify.authorize(mockReq, mockRes);
-  expect(response.error).toBe('Failed to retrieve spotify Token');
+  test('error retrieving tracks', async () => {
+    jest.resetAllMocks();
+    const response = await testSpotify.getTracks(source.PLAYLIST, 'uri');
+    expect(response.error).toBeDefined();
+  });
 });
