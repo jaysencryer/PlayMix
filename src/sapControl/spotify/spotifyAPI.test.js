@@ -1,18 +1,22 @@
 import { spotifyAPIBuilder } from './spotifyAPI';
 import { source } from '../../constants/enums';
 
-jest.mock('../../server/utils', () => {
-  const originalModule = jest.requireActual('../../server/utils');
+// jest.mock('../../server/utils', () => {
+//   const originalModule = jest.requireActual('../../server/utils');
 
-  return {
-    __esModule: true,
-    ...originalModule,
-    getSpotifyToken: (form, auth) => {
-      const failAuthBuffer = Buffer.from('fail:fail').toString('base64');
-      if (auth === failAuthBuffer) return { error: 'token error' };
-      return { access_token: 'access', refresh_token: 'refresh' };
-    },
-  };
+//   return {
+//     __esModule: true,
+//     ...originalModule,
+//     getSpotifyToken: (form, auth) => {
+//       const failAuthBuffer = Buffer.from('fail:fail').toString('base64');
+//       if (auth === failAuthBuffer) return { error: 'token error' };
+//       return { access_token: 'access', refresh_token: 'refresh' };
+//     },
+//   };
+// });
+
+afterEach(() => {
+  jest.clearAllMocks();
 });
 
 const mockId = '1234';
@@ -69,6 +73,15 @@ describe('spotifyAPIBuilder() tests', () => {
 });
 
 describe('spotifyAPI.authorize() tests', () => {
+  const testSpotify = spotifyAPIBuilder()
+    .useCredentials(mockId, mockSecret)
+    .useRedirect(mockUrl)
+    .build();
+
+  testSpotify.getAccessToken = jest.fn(() => {
+    return { access_token: 'access', refresh_token: 'refresh' };
+  });
+
   test('on spotifyAPI authorize success redirect to /spotifycomplete', async () => {
     const mockReq = {
       query: { code: 'code', state: 'state' },
@@ -77,11 +90,6 @@ describe('spotifyAPI.authorize() tests', () => {
     const mockRes = {
       redirect: jest.fn(),
     };
-
-    const testSpotify = spotifyAPIBuilder()
-      .useCredentials(mockId, mockSecret)
-      .useRedirect(mockUrl)
-      .build();
 
     testSpotify.spotAxios.get = () => {
       return mockProfileinfo;
@@ -101,11 +109,6 @@ describe('spotifyAPI.authorize() tests', () => {
       redirect: jest.fn(),
     };
 
-    const testSpotify = spotifyAPIBuilder()
-      .useCredentials(mockId, mockSecret)
-      .useRedirect(mockUrl)
-      .build();
-
     const response = await testSpotify.authorize(mockReq, mockRes);
     expect(response.error).toBe('Failed to authenticate spotify');
   });
@@ -119,11 +122,6 @@ describe('spotifyAPI.authorize() tests', () => {
       redirect: jest.fn(),
     };
 
-    const testSpotify = spotifyAPIBuilder()
-      .useCredentials(mockId, mockSecret)
-      .useRedirect(mockUrl)
-      .build();
-
     const response = await testSpotify.authorize(mockReq, mockRes);
     expect(response.error).toBe('Failed to authenticate spotify');
   });
@@ -134,12 +132,13 @@ describe('spotifyAPI.authorize() tests', () => {
       cookies: { spotify_auth_state: 'state' },
     };
 
-    const testSpotify = spotifyAPIBuilder()
+    const failSpotify = spotifyAPIBuilder()
       .useCredentials('fail', 'fail')
       .useRedirect(mockUrl)
       .build();
 
-    const response = await testSpotify.authorize(mockReq, mockRes);
+    failSpotify.getAccessToken = jest.fn(() => ({ error: 'error' }));
+    const response = await failSpotify.authorize(mockReq, mockRes);
     expect(response.error).toBe('Failed to retrieve spotify Token');
   });
 });
@@ -197,7 +196,6 @@ describe('spotifyAPI.getPlayLists() tests', () => {
 });
 
 describe('spotifyAPI.getTracks', () => {
-  // jest.resetAllMocks();
   const mockTrackList = [1, 2, 3, 4, 5];
 
   const testSpotify = spotifyAPIBuilder()
@@ -225,6 +223,37 @@ describe('spotifyAPI.getTracks', () => {
   test('error retrieving tracks', async () => {
     jest.resetAllMocks();
     const response = await testSpotify.getTracks(source.PLAYLIST, 'uri');
+    expect(response.error).toBeDefined();
+  });
+});
+
+describe('spotifyAPI.getAccessToken tests', () => {
+  const testSpotify = spotifyAPIBuilder()
+    .useCredentials(mockId, mockSecret)
+    .useRedirect(mockUrl)
+    .build();
+
+  test('getAccessToken returns token', async () => {
+    testSpotify.spotAxios.post = () => {
+      console.log(testSpotify.authBuffer, mockAuthBuffer);
+      return { data: { access_token: 'comein', refresh_token: 'refresh' } };
+    };
+    const { access_token, refresh_token } = await testSpotify.getAccessToken();
+    expect(access_token).toBe('comein');
+    expect(refresh_token).toBe('refresh');
+  });
+
+  test('getAccessToken returns error when invalid auth sent', async () => {
+    testSpotify.spotAxios.post = () => {
+      throw 'Authentication Error';
+    };
+    const response = await testSpotify.getAccessToken();
+    expect(response?.error).toBe('Authentication Error');
+  });
+
+  test('getAccessToken returns error when it cannot communicate with spotify', async () => {
+    jest.resetAllMocks();
+    const response = await testSpotify.getAccessToken();
     expect(response.error).toBeDefined();
   });
 });

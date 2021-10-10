@@ -30,27 +30,27 @@ export const uriEncode = (obj) => {
   return formBody.join('&');
 };
 
-export const getSpotifyToken = async (formBody, authBuffer) => {
-  console.log(`In getSpotifyToken ${formBody} ${authBuffer}`);
-  try {
-    const data = await spotFetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      body: formBody,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'Authorization': `Basic ${authBuffer}`,
-      },
-    });
+// export const getSpotifyToken = async (formBody, authBuffer) => {
+//   console.log(`In getSpotifyToken ${formBody} ${authBuffer}`);
+//   try {
+//     const data = await spotFetch('https://accounts.spotify.com/api/token', {
+//       method: 'POST',
+//       body: formBody,
+//       headers: {
+//         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+//         'Authorization': `Basic ${authBuffer}`,
+//       },
+//     });
 
-    return {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-    };
-  } catch (err) {
-    console.error(`getSpotifyToken: Error occured\n${err}`);
-    return { error: err };
-  }
-};
+//     return {
+//       access_token: data.access_token,
+//       refresh_token: data.refresh_token,
+//     };
+//   } catch (err) {
+//     console.error(`getSpotifyToken: Error occured\n${err}`);
+//     return { error: err };
+//   }
+// };
 
 // export const getSpotifyProfile = async (accessToken) => {
 //   try {

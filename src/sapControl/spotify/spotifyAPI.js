@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { source } from '../../constants/enums';
+import { sanitizePlayLists } from '../helpers/helpers';
 import {
   uriEncode,
   generateRandomString,
   getSpotifyToken,
-  getSpotifyProfile,
-  storePlayLists,
 } from '../../server/utils';
 
 const authUrl = {
@@ -105,7 +104,7 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   };
 
   const formBody = uriEncode(tokenBody);
-  const spotifyToken = await getSpotifyToken(formBody, this.authBuffer);
+  const spotifyToken = await this.getAccessToken(formBody);
 
   if ('error' in spotifyToken) {
     console.error('Failed to retrieve spotify Token');
@@ -151,7 +150,7 @@ spotifyAPI.prototype.getPlayLists = async function () {
       if (this.playLists.length === totalPlaylists) break; // playlists haven't changed
       offset += 50;
       limit = offset + limit > totalPlaylists ? totalPlaylists - offset : 50;
-      this.playLists = [...this.playLists, ...storePlayLists(data?.items)];
+      this.playLists = [...this.playLists, ...sanitizePlayLists(data?.items)];
       offsetParm = `&offset=${offset}`;
     } while (this.playLists.length < totalPlaylists);
 
@@ -164,7 +163,6 @@ spotifyAPI.prototype.getPlayLists = async function () {
 };
 
 spotifyAPI.prototype.getTracks = async function (trackSource, uri) {
-  console.log(trackSource);
   // Just doing playlists right now
   let url;
   switch (trackSource) {
@@ -175,14 +173,34 @@ spotifyAPI.prototype.getTracks = async function (trackSource, uri) {
       throw 'Unknown Source';
     }
   }
-  console.log(url);
   try {
     const response = await this.spotAxios.get(url);
-    // console.log(response.data);
-    // console.log(response.config);
     return response.data;
   } catch (err) {
     console.error(`Error getting ${source} tracks\n${err.message}`);
+    return { error: err };
+  }
+};
+
+spotifyAPI.prototype.getAccessToken = async function (formBody) {
+  try {
+    const response = await this.spotAxios.post(
+      'https://accounts.spotify.com/api/token',
+      formBody,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          'Authorization': `Basic ${this.authBuffer}`,
+        },
+      },
+    );
+    return {
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
+    };
+  } catch (err) {
+    console.error('spotifyAPI.getAccessToken: Error');
+    console.error(err);
     return { error: err };
   }
 };
