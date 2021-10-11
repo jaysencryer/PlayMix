@@ -1,11 +1,7 @@
 import axios from 'axios';
 import { source } from '../../constants/enums';
 import { sanitizePlayLists } from '../helpers/helpers';
-import {
-  uriEncode,
-  generateRandomString,
-  getSpotifyToken,
-} from '../../server/utils';
+import { uriEncode, generateRandomString } from '../../server/utils';
 
 const authUrl = {
   spotify: 'https://accounts.spotify.com/authorize',
@@ -204,3 +200,7 @@ spotifyAPI.prototype.getAccessToken = async function (formBody) {
     return { error: err };
   }
 };
+
+// spotifyAPI.prototype.search = function (searchString, searchType) {
+
+// }

@@ -11,14 +11,12 @@ import { SapControlBuilder } from '../sapControl/sapControl';
 
 import {
   generateRandomString,
-  // getSpotifyPlayLists,
   searchSpotify,
   randomSong,
-  playSpotifySong,
   addSpotifyPlayList,
-  getSpotifyTracks,
 } from './utils';
-import { searchType, source } from '../constants/enums';
+
+import { searchType } from '../constants/enums';
 
 const app = express();
 app.enable('trust proxy');

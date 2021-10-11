@@ -10,7 +10,7 @@ import SpotifySearchBar from './SpotifySearchBar';
 import Song from './Song';
 import Create from './Create';
 import PlayMix from './PlayMix/PlayMix';
-import PlayListSelector from './PlayListSelector';
+import DragTest from '../components/DragTest/DragTest';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -65,7 +65,8 @@ export function App({ initialData }) {
                 />
                 Search For an Artist <SpotifySearchBar type="artist" />
                 Select a PlayList
-                <PlayListSelector />
+                {/* <PlayListSelector /> */}
+                <DragTest />
               </div>
             </>
           )}
