@@ -27,7 +27,10 @@ const PlayMix = () => {
 
     // Set PlayMix Tracks
     for (let i = 0; i < repeat; i++) {
-      newTrackList.push({ ...track });
+      console.log(`i = ${i}`);
+      // create new unique track id
+      const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
+      newTrackList.push({ ...track, id: trackId });
     }
     const oldTrackList = [...playMixTracks];
 
@@ -39,7 +42,8 @@ const PlayMix = () => {
     // Set actual songs (this is async and takes more time)
     for (let i = 0; i < repeat; i++) {
       const addedSong = await getUniqueSong(track, newSongList);
-      newSongList.push({ ...addedSong });
+      const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
+      newSongList.push({ ...addedSong, id: trackId });
     }
 
     const oldSongList = [...playMixSongs];
@@ -57,7 +61,7 @@ const PlayMix = () => {
         console.log(addedSong.uri);
       } while (!songList.every((song) => song.uri !== addedSong.uri));
     } else {
-      addedSong = { name: track.label, uri: track.uri };
+      addedSong = { name: track.label, uri: track.uri, id: track.id };
     }
     return addedSong;
   };
@@ -98,8 +102,10 @@ const PlayMix = () => {
       <button
         type="button"
         onClick={() => {
-          setPlayMixTracks([...playMixTracks, { ...newTrack }]);
-          setPlayMixSongs([...playMixSongs, { ...newSong }]);
+          const trackId = playMixTracks.length ?? 0;
+          console.log(`trackId = ${trackId}`);
+          setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
+          setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
         }}
       >
         Add Track
@@ -109,6 +115,7 @@ const PlayMix = () => {
         playMixTracks.map((track, id) => (
           <section key={`${id}${track.type}`} className="playmix-track">
             <span>{`${id + 1} `}</span>
+            {console.log(track)}
             <TrackSelector id={id} track={track} saveTrack={saveTrack} />
           </section>
         ))}

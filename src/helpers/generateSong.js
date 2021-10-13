@@ -3,14 +3,14 @@ import { trackMode, trackType } from '../constants/enums';
 import { getRandomSong } from '../server/utils';
 
 const generateSong = async (track) => {
-  const { type, mode, uri, label } = track;
+  const { type, mode, uri, label, id } = track;
   let song;
 
   if (type !== trackType.RANDOM) {
     // why are we here?
     return;
   }
-
+  // TODO add default case
   switch (mode) {
     case trackMode.SPOTIFY: {
       song = await getRandomSong();
@@ -40,7 +40,7 @@ const generateSong = async (track) => {
     }
   }
   console.log(song);
-  return { name: song.name, uri: song.uri };
+  return { name: song.name, uri: song.uri, id: id };
 };
 
 export default generateSong;

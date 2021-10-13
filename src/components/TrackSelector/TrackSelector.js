@@ -29,6 +29,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
         label: label,
         option: option,
         uri: uri,
+        id: track.id,
       },
       repeatTimes,
     );

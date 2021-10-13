@@ -42,14 +42,12 @@ const DragTest = () => {
       // inserting above
       event.target.classList.remove('insert-below');
       event.target.classList.add('insert-above');
-      setDropTarget(overId);
+      setDropTarget(dragging < overId ? overId - 1 : overId);
     } else if (mouseY > targetBarY + targetBarHeight / 2) {
       // inserting below
       event.target.classList.remove('insert-above');
       event.target.classList.add('insert-below');
-      setDropTarget(
-        overId < arrayList.length - 1 ? overId + 1 : arrayList.length - 1,
-      );
+      setDropTarget(dragging > overId ? overId + 1 : overId);
     }
   };
 
