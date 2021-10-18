@@ -234,19 +234,21 @@ describe('spotifyAPI.getAccessToken tests', () => {
     .build();
 
   test('getAccessToken returns token', async () => {
-    testSpotify.spotAxios.post = () => {
-      console.log(testSpotify.authBuffer, mockAuthBuffer);
+    testSpotify.spotAxios.post = jest.fn(() => {
       return { data: { access_token: 'comein', refresh_token: 'refresh' } };
-    };
+    });
     const { access_token, refresh_token } = await testSpotify.getAccessToken();
     expect(access_token).toBe('comein');
     expect(refresh_token).toBe('refresh');
   });
 
   test('getAccessToken returns error when invalid auth sent', async () => {
-    testSpotify.spotAxios.post = () => {
-      throw 'Authentication Error';
-    };
+    jest.resetAllMocks();
+    testSpotify.spotAxios.post = jest.fn(async () => {
+      return Promise.reject({
+        response: { statusText: 'Authentication Error', status: 400 },
+      });
+    });
     const response = await testSpotify.getAccessToken();
     expect(response?.error).toBe('Authentication Error');
   });
@@ -254,6 +256,41 @@ describe('spotifyAPI.getAccessToken tests', () => {
   test('getAccessToken returns error when it cannot communicate with spotify', async () => {
     jest.resetAllMocks();
     const response = await testSpotify.getAccessToken();
+    expect(response.error).toBeDefined();
+  });
+});
+
+describe('spotifyAPI.refreshAccessToken tests', () => {
+  const testSpotify = spotifyAPIBuilder()
+    .useCredentials(mockId, mockSecret)
+    .useRedirect(mockUrl)
+    .build();
+
+  test('refreshAccessToken returns token', async () => {
+    testSpotify.spotAxios.post = jest.fn(() => {
+      return {
+        data: { access_token: 'newtoken', refresh_token: 'newrefresh' },
+      };
+    });
+    await testSpotify.refreshAccessToken();
+    expect(testSpotify.accessToken).toBe('newtoken');
+    expect(testSpotify.refreshToken).toBe('newrefresh');
+  });
+
+  test('refreshAccessToken returns error when invalid auth sent', async () => {
+    jest.resetAllMocks();
+    testSpotify.spotAxios.post = jest.fn(async () => {
+      return Promise.reject({
+        response: { statusText: 'Authentication Error', status: 400 },
+      });
+    });
+    const response = await testSpotify.refreshAccessToken();
+    expect(response?.error).toBe('Authentication Error');
+  });
+
+  test('refreshAccessToken returns error when it cannot communicate with spotify', async () => {
+    jest.resetAllMocks();
+    const response = await testSpotify.refreshAccessToken();
     expect(response.error).toBeDefined();
   });
 });

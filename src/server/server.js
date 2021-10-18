@@ -173,18 +173,25 @@ app.get('/random/:type', async (req, res) => {
 
 // Random spotify API endpoint
 app.get('/random', async (req, res) => {
-  const data = await randomSong(spotifyProfile.accessToken, req.query.query);
+  // const data = await randomSong(spotifyProfile.accessToken, req.query.query);
+  const data = await spotifyControl.getRandomSong(req.query.query);
   res.send(data);
 });
 
 app.post('/playsong', async (req, res) => {
   const songUris = req.body.songs; // array of song uri's
   try {
-    const data = await spotifyControl.playSong(songUris);
-    res.send(data.status);
+    const response = await spotifyControl.playSong(songUris);
+    console.log('/playsong response');
+    console.log(response);
+    if (response.data.data.status >= 400) {
+      res.send(response);
+    }
+    res.send(response);
   } catch (err) {
+    console.log('Comeing through here');
     console.log(err);
-    res.send({ error: err, status: 400 });
+    res.send(err);
   }
 });
 

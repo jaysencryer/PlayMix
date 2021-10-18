@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
 
-const DragTest = () => {
-  const [arrayList, setArrayList] = useState([
-    'alan',
-    'bernard',
-    'sally',
-    'kevin',
-    'clive',
-    'what',
-    'this',
-    'is',
-    'silly',
-  ]);
+const DragTest = ({ childArray, setChildArray }) => {
+  const [arrayList, setArrayList] = useState(
+    childArray ?? [
+      'alan',
+      'bernard',
+      'sally',
+      'kevin',
+      'clive',
+      'what',
+      'this',
+      'is',
+      'silly',
+    ],
+  );
   const [dragging, setDragging] = useState();
   const [dropTarget, setDropTarget] = useState();
 
+  // useEffect(() => {
+  //   if (childArray) {
+  //     setArrayList(childArray);
+  //   }
+  // }, [childArray]);
+
   const dragHandler = (event) => {
-    event.target.classList.add('dragging');
+    console.log(event.target);
+    event.target.parentNode.classList.add('dragging');
+    // event.target.classList.add('dragging');
     setDragging(parseInt(event.target.id.split('bar-')[1]));
     console.log(`Dragging ${event.target.id}`);
     console.log(event);
@@ -32,7 +42,7 @@ const DragTest = () => {
 
   const dragOverHandler = (event) => {
     event.preventDefault();
-    // console.log(`Dragging over ${event.target.id}`);
+    console.log(`Dragging over ${event.target.id}`);
     // console.log(event.target.getBoundingClientRect());
     const overId = parseInt(event.target.id.split('bar-')[1]);
     const { height: targetBarHeight, y: targetBarY } =
@@ -59,18 +69,26 @@ const DragTest = () => {
   return (
     <div>
       Drag Test Dragging: {dragging}, Drop Target {dropTarget}
-      {arrayList.map((item, index) => (
+      {childArray.map((item, index) => (
         <div
-          draggable
-          id={`bar-${index}`}
-          onDragStart={dragHandler}
-          onDragEnd={dragEndHandler}
-          onDragOver={dragOverHandler}
-          onDragLeave={dragLeaveHandler}
           className="bar"
-          key={item}
+          key={`barcontain-${index}`}
+          onDragOver={dragOverHandler}
+          id={`bar-${index}`}
+          onDragLeave={dragLeaveHandler}
         >
           {item}
+          <div
+            draggable
+            id={`bar-${index}`}
+            onDragStart={dragHandler}
+            onDragEnd={dragEndHandler}
+            className="handle"
+            key={`dragbar-${index}`}
+          >
+            <p>::::</p>
+            <p>::::</p>
+          </div>
         </div>
       ))}
     </div>

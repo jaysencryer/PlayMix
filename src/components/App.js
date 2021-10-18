@@ -66,7 +66,7 @@ export function App({ initialData }) {
                 Search For an Artist <SpotifySearchBar type="artist" />
                 Select a PlayList
                 {/* <PlayListSelector /> */}
-                <DragTest />
+                {/* <DragTest /> */}
               </div>
             </>
           )}

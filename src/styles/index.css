@@ -34,10 +34,16 @@ body {
   border-radius: 8px;
   border: solid 1px black;
   background-color: bisque;
-  display: block;
+  display: flex;
+  justify-content: space-between;
   cursor: move;
   text-align: center;
   font-weight: 600;
+}
+
+.handle {
+  width: 30px;
+  height: 100%;
 }
 
 .dragging {

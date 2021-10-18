@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { source } from '../../constants/enums';
+import { searchType, source } from '../../constants/enums';
 import { sanitizePlayLists } from '../helpers/helpers';
 import { uriEncode, generateRandomString } from '../../server/utils';
+import CommunicationStayPrimaryLandscape from 'material-ui/svg-icons/communication/stay-primary-landscape';
 
 const authUrl = {
   spotify: 'https://accounts.spotify.com/authorize',
@@ -112,6 +113,14 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   this.spotAxios.defaults.headers.common[
     'Authorization'
   ] = `Bearer ${this.accessToken}`;
+  this.spotAxios.interceptors.response.use(function (response) {
+    return response;
+  }, this.responseErrorInterceptor);
+
+  this.spotAxios.interceptors.request.use(
+    (response) => response,
+    this.requestErrorInterceptor,
+  );
 
   const profile = await this.spotAxios.get('/me');
   ({ id: this.id, display_name: this.user } = profile.data);
@@ -120,12 +129,31 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   res.redirect('/spotifycomplete');
 };
 
+spotifyAPI.prototype.responseErrorInterceptor = function (error) {
+  console.error('Intercepted an error!');
+  console.error(error.response.status);
+  // const errorData = error.response.data;
+  const originalRequest = error.config;
+  if (error.response.status === 401 && !originalRequest._retry) {
+    this.refreshAccessToken();
+    // somehow try again?
+    return this.spotAxios(originalRequest);
+  }
+  return Promise.reject(error.response.data.error);
+};
+
+spotifyAPI.prototype.requestErrorInterceptor = function (error) {
+  console.error('Intercepted request error!');
+  console.error(error);
+  return Promise.reject(error.message);
+};
+
 spotifyAPI.prototype.playSong = async function (uriList) {
   try {
-    this.spotAxios.put('/me/player/play', { uris: uriList });
+    await this.spotAxios.put('/me/player/play', { uris: uriList });
   } catch (err) {
     console.error(`Play Spotify song Error:\n ${err.message}`);
-    return { error: err };
+    return Promise.reject(err);
   }
 };
 
@@ -196,11 +224,77 @@ spotifyAPI.prototype.getAccessToken = async function (formBody) {
     };
   } catch (err) {
     console.error('spotifyAPI.getAccessToken: Error');
-    console.error(err);
-    return { error: err };
+    console.error(err.response.statusText);
+    return { status: err.response.status, error: err.response.statusText };
+  }
+};
+
+spotifyAPI.prototype.refreshAccessToken = async function () {
+  console.log('Refreshing access token');
+  try {
+    const response = await this.spotAxios.post(
+      'https://accounts.spotify.com/api/token',
+      {
+        headers: {
+          Authorization: `Basic ${this.authBuffer}`,
+        },
+        Body: uriEncode({
+          grant_type: 'refresh_token',
+          refresh_token: this.refreshToken,
+        }),
+      },
+    );
+
+    this.accessToken = response.data.access_token;
+    this.refreshToken = response.data.refresh_token;
+  } catch (err) {
+    console.error(`Refresh Token error:\n ${err.response.statusText}`);
+    return { status: err.response.status, error: err.response.statusText };
   }
 };
 
 // spotifyAPI.prototype.search = function (searchString, searchType) {
 
 // }
+
+spotifyAPI.prototype.getRandomSong = async function (
+  searchString,
+  type = searchType.TRACK,
+) {
+  const encodedString =
+    type === searchType.TRACK
+      ? encodeURIComponent(`"${searchString}"`)
+      : encodeURIComponent(searchString);
+  let offset = 0;
+  const queryString = `${type}%3A${encodedString}%20NOT%20karaoke&type=track`;
+  try {
+    const response = await this.spotAxios.get(
+      `/search?query=${queryString}&offset=${offset}`,
+    );
+    let { data } = response;
+    const totalSongs = data.tracks.total;
+    console.log(`total songs = ${totalSongs}`);
+    let songList = [];
+    do {
+      const randOffset = totalSongs < 1000 ? totalSongs : 980;
+      offset = Math.floor(Math.random() * randOffset);
+      console.log(`offset ${offset}`);
+      ({ data } = await this.spotAxios.get(
+        `/search?query=${queryString}&offset=${offset}`,
+      ));
+      console.log(data);
+      songList =
+        type === searchType.ARTIST
+          ? data.tracks.items.filter(
+              (track) => track.artists[0].name === searchString,
+            )
+          : data.tracks.items;
+    } while (songList.length === 0);
+    const randomTrack = Math.floor(Math.random() * songList.length);
+    return songList[randomTrack];
+  } catch (err) {
+    console.error(`Get Random Song Error:`);
+    console.error(`\n ${err}`);
+    return { error: err };
+  }
+};

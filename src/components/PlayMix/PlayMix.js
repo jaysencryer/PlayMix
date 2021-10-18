@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 import TrackSelector from '../TrackSelector/TrackSelector';
+import DragTest from '../DragTest/DragTest';
 import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../constants/enums';
@@ -111,14 +112,18 @@ const PlayMix = () => {
         Add Track
       </button>
 
-      {playMixTracks &&
-        playMixTracks.map((track, id) => (
-          <section key={`${id}${track.type}`} className="playmix-track">
-            <span>{`${id + 1} `}</span>
-            {console.log(track)}
-            <TrackSelector id={id} track={track} saveTrack={saveTrack} />
-          </section>
-        ))}
+      {playMixTracks && (
+        <DragTest
+          setChildArray={setPlayMixTracks}
+          childArray={playMixTracks.map((track, id) => (
+            <section key={`${track.id}${track.type}`} className="playmix-track">
+              <span>{`${id + 1} `}</span>
+              {/* {console.log(track)} */}
+              <TrackSelector id={id} track={track} saveTrack={saveTrack} />
+            </section>
+          ))}
+        />
+      )}
       {/* {playMixTracks && <MixTracks playMixTracks={playMixTracks} />} */}
       {playMixTracks.length > 5 && (
         <>
