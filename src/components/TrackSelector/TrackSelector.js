@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import SpotifySearchBar from '../SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
 
-import { trackType, trackMode } from '../../constants/enums';
+import { trackType, trackMode } from '../../sapControl/constants/enums';
 // import './TrackSelector.css';
 
 const TrackSelector = ({ track, id, saveTrack }) => {

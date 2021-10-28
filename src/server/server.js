@@ -16,7 +16,7 @@ import {
   addSpotifyPlayList,
 } from './utils';
 
-import { searchType } from '../constants/enums';
+import { searchType } from '../sapControl/constants/enums';
 
 const app = express();
 app.enable('trust proxy');
@@ -183,10 +183,6 @@ app.post('/playsong', async (req, res) => {
   try {
     const response = await spotifyControl.playSong(songUris);
     console.log('/playsong response');
-    console.log(response);
-    if (response.data.data.status >= 400) {
-      res.send(response);
-    }
     res.send(response);
   } catch (err) {
     console.log('Comeing through here');
@@ -200,7 +196,7 @@ app.post('/playlist', async (req, res) => {
   // Body contains - song uris, playlist id (if adding or modifying)
   console.log(req.body);
   // create the new playlist - if no playlist id given
-  const data = await addSpotifyPlayList(
+  await addSpotifyPlayList(
     spotifyProfile.accessToken,
     spotifyProfile.id,
     req.body.name,
@@ -221,6 +217,15 @@ app.get('/tracks', async (req, res) => {
     console.log(err.message);
     console.log('fail');
     res.send('too bad');
+  }
+});
+
+app.get('/refreshtoken', async (req, res) => {
+  try {
+    const response = await spotifyControl.refreshAccessToken();
+    res.send(response);
+  } catch (err) {
+    res.send(err);
   }
 });
 

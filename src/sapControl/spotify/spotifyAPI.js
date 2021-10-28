@@ -1,8 +1,13 @@
 import axios from 'axios';
-import { searchType, source } from '../../constants/enums';
-import { sanitizePlayLists } from '../helpers/helpers';
-import { uriEncode, generateRandomString } from '../../server/utils';
-import CommunicationStayPrimaryLandscape from 'material-ui/svg-icons/communication/stay-primary-landscape';
+import { searchType as SEARCHTYPE } from '../constants/enums';
+import {
+  sanitizeSpotifyPlayLists,
+  configureSpotAxiosInstance,
+  getSpotifyTrackSourceURL,
+  getSpotifySearchUrl,
+} from '../helpers/spotify/spotifyHelpers';
+import { generateRandomString } from '../../server/utils';
+import { uriEncode } from '../helpers/helpers';
 
 const authUrl = {
   spotify: 'https://accounts.spotify.com/authorize',
@@ -42,6 +47,7 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
   this.stateKey = 'spotify_auth_state';
   const state = generateRandomString(16);
 
+  // spotify specific permissions
   const scope =
     'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state playlist-modify-public';
 
@@ -67,7 +73,6 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     baseURL: 'https://api.spotify.com/v1',
   });
 
-  // headers: { Authorization: `Bearer ${this.accessToken}` },
   this.connect = function (req, res) {
     res.cookie(this.stateKey, state);
     res.redirect(url);
@@ -91,6 +96,7 @@ spotifyAPI.prototype.authorize = async function (req, res) {
 
   if (state === null || state !== storedState) {
     console.error('Failed to authenticate spotify');
+    // TODO - throw an error
     return { error: 'Failed to authenticate spotify' };
   }
 
@@ -103,6 +109,8 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   const formBody = uriEncode(tokenBody);
   const spotifyToken = await this.getAccessToken(formBody);
 
+  // TODO - does getAccessToken throw?
+
   if ('error' in spotifyToken) {
     console.error('Failed to retrieve spotify Token');
     return { error: 'Failed to retrieve spotify Token' };
@@ -110,17 +118,8 @@ spotifyAPI.prototype.authorize = async function (req, res) {
 
   this.accessToken = spotifyToken.access_token;
   this.refreshToken = spotifyToken.refresh_token;
-  this.spotAxios.defaults.headers.common[
-    'Authorization'
-  ] = `Bearer ${this.accessToken}`;
-  this.spotAxios.interceptors.response.use(function (response) {
-    return response;
-  }, this.responseErrorInterceptor);
 
-  this.spotAxios.interceptors.request.use(
-    (response) => response,
-    this.requestErrorInterceptor,
-  );
+  configureSpotAxiosInstance(this);
 
   const profile = await this.spotAxios.get('/me');
   ({ id: this.id, display_name: this.user } = profile.data);
@@ -129,17 +128,32 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   res.redirect('/spotifycomplete');
 };
 
-spotifyAPI.prototype.responseErrorInterceptor = function (error) {
-  console.error('Intercepted an error!');
-  console.error(error.response.status);
-  // const errorData = error.response.data;
+spotifyAPI.prototype.responseErrorInterceptor = async function (
+  error,
+  APIobject,
+) {
+  console.error(
+    `spotAxios response Error Interceptor : ${error.response.status}`,
+  );
+
   const originalRequest = error.config;
+
   if (error.response.status === 401 && !originalRequest._retry) {
-    this.refreshAccessToken();
-    // somehow try again?
-    return this.spotAxios(originalRequest);
+    originalRequest._retry = true;
+    await APIobject.refreshAccessToken();
+
+    const refreshedHeader = {
+      ...originalRequest.headers,
+      Authorization: `Bearer ${APIobject.accessToken}`,
+    };
+
+    return APIobject.spotAxios({
+      ...originalRequest,
+      headers: refreshedHeader,
+    });
   }
-  return Promise.reject(error.response.data.error);
+
+  return Promise.reject(error);
 };
 
 spotifyAPI.prototype.requestErrorInterceptor = function (error) {
@@ -158,51 +172,51 @@ spotifyAPI.prototype.playSong = async function (uriList) {
 };
 
 spotifyAPI.prototype.getPlayLists = async function () {
+  try {
+    await this.getAllUsersPlaylists();
+    return this.playLists;
+  } catch (err) {
+    console.error(`Error retrieving playLists`);
+    return Promise.reject(err);
+  }
+};
+
+spotifyAPI.prototype.getAllUsersPlaylists = async function () {
   let totalPlaylists = 0;
   let offsetParm = '';
   let offset = 0;
   let limit = 50;
 
-  try {
-    do {
-      const response = await this.spotAxios.get(
-        `/me/playlists?limit=${limit}${offsetParm}`,
-      );
-      // TODO error checking?
-      const { data } = response;
-      totalPlaylists = data.total;
-      if (this.playLists.length === totalPlaylists) break; // playlists haven't changed
-      offset += 50;
-      limit = offset + limit > totalPlaylists ? totalPlaylists - offset : 50;
-      this.playLists = [...this.playLists, ...sanitizePlayLists(data?.items)];
-      offsetParm = `&offset=${offset}`;
-    } while (this.playLists.length < totalPlaylists);
+  do {
+    const { data } = await this.spotAxios.get(
+      `/me/playlists?limit=${limit}${offsetParm}`,
+    );
 
-    return this.playLists;
-  } catch (err) {
-    console.error(`Error retrieving playLists`);
-    console.error(err);
-    return { error: err };
-  }
+    totalPlaylists = data.total;
+
+    if (this.playLists.length === totalPlaylists) return; // playlists haven't changed
+
+    offset += 50;
+    limit = offset + limit > totalPlaylists ? totalPlaylists - offset : 50;
+
+    this.playLists = [
+      ...this.playLists,
+      ...sanitizeSpotifyPlayLists(data?.items),
+    ];
+
+    offsetParm = `&offset=${offset}`;
+  } while (this.playLists.length < totalPlaylists);
 };
 
-spotifyAPI.prototype.getTracks = async function (trackSource, uri) {
-  // Just doing playlists right now
-  let url;
-  switch (trackSource) {
-    case source.PLAYLIST:
-      url = `/playlists/${uri}/tracks`;
-      break;
-    default: {
-      throw 'Unknown Source';
-    }
-  }
+spotifyAPI.prototype.getTracks = async function (trackSource, sourceUri) {
+  const url = getSpotifyTrackSourceURL(trackSource, sourceUri);
+
   try {
     const response = await this.spotAxios.get(url);
     return response.data;
   } catch (err) {
-    console.error(`Error getting ${source} tracks\n${err.message}`);
-    return { error: err };
+    console.error(`Error getting ${trackSource} tracks`);
+    return Promise.reject(err);
   }
 };
 
@@ -224,32 +238,38 @@ spotifyAPI.prototype.getAccessToken = async function (formBody) {
     };
   } catch (err) {
     console.error('spotifyAPI.getAccessToken: Error');
-    console.error(err.response.statusText);
-    return { status: err.response.status, error: err.response.statusText };
+    console.error(err?.response?.statusText);
+    return Promise.reject(err);
   }
 };
 
 spotifyAPI.prototype.refreshAccessToken = async function () {
-  console.log('Refreshing access token');
+  console.info('Refreshing access token');
+
   try {
     const response = await this.spotAxios.post(
       'https://accounts.spotify.com/api/token',
+      uriEncode({
+        grant_type: 'refresh_token',
+        refresh_token: this.refreshToken,
+      }),
       {
         headers: {
-          Authorization: `Basic ${this.authBuffer}`,
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          'Authorization': `Basic ${this.authBuffer}`,
         },
-        Body: uriEncode({
-          grant_type: 'refresh_token',
-          refresh_token: this.refreshToken,
-        }),
       },
     );
 
     this.accessToken = response.data.access_token;
-    this.refreshToken = response.data.refresh_token;
+    this.refreshToken = response.data.refresh_token ?? this.refreshToken;
+
+    this.spotAxios.defaults.headers.common[
+      'Authorization'
+    ] = `Bearer ${this.accessToken}`;
   } catch (err) {
-    console.error(`Refresh Token error:\n ${err.response.statusText}`);
-    return { status: err.response.status, error: err.response.statusText };
+    console.error(`Refresh Token error:\n ${err?.response?.statusText}`);
+    return Promise.reject(err);
   }
 };
 
@@ -259,42 +279,40 @@ spotifyAPI.prototype.refreshAccessToken = async function () {
 
 spotifyAPI.prototype.getRandomSong = async function (
   searchString,
-  type = searchType.TRACK,
+  searchType = SEARCHTYPE.TRACK,
 ) {
-  const encodedString =
-    type === searchType.TRACK
-      ? encodeURIComponent(`"${searchString}"`)
-      : encodeURIComponent(searchString);
-  let offset = 0;
-  const queryString = `${type}%3A${encodedString}%20NOT%20karaoke&type=track`;
+  const url = getSpotifySearchUrl(searchString, searchType);
+
   try {
-    const response = await this.spotAxios.get(
-      `/search?query=${queryString}&offset=${offset}`,
-    );
-    let { data } = response;
-    const totalSongs = data.tracks.total;
-    console.log(`total songs = ${totalSongs}`);
-    let songList = [];
-    do {
-      const randOffset = totalSongs < 1000 ? totalSongs : 980;
-      offset = Math.floor(Math.random() * randOffset);
-      console.log(`offset ${offset}`);
-      ({ data } = await this.spotAxios.get(
-        `/search?query=${queryString}&offset=${offset}`,
-      ));
-      console.log(data);
-      songList =
-        type === searchType.ARTIST
-          ? data.tracks.items.filter(
-              (track) => track.artists[0].name === searchString,
-            )
-          : data.tracks.items;
-    } while (songList.length === 0);
-    const randomTrack = Math.floor(Math.random() * songList.length);
-    return songList[randomTrack];
+    return await this.selectRandomSong(url);
   } catch (err) {
     console.error(`Get Random Song Error:`);
     console.error(`\n ${err}`);
-    return { error: err };
+    return Promise.reject(err);
+    // return { error: err };
   }
+};
+
+spotifyAPI.prototype.selectRandomSong = async function (url, searchType) {
+  let offset = 0;
+  let { data } = await this.spotAxios.get(url);
+  // let { data } = response;
+  const totalSongs = data.tracks.total;
+  console.log(`total songs = ${totalSongs}`);
+  let songList = [];
+  do {
+    const randOffset = totalSongs < 1000 ? totalSongs : 980;
+    offset = Math.floor(Math.random() * randOffset);
+    console.log(`offset ${offset}`);
+    ({ data } = await this.spotAxios.get(`${url}&offset=${offset}`));
+    console.log(data);
+    songList =
+      searchType === SEARCHTYPE.ARTIST
+        ? data.tracks.items.filter(
+            (track) => track.artists[0].name === searchString,
+          )
+        : data.tracks.items;
+  } while (songList.length === 0);
+  const randomTrack = Math.floor(Math.random() * songList.length);
+  return songList[randomTrack];
 };

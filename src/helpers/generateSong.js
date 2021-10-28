@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { trackMode, trackType } from '../constants/enums';
+import { trackMode, trackType } from '../sapControl/constants/enums';
 import { getRandomSong } from '../server/utils';
 
 const generateSong = async (track) => {

@@ -1,10 +1,9 @@
-export const sanitizePlayLists = (jsonData) => {
-  return jsonData.map((pList) => ({
-    name: pList?.name,
-    owner: pList?.owner?.display_name,
-    uri: pList?.uri,
-    href: pList?.href,
-    images: pList?.images ? pList?.images[0]?.url : '',
-    tracks: pList?.tracks,
-  }));
+export const uriEncode = (obj) => {
+  let formBody = [];
+  for (const property in obj) {
+    const encodedKey = encodeURIComponent(property);
+    const encodedValue = encodeURIComponent(obj[property]);
+    formBody.push(encodedKey + '=' + encodedValue);
+  }
+  return formBody.join('&');
 };
