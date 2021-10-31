@@ -16,7 +16,7 @@ import {
   addSpotifyPlayList,
 } from './utils';
 
-import { searchType } from '../sapControl/constants/enums';
+import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
 
 const app = express();
 app.enable('trust proxy');
@@ -114,30 +114,32 @@ app.get('/playlists', async (req, res) => {
   res.send(spotifyControl.playLists);
 });
 
+// Dev only
 app.get('/sapinfo', (req, res) => {
-  res.send(spotifyControl);
+  if (config.isDev) res.send(spotifyControl);
+  res.send('Dev Only');
 });
 
 // Search spotify API endpoint
 app.get('/search', async (req, res) => {
-  console.log(req.url);
-  const searchString = [...req.url.matchAll(/search\?query=(\w.*)/g)];
-  console.log(searchString[0][1]);
-  const data = await searchSpotify(
-    spotifyProfile.accessToken,
-    searchString[0][1],
-    'track',
+  const data = await spotifyControl.searchSpotify(
+    req.query.query,
+    SEARCHTYPE.TRACK,
   );
+  // const data = await searchSpotify(
+  //   spotifyProfile.accessToken,
+  //   req.query.query,
+  //   'track',
+  // );
   res.send(data);
 });
 
 app.get('/search/:type', async (req, res) => {
-  const data = await searchSpotify(
-    spotifyProfile.accessToken,
-    req.query.q,
+  const data = await spotifyControl.searchSpotify(
+    req.query.query,
     req.params.type,
+    true,
   );
-
   res.send({
     type: req.params.type,
     data,
@@ -145,36 +147,17 @@ app.get('/search/:type', async (req, res) => {
 });
 
 app.get('/random/:type', async (req, res) => {
-  const randSearchTerm = generateRandomString(2);
-  let data;
-  if (req.params.type === searchType.TRACK) {
-    data = await randomSong(
-      spotifyProfile.accessToken,
-      randSearchTerm,
-      searchType.TRACK,
-    );
-  } else if (req.params.type === searchType.ARTIST) {
-    const artist = req.query.name;
-    do {
-      data = await randomSong(
-        spotifyProfile.accessToken,
-        artist,
-        searchType.ARTIST,
-      );
-      console.log(
-        `found artist - ${data.artists[0].name} looking for ${artist}`,
-      );
-    } while (data.artists[0].name.toLowerCase() !== artist.toLowerCase());
-    // data = { message: 'Random song from artist not implemented yet' };
-  }
+  const searchType = req.params.type;
+  const searchString = req.query.query;
 
+  const data = await spotifyControl.getRandomSong(searchString, searchType);
   res.send(data);
 });
 
 // Random spotify API endpoint
 app.get('/random', async (req, res) => {
   // const data = await randomSong(spotifyProfile.accessToken, req.query.query);
-  const data = await spotifyControl.getRandomSong(req.query.query);
+  const data = await spotifyControl.getRandomSong();
   res.send(data);
 });
 

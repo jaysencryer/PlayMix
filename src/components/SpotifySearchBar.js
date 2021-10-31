@@ -6,7 +6,7 @@ const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const getOptions = async (inputValue) => {
     if (library === 'spotify') {
       const { data: response } = await axios.get(
-        `/search/${type}?q=${inputValue}`,
+        `/search/${type}?query=${inputValue}`,
       );
       // console.log(response.data);
       if (type === 'track') {

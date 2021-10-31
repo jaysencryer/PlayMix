@@ -179,7 +179,7 @@ export const getRandomSong = async (type = {}) => {
   let randSong;
   if ('artist' in type) {
     console.log(`Looking for song from Artist ${type.artist}`);
-    randSong = await axios.get(`/random/artist?name=${type.artist}`);
+    randSong = await axios.get(`/random/artist?query=${type.artist}`);
   } else if ('playList' in type) {
     // TODO: make this cleaner! and error checking?
     // const uri = type.playList.split(':')[2];
@@ -194,7 +194,7 @@ export const getRandomSong = async (type = {}) => {
     console.log('playlist randSong');
     console.log(randSong);
   } else {
-    randSong = await axios.get(`/random?query=${randSearchTerm}`);
+    randSong = await axios.get(`/random`);
   }
 
   return randSong.data;

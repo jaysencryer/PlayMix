@@ -4,6 +4,7 @@ import SpotifySearchBar from '../SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
+import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 // import './TrackSelector.css';
 
 const TrackSelector = ({ track, id, saveTrack }) => {
@@ -84,7 +85,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
           {randomMode === trackMode.ARTIST && (
             <SpotifySearchBar
               onSelect={(selected) => selectTrack({ label: selected.label })}
-              type="artist"
+              type={SEARCHTYPE.ARTIST}
               library="spotify"
               value={track.label ?? ''}
             />

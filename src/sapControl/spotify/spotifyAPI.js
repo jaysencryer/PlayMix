@@ -1,17 +1,26 @@
 import axios from 'axios';
+
 import { searchType as SEARCHTYPE } from '../constants/enums';
+
+import {
+  uriEncode,
+  randomItem,
+  generateRandomString,
+  randomFloored,
+} from '../helpers/helpers';
+
 import {
   sanitizeSpotifyPlayLists,
   configureSpotAxiosInstance,
   getSpotifyTrackSourceURL,
-  getSpotifySearchUrl,
+  getSpotifySongSearchUrl,
+  getSpotifySearchUrlByType,
+  filterSpotifySongsByType,
 } from '../helpers/spotify/spotifyHelpers';
-import { generateRandomString } from '../../server/utils';
-import { uriEncode } from '../helpers/helpers';
 
-const authUrl = {
-  spotify: 'https://accounts.spotify.com/authorize',
-};
+import * as SPOTIFY from '../helpers/spotify/spotifyConstants';
+
+const authUrl = SPOTIFY.AUTHURL;
 
 export function spotifyAPIBuilder() {
   return {
@@ -59,7 +68,7 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     redirect_uri: redirectUrl,
   });
 
-  const url = `${authUrl.spotify}?${authParams}`;
+  const url = `${authUrl}?${authParams}`;
 
   this.accessToken = '';
   this.refreshToken = '';
@@ -273,46 +282,103 @@ spotifyAPI.prototype.refreshAccessToken = async function () {
   }
 };
 
-// spotifyAPI.prototype.search = function (searchString, searchType) {
-
-// }
-
-spotifyAPI.prototype.getRandomSong = async function (
+spotifyAPI.prototype.searchSpotifySongs = async function (
   searchString,
   searchType = SEARCHTYPE.TRACK,
 ) {
-  const url = getSpotifySearchUrl(searchString, searchType);
-
+  const url = getSpotifySongSearchUrl(searchString, searchType);
+  console.log(url);
   try {
-    return await this.selectRandomSong(url);
+    const { data } = await this.spotAxios.get(url);
+
+    console.log(data);
+
+    const songList = data.tracks.items.map((track) => ({
+      artist: track.artists[0].name,
+      title: track.name,
+      uri: track.uri,
+    }));
+    return songList;
+  } catch (err) {
+    console.error(`Search Spotify Songs Error:`);
+    return Promise.reject(err);
+  }
+};
+
+spotifyAPI.prototype.searchSpotifyArtists = async function (searchString) {
+  const url = getSpotifySearchUrlByType(searchString, SEARCHTYPE.ARTIST);
+  try {
+    const { data } = await this.spotAxios.get(url);
+    const artistList = data.artists.items.map((artist) => ({
+      name: artist.name,
+    }));
+    return artistList;
+  } catch (err) {
+    console.error(`Search Spotify Artists Error:`);
+    return Promise.reject(err);
+  }
+};
+
+spotifyAPI.prototype.searchSpotify = async function (
+  searchString,
+  searchType,
+  byType = false,
+) {
+  switch (searchType) {
+    case SEARCHTYPE.ARTIST: {
+      if (byType) {
+        return await this.searchSpotifyArtists(searchString);
+      }
+      return await this.searchSpotifySongs(searchString, SEARCHTYPE.ARTIST);
+    }
+    case SEARCHTYPE.TRACK: {
+      return await this.searchSpotifySongs(searchString);
+    }
+    default: {
+      return await this.searchSpotifySongs('Never Gonna give You Up');
+    }
+  }
+};
+
+spotifyAPI.prototype.getRandomSong = async function (
+  searchString = generateRandomString(2),
+  searchType = SEARCHTYPE.TRACK,
+) {
+  try {
+    return await this.selectRandomSpotifySong(searchString, searchType);
   } catch (err) {
     console.error(`Get Random Song Error:`);
     console.error(`\n ${err}`);
     return Promise.reject(err);
-    // return { error: err };
   }
 };
 
-spotifyAPI.prototype.selectRandomSong = async function (url, searchType) {
+spotifyAPI.prototype.selectRandomSpotifySong = async function (
+  searchString,
+  searchType,
+) {
+  const url = getSpotifySongSearchUrl(searchString, searchType);
+
+  let totalSongs;
   let offset = 0;
-  let { data } = await this.spotAxios.get(url);
-  // let { data } = response;
-  const totalSongs = data.tracks.total;
-  console.log(`total songs = ${totalSongs}`);
   let songList = [];
+
   do {
-    const randOffset = totalSongs < 1000 ? totalSongs : 980;
-    offset = Math.floor(Math.random() * randOffset);
-    console.log(`offset ${offset}`);
-    ({ data } = await this.spotAxios.get(`${url}&offset=${offset}`));
-    console.log(data);
-    songList =
-      searchType === SEARCHTYPE.ARTIST
-        ? data.tracks.items.filter(
-            (track) => track.artists[0].name === searchString,
-          )
-        : data.tracks.items;
+    let { data } = await this.spotAxios.get(`${url}&offset=${offset}`);
+
+    // This is skipped first time through
+    if (totalSongs) {
+      songList = filterSpotifySongsByType(
+        data.tracks.items,
+        searchString,
+        searchType,
+      );
+    }
+    totalSongs = totalSongs ?? data.tracks.total;
+    console.log(`totalSongs = ${totalSongs}`);
+    const randOffsetSize = totalSongs < 1000 ? totalSongs : 950;
+    offset = randomFloored(randOffsetSize);
   } while (songList.length === 0);
-  const randomTrack = Math.floor(Math.random() * songList.length);
-  return songList[randomTrack];
+
+  return randomItem(songList);
 };

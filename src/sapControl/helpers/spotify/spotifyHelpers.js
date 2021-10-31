@@ -1,4 +1,8 @@
-import { source, searchType as SEARCHTYPE } from '../../constants/enums';
+import {
+  source,
+  searchType as SEARCHTYPE,
+  searchType,
+} from '../../constants/enums';
 
 export const configureSpotAxiosInstance = (APIobject) => {
   APIobject.spotAxios.defaults.headers.common[
@@ -34,11 +38,32 @@ export const getSpotifyTrackSourceURL = (trackSource, sourceUri) => {
   }
 };
 
-export const getSpotifySearchUrl = (searchString, searchType) => {
+const getSpotifySearchUrlBase = (searchString, searchType) => {
   const encodedString =
-    searchType === SEARCHTYPE.TRACK
+    searchType === SEARCHTYPE.ARTIST
       ? encodeURIComponent(`"${searchString}"`)
       : encodeURIComponent(searchString);
-  const queryString = `${searchType}%3A${encodedString}%20NOT%20karaoke&type=track`;
-  return `/search?query=${queryString}`;
+  return `/search?query=${searchType}%3A${encodedString}`;
+};
+
+export const getSpotifySongSearchUrl = (searchString, searchType) => {
+  const url = getSpotifySearchUrlBase(searchString, searchType);
+  return `${url}%20NOT%20karaoke&type=track`;
+};
+
+export const getSpotifySearchUrlByType = (searchString, searchType) => {
+  const url = getSpotifySearchUrlBase(searchString, searchType);
+  return `${url}&type=${searchType}`;
+};
+
+export const filterSpotifySongsByType = (songs, searchString, searchType) => {
+  switch (searchType) {
+    case SEARCHTYPE.ARTIST:
+      return songs.filter(
+        (song) =>
+          song.artists[0].name.toLowerCase() === searchString.toLowerCase(),
+      );
+    default:
+      return songs;
+  }
 };
