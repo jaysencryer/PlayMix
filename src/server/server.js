@@ -9,12 +9,7 @@ import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
 import { SapControlBuilder } from '../sapControl/sapControl';
 
-import {
-  generateRandomString,
-  searchSpotify,
-  randomSong,
-  addSpotifyPlayList,
-} from './utils';
+import { addSpotifyPlayList } from './utils';
 
 import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
 
