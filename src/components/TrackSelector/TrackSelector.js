@@ -80,15 +80,16 @@ const TrackSelector = ({ track, id, saveTrack }) => {
             <option value={trackMode.ARTIST}>Artist</option>
           </select>
           {randomMode === trackMode.PLAYLIST && (
-            <PlaylistSelector setTracks={selectTrack} />
+            <PlaylistSelector setTracks={selectTrack} track={track} />
           )}
           {randomMode === trackMode.ARTIST && (
             <SpotifySearchBar
               onSelect={(selected) => selectTrack({ label: selected.label })}
               type={SEARCHTYPE.ARTIST}
               library="spotify"
-              value={track.label ?? ''}
+              value="test"
             />
+            // value={track.label ?? ''}
           )}
         </>
       )}

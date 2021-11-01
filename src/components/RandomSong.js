@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import Song from './Song';
 
 export const getRandomSong = async () => {
-  const vowels = ['a', 'e', 'i', 'o', 'u'];
-  const randVowel = Math.floor(Math.random() * 4);
-  const randSecondLetter = Math.floor(Math.random() * 26) + 97;
-  const randSearchTerm = `${vowels[randVowel]}${String.fromCharCode(
-    randSecondLetter,
-  )}`;
-  const { data: randSong } = await axios.get(`/random?query=${randSearchTerm}`);
+  // const vowels = ['a', 'e', 'i', 'o', 'u'];
+  // const randVowel = Math.floor(Math.random() * 4);
+  // const randSecondLetter = Math.floor(Math.random() * 26) + 97;
+  // const randSearchTerm = `${vowels[randVowel]}${String.fromCharCode(
+  //   randSecondLetter,
+  // )}`;
+  const { data: randSong } = await axios.get(`/random`);
   return randSong;
 };
 
