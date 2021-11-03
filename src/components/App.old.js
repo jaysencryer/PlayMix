@@ -10,7 +10,7 @@ import SpotifySearchBar from './SpotifySearchBar';
 import Song from './Song';
 import Create from './Create';
 import PlayMix from './PlayMix/PlayMix';
-import DragTest from '../components/DragTest/DragTest';
+import DragTest from './DragTest/DragTest';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -28,6 +28,7 @@ export function App({ initialData }) {
       setUser(spotifyProfile.user);
       setAvatar(spotifyProfile.avatar);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelection = (selectedOption) => {
