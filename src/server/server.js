@@ -121,11 +121,6 @@ app.get('/search', async (req, res) => {
     req.query.query,
     SEARCHTYPE.TRACK,
   );
-  // const data = await searchSpotify(
-  //   spotifyProfile.accessToken,
-  //   req.query.query,
-  //   'track',
-  // );
   res.send(data);
 });
 
@@ -163,7 +158,7 @@ app.post('/playsong', async (req, res) => {
     console.log('/playsong response');
     res.send(response);
   } catch (err) {
-    console.log('Comeing through here');
+    console.log('Coming through here');
     console.log(err);
     res.send(err);
   }

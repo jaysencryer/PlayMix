@@ -1,5 +1,7 @@
 :root {
-  --color-main: #333;
+  --color-main: #ddd;
+  --background-color: black;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 *,
@@ -9,36 +11,13 @@
 }
 
 body {
+  background-color: var(--background-color);
   color: var(--color-main);
-}
-
-.playlist-selector {
-  font-size: 20px;
-}
-
-.playmix-track {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+  font-size: 18px;
 }
 
 .track-type-selector-dropdown {
   width: 200px;
-}
-
-.bar {
-  width: 100%;
-  height: 50px;
-  padding: 5px;
-  border-radius: 8px;
-  border: solid 1px black;
-  background-color: bisque;
-  display: flex;
-  justify-content: space-between;
-  cursor: move;
-  text-align: center;
-  font-weight: 600;
 }
 
 .handle {
@@ -58,4 +37,27 @@ body {
 .insert-below {
   border-bottom: solid 2px blue;
   margin-bottom: 2px;
+}
+
+#main-app {
+  display: flex;
+  flex-direction: column;
+}
+#main-app button {
+  padding: 6px;
+  background-color: azure;
+  border-radius: 8px;
+}
+
+.nav-menu {
+  display: flex;
+}
+.nav-menu li {
+  display: inline;
+}
+
+@media (min-width: 720px) {
+  #main-app {
+    flex-direction: row;
+  }
 }

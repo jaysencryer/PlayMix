@@ -1,0 +1,76 @@
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  margin: 4px;
+}
+
+#main-app .nav-menu .btn-nav {
+  justify-content: center;
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+  font-size: 11px;
+  margin: 4px;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  box-shadow: 0 0 3px #444444;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-menu ul {
+  display: flex;
+  padding: 6px;
+  /* margin-right: 16px; */
+  flex-wrap: wrap;
+}
+
+.nav-menu h1 {
+  display: none;
+}
+
+@media (min-width: 320px) {
+  .nav-menu {
+    position: fixed;
+    top: 0;
+  }
+  .nav-menu ul {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (min-width: 400px) {
+  .nav-menu h1 {
+    display: block;
+    font-size: 5vw;
+    margin: 8px;
+  }
+}
+
+@media (min-width: 720px) {
+  .nav-menu {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    /* height: 100vh; */
+    width: fit-content;
+    margin-right: 16px;
+    position: relative;
+  }
+
+  .nav-menu h1 {
+    font-size: 3vw;
+  }
+  .nav-menu ul {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin: 4px;
+    align-items: center;
+  }
+}

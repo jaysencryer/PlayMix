@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-import SpotifySearchBar from '../SpotifySearchBar';
+import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
-// import './TrackSelector.css';
+import './TrackSelector.css';
 
 const TrackSelector = ({ track, id, saveTrack }) => {
   const [selectType, setSelectType] = useState(track.type);
@@ -36,9 +36,40 @@ const TrackSelector = ({ track, id, saveTrack }) => {
     );
   };
 
+  const toggleTrackType = () => {
+    if (selectType === trackType.SONG) {
+      setSelectType(trackType.RANDOM);
+    } else {
+      setSelectType(trackType.SONG);
+    }
+  };
+
   return (
-    <div>
-      <select
+    <div id="playmix-trackselector">
+      {selectType === trackType.SONG ? (
+        <button
+          type="button"
+          className="btn-track-type"
+          aria-label="switch to random"
+          onClick={toggleTrackType}
+        >
+          <img
+            className="icon-song"
+            src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/64/000000/external-vinyl-music-kiranshastry-solid-kiranshastry.png"
+          />
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="btn-track-type"
+          aria-label="switch to song"
+          onClick={toggleTrackType}
+        >
+          <span className="icon-random">?</span>
+        </button>
+      )}
+
+      {/* <select
         className="track-type-selector-dropdown"
         name="type"
         id="selectType"
@@ -50,7 +81,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
         </option>
         <option value={trackType.SONG}>Song</option>
         <option value={trackType.RANDOM}>Random</option>
-      </select>
+      </select> */}
       {selectType === trackType.SONG && (
         <SpotifySearchBar
           onSelect={(selected) => selectTrack(selected)}

@@ -2,6 +2,8 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 
+import './SpotifySearchBar.css';
+
 const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const getOptions = async (inputValue) => {
     if (library === 'spotify') {
@@ -35,7 +37,7 @@ const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   };
 
   return (
-    <div>
+    <div className="spotify-search-bar">
       <AsyncSelect
         onChange={onSelect}
         cacheOptions

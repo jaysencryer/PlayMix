@@ -2,12 +2,12 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import Header from './Header';
-import ConnectSpotify from './ConnectSpotify';
+import ConnectSpotify from './ConnectSpotify/ConnectSpotify';
 import PlayLists from './PlayLists';
-import RandomSong from './RandomSong';
-import RandomList from './RandomList';
+import RandomSong from './RandomSong/RandomSong';
+import RandomList from './RandomList/RandomList';
 import SpotifySearchBar from './SpotifySearchBar';
-import Song from './Song';
+import Song from './Song/Song';
 import Create from './Create';
 import PlayMix from './PlayMix/PlayMix';
 import DragTest from './DragTest/DragTest';

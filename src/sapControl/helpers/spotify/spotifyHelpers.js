@@ -1,13 +1,13 @@
-import {
-  source,
-  searchType as SEARCHTYPE,
-  searchType,
-} from '../../constants/enums';
+import { source, searchType as SEARCHTYPE } from '../../constants/enums';
 
-export const configureSpotAxiosInstance = (APIobject) => {
+export const setSpotAxiosHeader = (APIobject) => {
   APIobject.spotAxios.defaults.headers.common[
     'Authorization'
   ] = `Bearer ${APIobject.accessToken}`;
+};
+
+export const configureSpotAxiosInstance = (APIobject) => {
+  setSpotAxiosHeader(APIobject);
 
   APIobject.spotAxios.interceptors.response.use(
     function (response) {
@@ -66,4 +66,12 @@ export const filterSpotifySongsByType = (songs, searchString, searchType) => {
     default:
       return songs;
   }
+};
+
+export const sanitizedSpotifySongList = (spotifyResponseData) => {
+  return spotifyResponseData?.tracks?.items.map((track) => ({
+    artist: track.artists[0].name,
+    title: track.name,
+    uri: track.uri,
+  }));
 };

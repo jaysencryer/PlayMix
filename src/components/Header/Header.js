@@ -1,6 +1,6 @@
 import React from 'react';
-import { PlayMixCSS } from '../styles/styles.js';
-import NavMenu from './NavMenu';
+import { PlayMixCSS } from '../../styles/styles.js';
+import NavMenu from '../NavMenu/NavMenu';
 
 const Header = ({ user, avatar, setView }) => {
   const clickHandler = (option) => {
@@ -8,20 +8,7 @@ const Header = ({ user, avatar, setView }) => {
   };
 
   return (
-    <div>
-      <NavMenu>
-        {user && (
-          <>
-            {user}
-            <img style={PlayMixCSS.avatar} src={avatar}></img>
-          </>
-        )}
-        <div onClick={() => clickHandler('playlists')}>Play Lists</div>
-        <div onClick={() => clickHandler('testing')}>Testing</div>
-        <div onClick={() => clickHandler('create')}>Create Play List</div>
-        <div onClick={() => clickHandler('playmix')}>Create PlayMix</div>
-      </NavMenu>
-    </div>
+    
   );
 };
 /*

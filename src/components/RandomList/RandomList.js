@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { getRandomSong } from './RandomSong';
+import { getRandomSong } from '../RandomSong/RandomSong';
 
 const RandomList = () => {
   const [songUris, setSongUris] = useState([]);

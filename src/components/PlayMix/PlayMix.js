@@ -7,8 +7,10 @@ import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 
+import './PlayMix.css';
+
 const newTrack = {
-  type: trackType.DEFAULT,
+  type: trackType.SONG,
   mode: trackMode.DEFAULT,
 };
 
@@ -99,18 +101,33 @@ const PlayMix = () => {
   };
 
   return (
-    <section id="playmix-screen-container">
-      <button
-        type="button"
-        onClick={() => {
-          const trackId = playMixTracks.length ?? 0;
-          console.log(`trackId = ${trackId}`);
-          setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
-          setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
-        }}
-      >
-        Add Track
-      </button>
+    <div id="playmix-screen-container">
+      <div className="playmix-controller">
+        {playMixTracks.length > 5 && (
+          <>
+            <button type="button" onClick={sendToSpotify}>
+              Send to Spotify
+            </button>
+            <button type="button" onClick={saveAsPlayList}>
+              Save as PlayList
+            </button>
+            <button type="button" onClick={regenerateSongs}>
+              Regenerate List
+            </button>
+          </>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            const trackId = playMixTracks.length ?? 0;
+            console.log(`trackId = ${trackId}`);
+            setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
+            setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
+          }}
+        >
+          Add Track
+        </button>
+      </div>
 
       {playMixTracks && (
         <DragTest
@@ -125,22 +142,9 @@ const PlayMix = () => {
         />
       )}
       {/* {playMixTracks && <MixTracks playMixTracks={playMixTracks} />} */}
-      {playMixTracks.length > 5 && (
-        <>
-          <button type="button" onClick={sendToSpotify}>
-            Send to Spotify
-          </button>
-          <button type="button" onClick={saveAsPlayList}>
-            Save as PlayList
-          </button>
-          <button type="button" onClick={regenerateSongs}>
-            Regenerate List
-          </button>
-        </>
-      )}
       {/* {playMixSongs &&
         playMixSongs.map((song) => <div key={song.uri}>{song.name}</div>)} */}
-    </section>
+    </div>
   );
 };
 

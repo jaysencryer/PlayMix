@@ -1,5 +1,5 @@
 import { spotifyAPIBuilder } from './spotifyAPI';
-import { source } from '../../constants/enums';
+import { source } from '../constants/enums';
 
 // jest.mock('../../server/utils', () => {
 //   const originalModule = jest.requireActual('../../server/utils');

@@ -3,24 +3,24 @@ import axios from 'axios';
 import { searchType as SEARCHTYPE } from '../constants/enums';
 
 import {
-  uriEncode,
-  randomItem,
   generateRandomString,
   randomFloored,
+  randomItem,
+  uriEncode,
 } from '../helpers/helpers';
 
 import {
-  sanitizeSpotifyPlayLists,
   configureSpotAxiosInstance,
-  getSpotifyTrackSourceURL,
-  getSpotifySongSearchUrl,
-  getSpotifySearchUrlByType,
   filterSpotifySongsByType,
+  getSpotifySearchUrlByType,
+  getSpotifySongSearchUrl,
+  getSpotifyTrackSourceURL,
+  sanitizeSpotifyPlayLists,
+  sanitizedSpotifySongList,
+  setSpotAxiosHeader,
 } from '../helpers/spotify/spotifyHelpers';
 
 import * as SPOTIFY from '../helpers/spotify/spotifyConstants';
-
-const authUrl = SPOTIFY.AUTHURL;
 
 export function spotifyAPIBuilder() {
   return {
@@ -37,13 +37,23 @@ export function spotifyAPIBuilder() {
       return this;
     },
 
+    useAuthorizedUrl: function (authorizedUrl) {
+      this.authorizedUrl = authorizedUrl;
+      return this;
+    },
+
     build: function () {
-      return new spotifyAPI(this.authBuffer, this.clientId, this.redirectUrl);
+      return new spotifyAPI(
+        this.authBuffer,
+        this.clientId,
+        this.redirectUrl,
+        this.authorizedUrl,
+      );
     },
   };
 }
 
-function spotifyAPI(authBuffer, clientId, redirectUrl) {
+function spotifyAPI(authBuffer, clientId, redirectUrl, authorizedUrl) {
   if (!clientId) {
     throw 'spotifyAPI cannot build object - clientId undefined or null.  Did you specify a clientId & clientSecret? with useCredentials()';
   }
@@ -52,13 +62,20 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
   }
   this.authBuffer = authBuffer;
   this.redirectUrl = redirectUrl;
+  this.authorizedUrl = authorizedUrl ?? '/spotifycomplete';
+
+  this.accessTokenHeader = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'Authorization': `Basic ${this.authBuffer}`,
+    },
+  };
 
   this.stateKey = 'spotify_auth_state';
   const state = generateRandomString(16);
 
   // spotify specific permissions
-  const scope =
-    'user-read-private user-read-email playlist-read-private user-modify-playback-state user-read-playback-state playlist-modify-public';
+  const scope = SPOTIFY.SCOPE;
 
   const authParams = uriEncode({
     response_type: 'code',
@@ -68,7 +85,7 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
     redirect_uri: redirectUrl,
   });
 
-  const url = `${authUrl}?${authParams}`;
+  const url = `${SPOTIFY.AUTHURL}?${authParams}`;
 
   this.accessToken = '';
   this.refreshToken = '';
@@ -79,7 +96,7 @@ function spotifyAPI(authBuffer, clientId, redirectUrl) {
   this.playLists = [];
 
   this.spotAxios = axios.create({
-    baseURL: 'https://api.spotify.com/v1',
+    baseURL: SPOTIFY.API_BASE_URL,
   });
 
   this.connect = function (req, res) {
@@ -105,8 +122,7 @@ spotifyAPI.prototype.authorize = async function (req, res) {
 
   if (state === null || state !== storedState) {
     console.error('Failed to authenticate spotify');
-    // TODO - throw an error
-    return { error: 'Failed to authenticate spotify' };
+    return Promise.reject('Failed to authenticate Spotify');
   }
 
   const tokenBody = {
@@ -134,7 +150,7 @@ spotifyAPI.prototype.authorize = async function (req, res) {
   ({ id: this.id, display_name: this.user } = profile.data);
   this.avatar = profile.data.images[0].url;
 
-  res.redirect('/spotifycomplete');
+  res.redirect(this.authorizedUrl);
 };
 
 spotifyAPI.prototype.responseErrorInterceptor = async function (
@@ -234,12 +250,7 @@ spotifyAPI.prototype.getAccessToken = async function (formBody) {
     const response = await this.spotAxios.post(
       'https://accounts.spotify.com/api/token',
       formBody,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-          'Authorization': `Basic ${this.authBuffer}`,
-        },
-      },
+      this.accessTokenHeader,
     );
     return {
       access_token: response.data.access_token,
@@ -262,20 +273,13 @@ spotifyAPI.prototype.refreshAccessToken = async function () {
         grant_type: 'refresh_token',
         refresh_token: this.refreshToken,
       }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-          'Authorization': `Basic ${this.authBuffer}`,
-        },
-      },
+      this.accessTokenHeader,
     );
 
     this.accessToken = response.data.access_token;
     this.refreshToken = response.data.refresh_token ?? this.refreshToken;
 
-    this.spotAxios.defaults.headers.common[
-      'Authorization'
-    ] = `Bearer ${this.accessToken}`;
+    setSpotAxiosHeader(this);
   } catch (err) {
     console.error(`Refresh Token error:\n ${err?.response?.statusText}`);
     return Promise.reject(err);
@@ -287,18 +291,10 @@ spotifyAPI.prototype.searchSpotifySongs = async function (
   searchType = SEARCHTYPE.TRACK,
 ) {
   const url = getSpotifySongSearchUrl(searchString, searchType);
-  console.log(url);
+
   try {
     const { data } = await this.spotAxios.get(url);
-
-    console.log(data);
-
-    const songList = data.tracks.items.map((track) => ({
-      artist: track.artists[0].name,
-      title: track.name,
-      uri: track.uri,
-    }));
-    return songList;
+    return sanitizedSpotifySongList(data);
   } catch (err) {
     console.error(`Search Spotify Songs Error:`);
     return Promise.reject(err);
