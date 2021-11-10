@@ -72,19 +72,18 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/connectSpotify', (req, res) => {
-  spotifyControl.connect(req, res);
+  spotifyControl.connect(res);
 });
 
-app.get('/authorized', (req, res) => {
-  const response = spotifyControl.authorize(req, res);
-  if ('error' in response) {
-    res.render('error', { error: response.error });
-  }
+app.get('/authorized', async (req, res) => {
+  spotifyControl.authorize(req, res);
+  // if ('error' in response) {
+  //   res.render('error', { error: response.error });
+  // }
 });
 
 app.get('/spotifycomplete', async (req, res) => {
   authorized = true;
-
   // Keep this until all other endpoints rewritten
   ({
     id: spotifyProfile.id,
@@ -200,6 +199,11 @@ app.get('/refreshtoken', async (req, res) => {
   } catch (err) {
     res.send(err);
   }
+});
+
+app.get('/test', async (req, res) => {
+  console.log(spotifyControl.testMethod());
+  res.send('How did it go?');
 });
 
 app.listen(config.port, config.host, () => {

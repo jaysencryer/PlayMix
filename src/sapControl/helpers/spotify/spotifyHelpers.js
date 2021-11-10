@@ -1,22 +1,5 @@
 import { source, searchType as SEARCHTYPE } from '../../constants/enums';
 
-export const setSpotAxiosHeader = (APIobject) => {
-  APIobject.spotAxios.defaults.headers.common[
-    'Authorization'
-  ] = `Bearer ${APIobject.accessToken}`;
-};
-
-export const configureSpotAxiosInstance = (APIobject) => {
-  setSpotAxiosHeader(APIobject);
-
-  APIobject.spotAxios.interceptors.response.use(
-    function (response) {
-      return response;
-    },
-    async (error) => APIobject.responseErrorInterceptor(error, APIobject),
-  );
-};
-
 export const sanitizeSpotifyPlayLists = (jsonData) => {
   return jsonData.map((pList) => ({
     name: pList?.name,
