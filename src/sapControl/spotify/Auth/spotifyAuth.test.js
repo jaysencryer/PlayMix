@@ -1,4 +1,4 @@
-import { spotifyAPIBuilder } from './spotifyAPI';
+import { spotifyAPIBuilder } from '../API/spotifyAPI';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -56,8 +56,9 @@ describe('spotifyAPI.authorize() tests', () => {
       redirect: jest.fn(),
     };
 
-    const response = await testSpotify.authorize(mockReq, mockRes);
-    expect(response.error).toBe('Failed to authenticate spotify');
+    await expect(testSpotify.authorize(mockReq, mockRes)).rejects.toBe(
+      'Failed to authenticate Spotify',
+    );
   });
 
   test('null returned state causes authorize error', async () => {
@@ -69,8 +70,9 @@ describe('spotifyAPI.authorize() tests', () => {
       redirect: jest.fn(),
     };
 
-    const response = await testSpotify.authorize(mockReq, mockRes);
-    expect(response.error).toBe('Failed to authenticate spotify');
+    await expect(testSpotify.authorize(mockReq, mockRes)).rejects.toBe(
+      'Failed to authenticate Spotify',
+    );
   });
 
   test('spotifyToken fails', async () => {

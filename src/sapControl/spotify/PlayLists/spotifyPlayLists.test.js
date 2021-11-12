@@ -1,5 +1,5 @@
-import { spotifyAPIBuilder } from './spotifyAPI';
-import { source } from '../constants/enums';
+import { spotifyAPIBuilder } from '../API/spotifyAPI';
+import { source } from '../../constants/enums';
 
 afterEach(() => {
   jest.clearAllMocks();

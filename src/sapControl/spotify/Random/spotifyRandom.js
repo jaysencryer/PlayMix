@@ -2,12 +2,12 @@ import {
   generateRandomString,
   randomFloored,
   randomItem,
-} from '../helpers/helpers';
-import { searchType as SEARCHTYPE } from '../constants/enums';
+} from '../../helpers/helpers';
+import { searchType as SEARCHTYPE } from '../../constants/enums';
 import {
   getSpotifySongSearchUrl,
   filterSpotifySongsByType,
-} from '../helpers/spotify/spotifyHelpers';
+} from '../../helpers/spotify/spotifyHelpers';
 
 export const getRandomSong = async function (
   searchString = generateRandomString(2),
@@ -33,7 +33,7 @@ export const selectRandomSpotifySong = async function (
   let songList = [];
 
   do {
-    let { data } = await this.spotAxios.get(`${url}&offset=${offset}`);
+    let { data } = await this.spotAxios.execute.get(`${url}&offset=${offset}`);
 
     // This is skipped first time through
     if (totalSongs) {

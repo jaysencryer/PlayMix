@@ -91,14 +91,12 @@ app.get('/spotifycomplete', async (req, res) => {
     avatar: spotifyProfile.avatar,
     accessToken: spotifyProfile.accessToken,
   } = await spotifyControl.getProfile());
-  // console.log(spotifyProfile);
   res.redirect('/');
 });
 
 // Load spotify playlists for current user
 app.get('/playlists', async (req, res) => {
   // check to see if we already have playlists loaded.
-  // console.log(spotifyControl.playLists);
   if (spotifyControl.playLists.length === 0) {
     console.log('getting playlists');
     // If not load all users playlists
@@ -166,16 +164,20 @@ app.post('/playsong', async (req, res) => {
 app.post('/playlist', async (req, res) => {
   // TO DO
   // Body contains - song uris, playlist id (if adding or modifying)
-  console.log(req.body);
+  // console.log(req.body);
   // create the new playlist - if no playlist id given
-  await addSpotifyPlayList(
-    spotifyProfile.accessToken,
-    spotifyProfile.id,
+  const response = await spotifyControl.addSpotifyPlayList(
     req.body.name,
     req.body.uris,
   );
+  // await addSpotifyPlayList(
+  //   spotifyProfile.accessToken,
+  //   spotifyProfile.id,
+  //   req.body.name,
+  //   req.body.uris,
+  // );
   // upload song uris
-  res.send({ status: 200 });
+  res.send(response);
 });
 
 app.get('/tracks', async (req, res) => {
@@ -192,19 +194,14 @@ app.get('/tracks', async (req, res) => {
   }
 });
 
-app.get('/refreshtoken', async (req, res) => {
-  try {
-    const response = await spotifyControl.refreshAccessToken();
-    res.send(response);
-  } catch (err) {
-    res.send(err);
-  }
-});
-
-app.get('/test', async (req, res) => {
-  console.log(spotifyControl.testMethod());
-  res.send('How did it go?');
-});
+// app.get('/refreshtoken', async (req, res) => {
+//   try {
+//     const response = await spotifyControl.refreshAccessToken();
+//     res.send(response);
+//   } catch (err) {
+//     res.send(err);
+//   }
+// });
 
 app.listen(config.port, config.host, () => {
   console.info(`Running on ${config.host}:${config.port}...`);

@@ -1,7 +1,7 @@
 import {
   getSpotifyTrackSourceURL,
   sanitizeSpotifyPlayLists,
-} from '../helpers/spotify/spotifyHelpers';
+} from '../../helpers/spotify/spotifyHelpers';
 
 export const getPlayLists = async function () {
   try {
@@ -20,7 +20,7 @@ export const getAllUsersPlaylists = async function () {
   let limit = 50;
 
   do {
-    const { data } = await this.spotAxios.get(
+    const { data } = await this.spotAxios.execute.get(
       `/me/playlists?limit=${limit}${offsetParm}`,
     );
 
@@ -44,10 +44,26 @@ export const getTracks = async function (trackSource, sourceUri) {
   const url = getSpotifyTrackSourceURL(trackSource, sourceUri);
 
   try {
-    const response = await this.spotAxios.get(url);
+    const response = await this.spotAxios.execute.get(url);
     return response.data;
   } catch (err) {
     console.error(`Error getting ${trackSource} tracks`);
+    return Promise.reject(err);
+  }
+};
+
+export const addSpotifyPlayList = async function (playListName, uris) {
+  try {
+    const { data } = await this.spotAxios.execute.post(
+      `/users/${this.userId}/playlists`,
+      { name: playListName, public: true },
+    );
+    const playListId = data.id;
+    await this.spotAxios.execute.post(`/playlists/${playListId}/tracks`, {
+      uris: uris,
+    });
+  } catch (err) {
+    console.error(`Add Spotify PlayList Error`);
     return Promise.reject(err);
   }
 };

@@ -2,33 +2,29 @@ import {
   authorize,
   configureSpotifyProfile,
   connect,
-  getAccessToken,
-  refreshAccessToken,
-} from './spotifyAuth';
+} from '../Auth/spotifyAuth';
+
+import { SpotAxiosBuilder } from '../AxiosInstance/spotifyAxiosInstance';
+
+import { playSong } from '../Play/spotifyPlay';
 
 import {
-  configureSpotAxiosInstance,
-  createSpotAxiosInstance,
-  responseErrorInterceptor,
-  requestErrorInterceptor,
-  setSpotAxiosHeader,
-} from './spotifyAxiosInstance';
-
-import { playSong } from './spotifyPlay';
-
-import {
+  addSpotifyPlayList,
   getPlayLists,
   getAllUsersPlaylists,
   getTracks,
-} from './spotifyPlayLists';
+} from '../PlayLists/spotifyPlayLists';
 
-import { getRandomSong, selectRandomSpotifySong } from './spotifyRandom';
+import {
+  getRandomSong,
+  selectRandomSpotifySong,
+} from '../Random/spotifyRandom';
 
 import {
   searchSpotify,
   searchSpotifySongs,
   searchSpotifyArtists,
-} from './spotifySearch';
+} from '../Search/spotifySearch';
 
 export function spotifyAPIBuilder() {
   return {
@@ -69,20 +65,19 @@ function spotifyAPI(authBuffer, clientId, redirectUrl, authorizedUrl) {
     throw 'spotifyAPI cannot build object - redirectUrl not defined or null.  Did you specify a redirectUrl with useRedirect()';
   }
 
-  this.authBuffer = authBuffer;
   this.clientId = clientId;
   this.redirectUrl = redirectUrl;
   this.authorizedUrl = authorizedUrl ?? '/spotifycomplete';
 
   this.playLists = [];
 
-  this.createSpotAxiosInstance();
+  this.spotAxios = SpotAxiosBuilder().useAuthuffer(authBuffer).build();
 }
 
 spotifyAPI.prototype.getProfile = async function () {
   console.log(this);
   return {
-    id: this.id,
+    id: this.userId,
     user: this.user,
     avatar: this.avatar,
     accessToken: this.accessToken,
@@ -91,23 +86,17 @@ spotifyAPI.prototype.getProfile = async function () {
 };
 
 Object.assign(spotifyAPI.prototype, {
+  addSpotifyPlayList,
   authorize,
-  configureSpotAxiosInstance,
   configureSpotifyProfile,
   connect,
-  createSpotAxiosInstance,
-  getAccessToken,
   getAllUsersPlaylists,
   getPlayLists,
   getRandomSong,
   getTracks,
   playSong,
-  refreshAccessToken,
-  requestErrorInterceptor,
-  responseErrorInterceptor,
   searchSpotify,
   searchSpotifyArtists,
   searchSpotifySongs,
   selectRandomSpotifySong,
-  setSpotAxiosHeader,
 });

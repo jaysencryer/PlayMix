@@ -2,8 +2,8 @@ import {
   getSpotifySearchUrlByType,
   getSpotifySongSearchUrl,
   sanitizedSpotifySongList,
-} from '../helpers/spotify/spotifyHelpers';
-import { searchType as SEARCHTYPE } from '../constants/enums';
+} from '../../helpers/spotify/spotifyHelpers';
+import { searchType as SEARCHTYPE } from '../../constants/enums';
 
 export const searchSpotifySongs = async function (
   searchString,
@@ -12,7 +12,7 @@ export const searchSpotifySongs = async function (
   const url = getSpotifySongSearchUrl(searchString, searchType);
 
   try {
-    const { data } = await this.spotAxios.get(url);
+    const { data } = await this.spotAxios.execute.get(url);
     return sanitizedSpotifySongList(data);
   } catch (err) {
     console.error(`Search Spotify Songs Error:`);
@@ -23,7 +23,7 @@ export const searchSpotifySongs = async function (
 export const searchSpotifyArtists = async function (searchString) {
   const url = getSpotifySearchUrlByType(searchString, SEARCHTYPE.ARTIST);
   try {
-    const { data } = await this.spotAxios.get(url);
+    const { data } = await this.spotAxios.execute.get(url);
     const artistList = data.artists.items.map((artist) => ({
       name: artist.name,
     }));
