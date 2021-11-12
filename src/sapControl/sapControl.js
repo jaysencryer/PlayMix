@@ -1,4 +1,4 @@
-import { spotifyAPIBuilder } from './spotify/spotifyAPI';
+import { spotifyAPIBuilder } from './spotify/API/spotifyAPI';
 
 export function SapControlBuilder() {
   return {
@@ -18,7 +18,7 @@ export function SapControlBuilder() {
 
     build: function () {
       if (!(this.streamer in sapControl)) {
-        throw 'Invalid streamer in SapControlBuilder()';
+        throw new Error('Invalid streamer in SapControlBuilder()');
       }
       return new sapControl[this.streamer](
         this.clientId,

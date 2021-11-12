@@ -1,39 +1,22 @@
-import { sanitizePlayLists } from './helpers';
+import { generateRandomString, randomItem, uriEncode } from './helpers';
 
-test('sanitizePlayLists works as expected', () => {
-  const mockPlayList = [
-    {
-      name: 'test playlist',
-      owner: { display_name: 'teddy tester' },
-      uri: 'bleepbloop',
-      href: 'http://somekindofurl',
-      images: [
-        { url: 'http://picture1', otherdata: 'test' },
-        { url: 'http://picture2', otherdata: 'test2' },
-      ],
-      tracks: 'http://trackurl',
-      datawedontneed: 'extra info',
-      license: 'other unused data',
-    },
-  ];
-
-  const sanitizedList = sanitizePlayLists(mockPlayList);
-
-  expect(sanitizedList[0].name).toBe(mockPlayList[0].name);
-  expect(sanitizedList[0].license).toBeUndefined();
-  expect(sanitizedList[0].images).toBe(mockPlayList[0].images[0].url);
+test('uriEncode test', () => {
+  const mockUriData = {
+    number: 1,
+    stringData: 'test',
+  };
+  const result = uriEncode(mockUriData);
+  expect(result).toBe('number=1&stringData=test');
 });
 
-test('if playlist does not have field, expect all field to be undefined', () => {
-  const emptyPlayList = [];
+test('generateRandomString test', () => {
+  const randomString = generateRandomString(10);
+  expect(randomString.length).toBe(10);
+});
 
-  const sanitizedList = sanitizePlayLists(emptyPlayList);
-  const listToCheck = sanitizedList[0];
-  for (let items in listToCheck) {
-    if (items !== 'images') {
-      expect(listToCheck[items]).toBeUndefined();
-    } else {
-      expect(listToCheck[items]).toBe('');
-    }
-  }
+test('randomItem returns an item from the array', () => {
+  const numberArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const randomNumber = randomItem(numberArray);
+  const isInArray = numberArray.includes(randomNumber);
+  expect(isInArray).toBeTruthy();
 });

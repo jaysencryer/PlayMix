@@ -7,9 +7,8 @@ import cookieParser from 'cookie-parser';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
-import { SapControlBuilder } from '../sapControl/sapControl';
 
-import { addSpotifyPlayList } from './utils';
+import { SapControlBuilder } from '../sapControl/sapControl';
 
 import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
 
