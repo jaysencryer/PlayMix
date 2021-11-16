@@ -5,7 +5,7 @@ import * as SPOTIFY from '../../helpers/spotify/spotifyConstants';
 
 export function SpotAxiosBuilder() {
   return {
-    useAuthuffer: function (authbuffer) {
+    useAuthBuffer: function (authbuffer) {
       this.authbuffer = authbuffer;
       return this;
     },
@@ -42,10 +42,9 @@ spotAxios.prototype.getAccessToken = async function (postBody) {
       accessTokenHeader,
     );
     this._accessToken = response?.data?.access_token;
-    this._refreshToken = response?.data?.refresh_token ?? this._refresh_token;
+    this._refreshToken = response?.data?.refresh_token ?? this._refreshToken;
   } catch (err) {
     console.error('spotAxios.getAccessToken: Error');
-    console.error(err?.response?.statusText);
     return Promise.reject(err);
   }
 };
@@ -86,11 +85,11 @@ spotAxios.prototype.responseErrorInterceptor = async function (error) {
   return Promise.reject(error);
 };
 
-spotAxios.prototype.requestErrorInterceptor = function (error) {
-  console.error('Intercepted request error!');
-  console.error(error);
-  return Promise.reject(error.message);
-};
+// spotAxios.prototype.requestErrorInterceptor = function (error) {
+//   console.error('Intercepted request error!');
+//   console.error(error);
+//   return Promise.reject(error.message);
+// };
 
 spotAxios.prototype.setSpotAxiosHeader = function () {
   this.execute.defaults.headers.common[

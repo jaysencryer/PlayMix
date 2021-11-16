@@ -17,6 +17,7 @@ describe('spotifyAPIBuilder() tests', () => {
     const testSpotify = spotifyAPIBuilder()
       .useCredentials(mockId, mockSecret)
       .useRedirect(mockUrl)
+      .useAuthorizedUrl('test')
       .build();
 
     expect(testSpotify.redirectUrl).toBe(mockUrl);
@@ -28,7 +29,7 @@ describe('spotifyAPIBuilder() tests', () => {
       .useRedirect(mockUrl)
       .build();
 
-    expect(testSpotify.authBuffer).toBe(mockAuthBuffer);
+    expect(testSpotify.spotAxios.authBuffer).toBe(mockAuthBuffer);
   });
 
   test('not using credentials throws an error', () => {

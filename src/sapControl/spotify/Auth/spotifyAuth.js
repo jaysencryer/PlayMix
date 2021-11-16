@@ -32,9 +32,6 @@ export const authorize = async function (req, res) {
     redirect_uri: this.redirectUrl,
     grant_type: 'authorization_code',
   });
-  console.log(
-    'About to initialize spotAxios, which gets the old access token!',
-  );
 
   await this.spotAxios.initialize(tokenPostBody);
 

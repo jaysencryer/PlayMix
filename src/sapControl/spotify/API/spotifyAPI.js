@@ -71,11 +71,10 @@ function spotifyAPI(authBuffer, clientId, redirectUrl, authorizedUrl) {
 
   this.playLists = [];
 
-  this.spotAxios = SpotAxiosBuilder().useAuthuffer(authBuffer).build();
+  this.spotAxios = SpotAxiosBuilder().useAuthBuffer(authBuffer).build();
 }
 
-spotifyAPI.prototype.getProfile = async function () {
-  console.log(this);
+spotifyAPI.prototype.getProfile = function () {
   return {
     id: this.userId,
     user: this.user,

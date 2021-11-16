@@ -30,13 +30,21 @@ const getSpotifySearchUrlBase = (searchString, searchType) => {
 };
 
 export const getSpotifySongSearchUrl = (searchString, searchType) => {
+  validateSearchType(searchType);
   const url = getSpotifySearchUrlBase(searchString, searchType);
   return `${url}%20NOT%20karaoke&type=track`;
 };
 
 export const getSpotifySearchUrlByType = (searchString, searchType) => {
+  validateSearchType(searchType);
   const url = getSpotifySearchUrlBase(searchString, searchType);
   return `${url}&type=${searchType}`;
+};
+
+const validateSearchType = (searchType) => {
+  if (!Object.values(SEARCHTYPE).includes(searchType)) {
+    throw new Error(`Unsupported search type ${searchType}`);
+  }
 };
 
 export const filterSpotifySongsByType = (songs, searchString, searchType) => {
@@ -52,7 +60,7 @@ export const filterSpotifySongsByType = (songs, searchString, searchType) => {
 };
 
 export const sanitizedSpotifySongList = (spotifyResponseData) => {
-  return spotifyResponseData?.tracks?.items.map((track) => ({
+  return spotifyResponseData?.tracks?.items?.map((track) => ({
     artist: track.artists[0].name,
     title: track.name,
     uri: track.uri,
