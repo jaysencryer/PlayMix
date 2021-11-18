@@ -1,5 +1,6 @@
 import { spotifyAPIBuilder } from '../API/spotifyAPI';
 import { source } from '../../constants/enums';
+import { addSpotifyPlayList } from './spotifyPlayLists';
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -8,6 +9,11 @@ afterEach(() => {
 const mockId = '1234';
 const mockSecret = 'abcdefg';
 const mockUrl = 'http://test';
+
+const testSpotify = spotifyAPIBuilder()
+  .useCredentials(mockId, mockSecret)
+  .useRedirect(mockUrl)
+  .build();
 
 describe('spotifyAPI.getPlayLists() tests', () => {
   const mockPlayListsFirst50 = [
@@ -25,12 +31,7 @@ describe('spotifyAPI.getPlayLists() tests', () => {
     { name: '10' },
   ];
 
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials(mockId, mockSecret)
-    .useRedirect(mockUrl)
-    .build();
-
-  testSpotify.spotAxios.get = jest.fn((url) => {
+  testSpotify.spotAxios.execute.get = jest.fn((url) => {
     const queryString = new URLSearchParams(url.split('?')[1]);
     const offset = queryString.get('offset');
     if (!offset) {
@@ -51,12 +52,28 @@ describe('spotifyAPI.getPlayLists() tests', () => {
     testSpotify.playLists = [...mockPlayListsFirst50, ...mockPlayListsSecond50];
     await testSpotify.getPlayLists();
 
-    expect(testSpotify.spotAxios.get).toBeCalledTimes(1);
+    expect(testSpotify.spotAxios.execute.get).toBeCalledTimes(1);
   });
 
   test('If there is an error getting playlists Promise will reject', async () => {
     jest.resetAllMocks();
     await expect(testSpotify.getPlayLists()).rejects.toBeTruthy();
+  });
+
+  test('if there are more than 100 playlists limit is 50', async () => {
+    jest.resetAllMocks();
+    testSpotify.spotAxios.execute.get = jest.fn(() => {
+      return { data: { total: 105, items: mockPlayListsFirst50 } };
+    });
+    await testSpotify.getPlayLists();
+    expect(testSpotify.spotAxios.execute.get).toHaveBeenNthCalledWith(
+      2,
+      '/me/playlists?limit=50&offset=50',
+    );
+    expect(testSpotify.spotAxios.execute.get).toHaveBeenNthCalledWith(
+      3,
+      '/me/playlists?limit=5&offset=100',
+    );
   });
 });
 
@@ -70,15 +87,16 @@ describe('spotifyAPI.getTracks', () => {
 
   test('successfully return a playlists tracks', async () => {
     jest.resetAllMocks();
-    testSpotify.spotAxios.get = jest.fn(() => {
+    testSpotify.spotAxios.execute.get = jest.fn(() => {
       return { data: mockTrackList };
     });
     const response = await testSpotify.getTracks(source.PLAYLIST, 'uri');
     expect(response).toEqual(mockTrackList);
   });
 
-  test('throw error if unknown source used', async () => {
-    expect(async () => await testSpotify.getTracks()).toThrow();
+  test('Reject Promise if unknown source used', async () => {
+    await expect(testSpotify.getTracks()).rejects.toBeTruthy();
+    // expect(async () => await testSpotify.getTracks()).toThrow();
   });
 
   test('error retrieving tracks', async () => {
@@ -86,5 +104,39 @@ describe('spotifyAPI.getTracks', () => {
     await expect(
       testSpotify.getTracks(source.PLAYLIST, 'uri'),
     ).rejects.toBeTruthy();
+  });
+});
+
+describe('addSpotifyPlayList tests', () => {
+  test('addSpotifyPlayList makes two calls to Spotify', async () => {
+    jest.resetAllMocks();
+    testSpotify.spotAxios.execute.post = jest.fn(() => ({
+      data: { id: 'newplaylistid' },
+    }));
+
+    const mockUris = ['mockuri1', 'mockuri2'];
+
+    await testSpotify.addSpotifyPlayList('test playlist', mockUris);
+    expect(testSpotify.spotAxios.execute.post).toHaveBeenCalledTimes(2);
+    expect(testSpotify.spotAxios.execute.post).toHaveBeenLastCalledWith(
+      `/playlists/newplaylistid/tracks`,
+      { uris: mockUris },
+    );
+  });
+
+  test('addSpotifyPlayList rejects if array of uris not sent', async () => {
+    jest.resetAllMocks();
+    testSpotify.spotAxios.execute.post = jest.fn(() => ({
+      data: { id: 'newplaylistid' },
+    }));
+
+    const mockuri = 'mockuri';
+    const mockError = new Error(`Array of uri's must be sent`);
+
+    await expect(
+      testSpotify.addSpotifyPlayList('test playlist', mockuri),
+    ).rejects.toEqual(mockError);
+
+    expect(testSpotify.spotAxios.execute.post).not.toHaveBeenCalled();
   });
 });
