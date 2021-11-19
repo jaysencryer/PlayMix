@@ -91,7 +91,23 @@ describe('selectRandomSpotifySong tests', () => {
       'type',
       SEARCHTYPE.TRACK,
     );
-    console.log(returnedSong);
     expect(returnedSong.track).not.toBe('Get Back' || 'Never Happened');
+  });
+
+  test('selectRandomSpotifySong still works over 1000 songs', async () => {
+    testSpotify.spotAxios.execute.get = jest.fn(() => ({
+      data: {
+        tracks: {
+          total: 2000,
+          items: [{ artists: [], track: {} }],
+        },
+      },
+    }));
+
+    const returnedSong = await testSpotify.selectRandomSpotifySong(
+      'test',
+      SEARCHTYPE.TRACK,
+    );
+    expect(returnedSong.track).toBe({});
   });
 });
