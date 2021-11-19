@@ -1,6 +1,5 @@
 import { spotifyAPIBuilder } from '../API/spotifyAPI';
 import { source } from '../../constants/enums';
-import { addSpotifyPlayList } from './spotifyPlayLists';
 
 afterEach(() => {
   jest.clearAllMocks();

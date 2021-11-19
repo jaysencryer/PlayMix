@@ -41,7 +41,7 @@ export const getSpotifySearchUrlByType = (searchString, searchType) => {
   return `${url}&type=${searchType}`;
 };
 
-const validateSearchType = (searchType) => {
+export const validateSearchType = (searchType) => {
   if (!Object.values(SEARCHTYPE).includes(searchType)) {
     throw new Error(`Unsupported search type ${searchType}`);
   }
