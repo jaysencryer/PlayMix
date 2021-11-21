@@ -113,7 +113,7 @@ describe('filterSpotifySongsByType tests', () => {
       SEARCHTYPE.ARTIST,
     );
     expect(newSongList.length).toBe(1);
-    expect(newSongList[0].track.name).toBe('Get Back');
+    expect(newSongList[0].name).toBe('Get Back');
   });
 
   test('filterSpotifySongsByType returns all songs if no searchType sent', () => {

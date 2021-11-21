@@ -3,12 +3,27 @@ import '@testing-library/jest-dom/extend-expect';
 
 import { App } from './App';
 
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
+
+const mockSpotProfile = {
+  user: 'testUser',
+  avater: 'mockAvater',
+};
 
 describe('App', () => {
   it('renders', () => {
-    const { getByText, getByTitle, asFragment } = render(
-      <App initialData={{ appName: 'TEST' }} />,
+    render(<App initialData={{ appName: 'TEST' }} />);
+  });
+
+  it('renders main app once spotify connected', () => {
+    render(
+      <App
+        initialData={{
+          appName: 'TEST',
+          spotAuthorized: true,
+          spotifyProfile: mockSpotProfile,
+        }}
+      />,
     );
   });
 });

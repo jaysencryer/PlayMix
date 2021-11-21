@@ -108,6 +108,6 @@ describe('selectRandomSpotifySong tests', () => {
       'test',
       SEARCHTYPE.TRACK,
     );
-    expect(returnedSong.track).toBe({});
+    expect(returnedSong.track).toEqual({});
   });
 });
