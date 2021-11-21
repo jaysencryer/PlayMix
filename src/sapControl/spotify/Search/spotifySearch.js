@@ -2,6 +2,7 @@ import {
   getSpotifySearchUrlByType,
   getSpotifySongSearchUrl,
   sanitizedSpotifySongList,
+  validateSearchType,
 } from '../../helpers/spotify/spotifyHelpers';
 import { searchType as SEARCHTYPE } from '../../constants/enums';
 
@@ -39,6 +40,7 @@ export const searchSpotify = async function (
   searchType,
   byType = false,
 ) {
+  validateSearchType(searchType);
   switch (searchType) {
     case SEARCHTYPE.ARTIST: {
       if (byType) {
@@ -50,7 +52,7 @@ export const searchSpotify = async function (
       return await this.searchSpotifySongs(searchString);
     }
     default: {
-      return await this.searchSpotifySongs('Never Gonna give You Up');
+      return await this.searchSpotifySongs(searchString, searchType);
     }
   }
 };

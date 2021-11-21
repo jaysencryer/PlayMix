@@ -9,12 +9,14 @@ export const trackMode = {
   SPOTIFY: 'spotify',
   ARTIST: 'artist',
   PLAYLIST: 'playlist',
+  GENRE: 'genre',
 };
 
 export const searchType = {
   ALBUM: 'album',
   ARTIST: 'artist',
   TRACK: 'track',
+  GENRE: 'genre',
 };
 
 export const source = {

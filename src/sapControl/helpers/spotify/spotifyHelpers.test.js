@@ -15,17 +15,13 @@ const mockSpotifyResponseData = {
     items: [
       {
         artists: [{ name: 'Rolling Stones' }, { name: 'The Beatles' }],
-        track: {
-          name: 'Never Happened',
-          uri: 'mockuri1',
-        },
+        name: 'Never Happened',
+        uri: 'mockuri1',
       },
       {
         artists: [{ name: 'The Beatles' }],
-        track: {
-          name: 'Get Back',
-          uri: 'mockuri2',
-        },
+        name: 'Get Back',
+        uri: 'mockuri2',
       },
     ],
   },
@@ -167,6 +163,7 @@ describe('sanitizedSpotifySongList tests', () => {
     const songList = sanitizedSpotifySongList(mockSpotifyResponseData);
     expect(songList.length).toBe(mockSpotifyResponseData.tracks.items.length);
     expect(songList[0].artist).toBe('Rolling Stones');
+    expect(songList[0].title).toBe('Never Happened');
   });
 
   test('sanitizedSpotifySongList returns undefined if data is incorrect', () => {

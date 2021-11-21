@@ -12,6 +12,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
   const [randomMode, setRandomMode] = useState(track.mode);
   const [repeat, setRepeat] = useState(false);
   const [repeatTimes, setRepeatTimes] = useState(1);
+  const [trackGenre, setTrackGenre] = useState('');
 
   console.log(track.label);
 
@@ -109,6 +110,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
             <option value={trackMode.PLAYLIST}>Play List</option>
             <option value={trackMode.SPOTIFY}>Spotify</option>
             <option value={trackMode.ARTIST}>Artist</option>
+            <option value={trackMode.GENRE}>Genre</option>
           </select>
           {randomMode === trackMode.PLAYLIST && (
             <PlaylistSelector setTracks={selectTrack} track={track} />
@@ -121,6 +123,14 @@ const TrackSelector = ({ track, id, saveTrack }) => {
               value="test"
             />
             // value={track.label ?? ''}
+          )}
+          {randomMode === trackMode.GENRE && (
+            <input
+              type="text"
+              value={trackGenre}
+              onChange={(e) => setTrackGenre(e.target.value)}
+              onBlur={() => selectTrack({ label: trackGenre })}
+            />
           )}
         </>
       )}

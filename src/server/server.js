@@ -11,6 +11,7 @@ import { serverRenderer } from 'renderers/server';
 import { SapControlBuilder } from '../sapControl/sapControl';
 
 import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
+import { randomItem } from '../sapControl/helpers/helpers';
 
 const app = express();
 app.enable('trust proxy');
@@ -151,10 +152,8 @@ app.post('/playsong', async (req, res) => {
   const songUris = req.body.songs; // array of song uri's
   try {
     const response = await spotifyControl.playSong(songUris);
-    console.log('/playsong response');
     res.send(response);
   } catch (err) {
-    console.log('Coming through here');
     console.log(err);
     res.send(err);
   }
@@ -169,13 +168,6 @@ app.post('/playlist', async (req, res) => {
     req.body.name,
     req.body.uris,
   );
-  // await addSpotifyPlayList(
-  //   spotifyProfile.accessToken,
-  //   spotifyProfile.id,
-  //   req.body.name,
-  //   req.body.uris,
-  // );
-  // upload song uris
   res.send(response);
 });
 
@@ -193,15 +185,59 @@ app.get('/tracks', async (req, res) => {
   }
 });
 
-// app.get('/refreshtoken', async (req, res) => {
-//   try {
-//     const response = await spotifyControl.refreshAccessToken();
-//     res.send(response);
-//   } catch (err) {
-//     res.send(err);
-//   }
-// });
+const getRandomQualifier = () => {
+  const qualifiers = [
+    ['traditional', 'pop', 'rock', 'jazz'],
+    ['hip-hop', "r'n'b", 'alternative'],
+  ];
 
-app.listen(config.port, config.host, () => {
+  const randomDistribution = Math.floor(Math.random() * 8) + 1;
+
+  let randomListOfQualifiers = [];
+
+  for (let i = 0; i < randomDistribution; i++) {
+    randomListOfQualifiers.push(0);
+  }
+  for (let j = 0; j < randomDistribution - 2; j++) {
+    randomListOfQualifiers.push(1);
+  }
+
+  const result = randomItem(qualifiers[randomItem(randomListOfQualifiers)]);
+
+  return result;
+};
+
+app.get('/xmix', async (req, res) => {
+  let songList = [];
+  let type;
+  let searchString;
+  let message = [];
+  let response;
+  try {
+    do {
+      type = getRandomQualifier();
+      searchString = `${type} AND Christmas`;
+      message.push(`Searching for ${searchString}`);
+
+      response = await spotifyControl.getRandomSong(
+        searchString,
+        SEARCHTYPE.GENRE,
+      );
+      if (response?.uri) {
+        songList.push(response.uri);
+      }
+    } while (songList.length < 120);
+    spotifyControl.playSong(songList);
+    res.send({ message, songList });
+  } catch (err) {
+    console.error('this is what happens');
+    console.error(err);
+    res.send(err);
+  }
+});
+
+const server = app.listen(config.port, config.host, () => {
   console.info(`Running on ${config.host}:${config.port}...`);
 });
+
+server.timeout = 240000;
