@@ -2,11 +2,13 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 
-const SpotifySearchBar = ({ type, onSelect, library }) => {
+import './SpotifySearchBar.css';
+
+const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const getOptions = async (inputValue) => {
     if (library === 'spotify') {
       const { data: response } = await axios.get(
-        `/search/${type}?q=${inputValue}`,
+        `/search/${type}?query=${inputValue}`,
       );
       // console.log(response.data);
       if (type === 'track') {
@@ -35,11 +37,12 @@ const SpotifySearchBar = ({ type, onSelect, library }) => {
   };
 
   return (
-    <div>
+    <div className="spotify-search-bar">
       <AsyncSelect
         onChange={onSelect}
         cacheOptions
         loadOptions={promiseOptions}
+        defaultValue={value ?? ''}
       />
     </div>
   );

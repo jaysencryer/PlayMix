@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import Song from './Song';
-import SpotifySearchBar from './SpotifySearchBar';
+import Song from '../Song/Song';
+import SpotifySearchBar from '../SpotifySearchBar';
 
 const Create = ({ user }) => {
   const [tracks, setTracks] = useState([]);

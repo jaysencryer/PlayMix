@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 
-import { App } from 'components/App';
+import { App } from 'components/App/App';
 
 export async function serverRenderer(authToken = false, spotifyProfile = {}) {
   const initialData = {

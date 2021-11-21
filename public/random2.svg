@@ -1,0 +1,37 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with UXWing SVG Editor - https://uxwing.com/svg-icon-editor/ -->
+ <defs>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_3_blur">
+   <feGaussianBlur stdDeviation="0.6" in="SourceGraphic"/>
+  </filter>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_2_blur">
+   <feGaussianBlur stdDeviation="1.1" in="SourceGraphic"/>
+  </filter>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_6_blur">
+   <feGaussianBlur stdDeviation="3.5" in="SourceGraphic"/>
+  </filter>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_4_blur">
+   <feGaussianBlur stdDeviation="2.3" in="SourceGraphic"/>
+  </filter>
+  <filter height="200%" width="200%" y="-50%" x="-50%" id="svg_5_blur">
+   <feGaussianBlur stdDeviation="2.7" in="SourceGraphic"/>
+  </filter>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect x="-1" y="-1" width="402.005366" height="402.005366" id="canvas_background" fill="none"/>
+  <g id="canvasGrid" display="none">
+   <rect id="svg_1" width="100%" height="100%" x="0" y="0" stroke-width="0" fill="url(#gridpattern)"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <ellipse filter="url(#svg_6_blur)" fill="#ffffff" stroke-width="9" cx="256.39012" cy="258.272295" id="svg_6" rx="84.939182" ry="85" transform="rotate(-0.10359884798526764 256.39010620116716,258.27227783202477) " stroke="#f9f9f9"/>
+  <ellipse filter="url(#svg_5_blur)" fill="none" stroke-width="9" cx="256.390138" cy="258.272305" id="svg_5" rx="131.325215" ry="133" transform="rotate(-0.10359884798526764 256.39013671873164,258.2723083495978) " stroke="#e2e0e0"/>
+  <ellipse filter="url(#svg_4_blur)" fill="none" stroke-width="9" cx="256.390132" cy="258.272307" id="svg_4" rx="191" ry="191.031346" stroke="#f4f2f2"/>
+  <ellipse filter="url(#svg_2_blur)" fill="none" stroke-width="9" cx="256.390126" cy="255.999998" id="svg_2" rx="232" ry="233.61003" stroke="#fcfcfc"/>
+  <ellipse fill="#000000" stroke-width="0" cx="238.812269" cy="345.727774" id="svg_8" stroke="#000000"/>
+  <ellipse fill="#000000" stroke="#000000" stroke-width="0" cx="256.000001" cy="256.000017" id="svg_7" rx="15" ry="15"/>
+  <text filter="url(#svg_3_blur)" stroke="#ffffff" transform="matrix(3.1885289761365243,0,0,2.057088901603805,-521.6466362652321,-147.67151910415743) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="250" id="svg_3" y="282.85" x="174.365396" stroke-opacity="null" stroke-width="0" fill="#4c4c4c">?</text>
+ </g>
+</svg>

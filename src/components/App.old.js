@@ -2,15 +2,15 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import Header from './Header';
-import ConnectSpotify from './ConnectSpotify';
+import ConnectSpotify from './ConnectSpotify/ConnectSpotify';
 import PlayLists from './PlayLists';
-import RandomSong from './RandomSong';
-import RandomList from './RandomList';
+import RandomSong from './RandomSong/RandomSong';
+import RandomList from './RandomList/RandomList';
 import SpotifySearchBar from './SpotifySearchBar';
-import Song from './Song';
+import Song from './Song/Song';
 import Create from './Create';
-import PlayMix from './PlayMix';
-import PlayListSelector from './PlayListSelector';
+import PlayMix from './PlayMix/PlayMix';
+import DragTest from './DragTest/DragTest';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -22,10 +22,14 @@ export function App({ initialData }) {
   const [songName, setSongName] = useState('');
   const [songUri, setSongUri] = useState('');
 
-  if (spotifyProfile && user === '') {
-    setUser(spotifyProfile.user);
-    setAvatar(spotifyProfile.avatar);
-  }
+  // console.log(spotifyProfile);
+  React.useEffect(() => {
+    if (spotifyProfile && user === '') {
+      setUser(spotifyProfile.user);
+      setAvatar(spotifyProfile.avatar);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelection = (selectedOption) => {
     setSongName(selectedOption.label);
@@ -62,11 +66,12 @@ export function App({ initialData }) {
                 />
                 Search For an Artist <SpotifySearchBar type="artist" />
                 Select a PlayList
-                <PlayListSelector />
+                {/* <PlayListSelector /> */}
+                {/* <DragTest /> */}
               </div>
             </>
           )}
-          {view === 'playmix' && <PlayMix />}
+          {view === 'playmix' && <PlayMix sapControl={spotifyProfile} />}
         </>
       )}
     </div>

@@ -1,5 +1,7 @@
 :root {
-  --color-main: #333;
+  --color-main: #ddd;
+  --background-color: black;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 *,
@@ -9,5 +11,53 @@
 }
 
 body {
+  background-color: var(--background-color);
   color: var(--color-main);
+  font-size: 18px;
+}
+
+.track-type-selector-dropdown {
+  width: 200px;
+}
+
+.handle {
+  width: 30px;
+  height: 100%;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.insert-above {
+  border-top: solid 2px blue;
+  margin-top: 2px;
+}
+
+.insert-below {
+  border-bottom: solid 2px blue;
+  margin-bottom: 2px;
+}
+
+#main-app {
+  display: flex;
+  flex-direction: column;
+}
+#main-app button {
+  padding: 6px;
+  background-color: azure;
+  border-radius: 8px;
+}
+
+.nav-menu {
+  display: flex;
+}
+.nav-menu li {
+  display: inline;
+}
+
+@media (min-width: 720px) {
+  #main-app {
+    flex-direction: row;
+  }
 }

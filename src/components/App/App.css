@@ -1,0 +1,16 @@
+#view-container {
+  margin-left: 16px;
+  margin-right: 8px;
+}
+
+@media (min-width: 320px) {
+  #view-container {
+    margin-top: 70px;
+  }
+}
+
+@media (min-width: 720px) {
+  #view-container {
+    margin-top: 0;
+  }
+}
