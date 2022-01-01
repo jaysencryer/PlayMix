@@ -11,7 +11,7 @@ const getPlayListSongs = async (playListUri) => {
 
 const getRandomSong = async (type = trackMode.SPOTIFY, searchString = '') => {
   let randomSongURL = '/random';
-  if (type === trackMode.ARTIST || type === trackMode.GENRE) {
+  if (type !== trackMode.SPOTIFY) {
     randomSongURL += `/${type}?query=${searchString}`;
   }
   const { data } = await axios.get(randomSongURL);
@@ -28,14 +28,14 @@ const generateSong = async (track) => {
   }
 
   switch (mode) {
-    case trackMode.ARTIST: {
-      song = await getRandomSong(trackMode.ARTIST, label);
-      break;
-    }
-    case trackMode.GENRE: {
-      song = await getRandomSong(trackMode.GENRE, label);
-      break;
-    }
+    // case trackMode.ARTIST: {
+    //   song = await getRandomSong(trackMode.ARTIST, label);
+    //   break;
+    // }
+    // case trackMode.GENRE: {
+    //   song = await getRandomSong(trackMode.GENRE, label);
+    //   break;
+    // }
     case trackMode.PLAYLIST: {
       let allPlayListUris = [];
       if (label === 'All Playlists') {
@@ -52,7 +52,7 @@ const generateSong = async (track) => {
       break;
     }
     default:
-      song = await getRandomSong();
+      song = await getRandomSong(mode, label);
       break;
   }
 
