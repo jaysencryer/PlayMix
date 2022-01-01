@@ -7,7 +7,7 @@ import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 
-import './PlayMix.css';
+// import './PlayMix.css';
 
 const newTrack = {
   type: trackType.SONG,
