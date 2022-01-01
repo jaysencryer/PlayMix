@@ -7,6 +7,7 @@
     "start": "concurrently \"npm run dev:server\" \"npm run dev:bundler\"",
     "dev:server": "cross-env NODE_PATH=./src nodemon --exec \"babel-node src/server/server.js\" --ignore .reactful.json --ignore public/",
     "dev:bundler": "webpack -w --mode=development",
+    "build": "npm install && npm run build:react && npm run build:node",
     "build:react": "cross-env NODE_ENV=production webpack --progress --mode=production",
     "build:node": "babel src -d build --config-file ./babel-node.config.js --copy-files",
     "build:all": "npm install && npm run build:react && npm run build:node",
