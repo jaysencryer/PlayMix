@@ -230,11 +230,11 @@ app.get('/xmix', async (req, res) => {
     } while (songList.size < 120);
     const uriList = Array.from(songList);
     spotifyControl.playSong(uriList);
+
     const date = new Date();
     const mixName = `XMix ${date.toLocaleDateString()}`;
 
     spotifyControl.addSpotifyPlayList(mixName, uriList.slice(0, 100));
-
     res.send({ message, uriList });
   } catch (err) {
     console.error('this is what happens');
