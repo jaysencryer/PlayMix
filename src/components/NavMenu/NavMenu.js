@@ -1,6 +1,6 @@
 import React from 'react';
 
-// import './NavMenu.css';
+import './NavMenu.css';
 
 const menuOptions = [
   { name: 'Play Lists', view: 'playlists' },

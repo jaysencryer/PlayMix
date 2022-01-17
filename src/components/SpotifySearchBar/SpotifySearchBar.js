@@ -2,7 +2,7 @@ import React from 'react';
 import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 
-// import './SpotifySearchBar.css';
+import './SpotifySearchBar.css';
 
 const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const getOptions = async (inputValue) => {

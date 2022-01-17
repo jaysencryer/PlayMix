@@ -7,7 +7,7 @@ import PlayMix from '../PlayMix/PlayMix';
 import RandomList from '../RandomList/RandomList';
 import RandomSong from '../RandomSong/RandomSong';
 
-// import './App.css';
+import './App.css';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);

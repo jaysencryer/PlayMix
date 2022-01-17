@@ -243,7 +243,7 @@ app.get('/xmix', async (req, res) => {
   }
 });
 
-const server = app.listen(config.port, config.host, () => {
+const server = app.listen(config.port || 1234, config.host, () => {
   console.info(`Running on ${config.host}:${config.port}...`);
 });
 
