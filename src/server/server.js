@@ -45,7 +45,8 @@ dotenv.config();
 
 const client_id = process.env.SPOT_CLIENT_ID;
 const client_secret = process.env.SPOT_SECRET;
-const redirect_uri = 'http://localhost:1234/authorized';
+const redirect_uri =
+  process.env.SPOT_REDIRECT_URL || 'http://localhost:1234/authorized';
 
 // // encode the client_id and secret for passing to spotify
 // const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
@@ -187,8 +188,8 @@ app.get('/tracks', async (req, res) => {
 
 const getRandomQualifier = () => {
   const qualifiers = [
-    ['traditional', 'pop', 'rock', 'jazz'],
-    ['hip-hop', "r'n'b", 'alternative'],
+    ['pop', 'rock', 'jazz'],
+    ['hip-hop', "r'n'b", 'alternative', 'traditional'],
   ];
 
   const randomDistribution = Math.floor(Math.random() * 8) + 1;
@@ -208,7 +209,7 @@ const getRandomQualifier = () => {
 };
 
 app.get('/xmix', async (req, res) => {
-  let songList = [];
+  let songList = new Set();
   let type;
   let searchString;
   let message = [];
@@ -224,11 +225,17 @@ app.get('/xmix', async (req, res) => {
         SEARCHTYPE.GENRE,
       );
       if (response?.uri) {
-        songList.push(response.uri);
+        songList.add(response.uri);
       }
-    } while (songList.length < 120);
-    spotifyControl.playSong(songList);
-    res.send({ message, songList });
+    } while (songList.size < 120);
+    const uriList = Array.from(songList);
+    spotifyControl.playSong(uriList);
+
+    const date = new Date();
+    const mixName = `XMix ${date.toLocaleDateString()}`;
+
+    spotifyControl.addSpotifyPlayList(mixName, uriList.slice(0, 100));
+    res.send({ message, uriList });
   } catch (err) {
     console.error('this is what happens');
     console.error(err);
@@ -236,7 +243,7 @@ app.get('/xmix', async (req, res) => {
   }
 });
 
-const server = app.listen(config.port, config.host, () => {
+const server = app.listen(config.port || 1234, config.host, () => {
   console.info(`Running on ${config.host}:${config.port}...`);
 });
 
