@@ -39,7 +39,6 @@ export function App({ initialData }) {
     <main id="main-app">
       <NavMenu user={user} avatar={avatar} setView={setView} />
       <div id="view-container">
-        <p>Yay! Spotify connected. Welcome to PlayMix {user}</p>
         {view === 'testing' && (
           <ul>
             <li>

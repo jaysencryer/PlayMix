@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
+import Toggle from '../Toggle/Toggle';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
-import './TrackSelector.css';
+import './TrackEditor.css';
 
-const TrackSelector = ({ track, id, saveTrack }) => {
+const TrackEditor = ({ track, id, saveTrack }) => {
   const [selectType, setSelectType] = useState(track.type);
   const [randomMode, setRandomMode] = useState(track.mode);
   const [repeat, setRepeat] = useState(false);
@@ -46,30 +47,14 @@ const TrackSelector = ({ track, id, saveTrack }) => {
   };
 
   return (
-    <div id="playmix-trackselector">
-      {selectType === trackType.SONG ? (
-        <button
-          type="button"
-          className="btn-track-type"
-          aria-label="switch to random"
+    <div id="playmix-trackeditor">
+      <div className="toggle-display">
+        <Toggle
+          on={selectType === trackType.RANDOM}
           onClick={toggleTrackType}
-        >
-          <img
-            className="icon-song"
-            src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/64/000000/external-vinyl-music-kiranshastry-solid-kiranshastry.png"
-          />
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="btn-track-type"
-          aria-label="switch to song"
-          onClick={toggleTrackType}
-        >
-          <span className="icon-random">?</span>
-        </button>
-      )}
-
+        />
+        <p>{selectType}</p>
+      </div>
       {selectType === trackType.SONG && (
         <SpotifySearchBar
           onSelect={(selected) => selectTrack(selected)}
@@ -140,4 +125,4 @@ const TrackSelector = ({ track, id, saveTrack }) => {
   );
 };
 
-export default TrackSelector;
+export default TrackEditor;

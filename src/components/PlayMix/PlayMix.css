@@ -2,6 +2,15 @@
   font-size: 20px;
 }
 
+#playmix-screen-container {
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
 .playmix-track {
   display: flex;
   flex-direction: row;
