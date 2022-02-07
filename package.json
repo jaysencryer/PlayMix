@@ -52,18 +52,14 @@
     "serialize-javascript": "^5.0.1"
   },
   "devDependencies": {
-    "style-loader": "^2.0.0",
-    "webpack": "^5.30.0",
-    "webpack-chunk-hash": "^0.6.0",
-    "webpack-cli": "^4.6.0",
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.13.14",
+    "@babel/node": "^7.13.13",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
     "@babel/runtime": "^7.13.10",
-    "@babel/node": "^7.13.13",
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^13.1.1",
@@ -78,6 +74,10 @@
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^1.6.2",
     "nodemon": "^2.0.7",
-    "reactful": "^3.2.4"
+    "reactful": "^3.2.4",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.30.0",
+    "webpack-chunk-hash": "^0.6.0",
+    "webpack-cli": "^4.9.2"
   }
 }
