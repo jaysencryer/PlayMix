@@ -75,9 +75,15 @@
   font-size: 18px;
   border-radius: 6px;
   border: solid 2px #28287a;
-  width: 100%;
+  flex-grow: 1;
   background-color: white;
   max-height: 40px;
   font-family: Arial, Helvetica, sans-serif;
   color: black;
+}
+
+.playlist-selector {
+  font-size: 20px;
+  width: 100%;
+  flex-grow: 1;
 }
