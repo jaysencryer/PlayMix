@@ -5,6 +5,7 @@ import {
   sanitizeSpotifyPlayLists,
   sanitizedSpotifySongList,
   getSpotifySongSearchUrl,
+  validUri,
 } from './spotifyHelpers';
 
 import { source } from '../../constants/enums';
@@ -169,5 +170,26 @@ describe('sanitizedSpotifySongList tests', () => {
   test('sanitizedSpotifySongList returns undefined if data is incorrect', () => {
     const songList = sanitizedSpotifySongList({ tracks: 'nothing' });
     expect(songList).toBeUndefined();
+  });
+});
+
+describe('validUri tests', () => {
+  const valid = 'spotify:track:abcdefghijklmnopqrstuv';
+  const invalidSections = 'spotify:track';
+  const invalidSpotify = 'invalid:track:abcdefghijklmnopqrstuv';
+  const invalidId = 'spotify:track:abcdefg';
+
+  test('valid track uri returns true', () => {
+    expect(validUri(valid)).toBeTruthy();
+  });
+
+  test('invalid number of sections returns false', () => {
+    expect(validUri(invalidSections)).toBeFalsy();
+  });
+  test('invalid number of Spotify returns false', () => {
+    expect(validUri(invalidSpotify)).toBeFalsy();
+  });
+  test('invalid length of Id returns false', () => {
+    expect(validUri(invalidId)).toBeFalsy();
   });
 });

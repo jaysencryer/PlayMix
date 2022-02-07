@@ -6,6 +6,7 @@ import ConnectSpotify from '../ConnectSpotify/ConnectSpotify';
 import PlayMix from '../PlayMix/PlayMix';
 import RandomList from '../RandomList/RandomList';
 import RandomSong from '../RandomSong/RandomSong';
+import TestBed from '../TestBed/TestBed';
 
 import './App.css';
 
@@ -39,16 +40,18 @@ export function App({ initialData }) {
     <main id="main-app">
       <NavMenu user={user} avatar={avatar} setView={setView} />
       <div id="view-container">
-        <p>Yay! Spotify connected. Welcome to PlayMix {user}</p>
         {view === 'testing' && (
-          <ul>
-            <li>
-              <RandomSong />
-            </li>
-            <li>
-              <RandomList />
-            </li>
-          </ul>
+          <>
+            <ul>
+              <li>
+                <RandomSong />
+              </li>
+              <li>
+                <RandomList />
+              </li>
+            </ul>
+            <TestBed />
+          </>
         )}
         {view === 'playmix' && <PlayMix sapControl={spotifyProfile} />}
       </div>

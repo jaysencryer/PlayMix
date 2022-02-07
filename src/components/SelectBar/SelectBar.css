@@ -1,0 +1,20 @@
+#select-bar {
+  display: flex;
+}
+
+#select-bar .select-btn {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 0;
+  border-left: solid 1px #0b3328;
+  border-right: solid 1px #0b3328;
+  padding: 10px 20px;
+  flex-grow: 1;
+  font-weight: 500;
+  font-size: 20px;
+}
+
+#select-bar .select-btn.active {
+  background-color: #2a876c;
+}
