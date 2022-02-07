@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
 import Toggle from '../Toggle/Toggle';
+import SelectBar from '../SelectBar/SelectBar';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
@@ -45,6 +46,7 @@ const TrackEditor = ({ track, id, saveTrack }) => {
       setSelectType(trackType.SONG);
     }
   };
+  console.log(Object.keys(trackMode).map((key) => trackMode[key]));
 
   return (
     <div id="playmix-trackeditor">
@@ -55,16 +57,30 @@ const TrackEditor = ({ track, id, saveTrack }) => {
         />
         <p>{selectType}</p>
       </div>
-      {selectType === trackType.SONG && (
-        <SpotifySearchBar
-          onSelect={(selected) => selectTrack(selected)}
-          type="track"
-          library="spotify"
-        />
-      )}
+      <div className="selector">
+        {selectType === trackType.SONG && (
+          <SpotifySearchBar
+            onSelect={(selected) => selectTrack(selected)}
+            type="track"
+            library="spotify"
+          />
+        )}
+      </div>
       {selectType === trackType.RANDOM && (
         <>
-          <select
+          <SelectBar
+            options={[trackMode.SPOTIFY, trackMode.PLAYLIST, trackMode.ARTIST]}
+            onClick={(selected) => {
+              if (selected === trackMode.SPOTIFY) {
+                selectTrack({
+                  mode: trackMode.SPOTIFY,
+                  label: trackMode.SPOTIFY,
+                });
+              }
+              setRandomMode(selected);
+            }}
+          />
+          {/* <select
             name="randomMode"
             id="randomMode"
             value={randomMode}
@@ -83,7 +99,7 @@ const TrackEditor = ({ track, id, saveTrack }) => {
             <option value={trackMode.SPOTIFY}>Spotify</option>
             <option value={trackMode.ARTIST}>Artist</option>
             <option value={trackMode.GENRE}>Genre</option>
-          </select>
+          </select> */}
           {randomMode === trackMode.PLAYLIST && (
             <PlaylistSelector setTracks={selectTrack} track={track} />
           )}

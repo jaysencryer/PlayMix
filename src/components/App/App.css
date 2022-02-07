@@ -1,6 +1,7 @@
 #view-container {
   margin-left: 16px;
   margin-right: 8px;
+  flex-grow: 1;
 }
 
 @media (min-width: 320px) {

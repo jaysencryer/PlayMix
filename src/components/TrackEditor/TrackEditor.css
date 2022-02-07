@@ -30,14 +30,20 @@
 #playmix-trackeditor {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .toggle-display {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-evenly;
-  width: 150px;
+  justify-content: flex-start;
+}
+
+.toggle-display p {
+  flex-grow: 1;
+  font-size: 4vw;
 }
 
 .track-type-selector-dropdown {

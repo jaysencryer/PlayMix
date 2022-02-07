@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // import TrackSelector from '../TrackSelector/TrackSelector';
 import ShowTrack from '../ShowTrack/ShowTrack';
-import DragTest from '../DragTest/DragTest';
+// import DragTest from '../DragTest/DragTest';
 import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
