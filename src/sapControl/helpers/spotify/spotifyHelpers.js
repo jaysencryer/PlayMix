@@ -66,3 +66,10 @@ export const sanitizedSpotifySongList = (spotifyResponseData) => {
     uri: track.uri,
   }));
 };
+
+export const validUri = (uri) => {
+  const uriElements = uri.split(':');
+  if (uriElements?.length !== 3 || uriElements?.[0] !== 'spotify') return false;
+
+  return uriElements?.[2].length === 22;
+};

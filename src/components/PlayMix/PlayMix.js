@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import TrackSelector from '../TrackSelector/TrackSelector';
-import DragTest from '../DragTest/DragTest';
+// import TrackSelector from '../TrackSelector/TrackSelector';
+import ShowTrack from '../ShowTrack/ShowTrack';
+// import DragTest from '../DragTest/DragTest';
 import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
+import { validUri } from '../../sapControl/helpers/spotify/spotifyHelpers';
 
 import './PlayMix.css';
 
@@ -66,6 +68,9 @@ const PlayMix = () => {
     } else {
       addedSong = { name: track.label, uri: track.uri, id: track.id };
     }
+    if (!validUri(addedSong.uri)) {
+      addedSong = { ...addedSong, inValid: true };
+    }
     return addedSong;
   };
 
@@ -76,13 +81,14 @@ const PlayMix = () => {
       newSongList.push({ ...addedSong });
     }
 
-    console.log('We get here!');
     console.table(newSongList);
     setPlayMixSongs(newSongList);
   };
 
   const sendToSpotify = async () => {
-    const songUris = playMixSongs.map((song) => song.uri);
+    const songUris = playMixSongs
+      .filter((song) => !song?.uri?.inValid)
+      .map((song) => song.uri);
     console.log(songUris);
 
     const data = await axios.post('/playsong', { songs: songUris });
@@ -103,7 +109,7 @@ const PlayMix = () => {
   return (
     <div id="playmix-screen-container">
       <div className="playmix-controller">
-        {playMixTracks.length > 5 && (
+        {playMixSongs.length > 5 && (
           <>
             <button type="button" onClick={sendToSpotify}>
               Send to Spotify
@@ -128,22 +134,15 @@ const PlayMix = () => {
           Add Track
         </button>
       </div>
-
-      {playMixTracks && (
-        <DragTest
-          setChildArray={setPlayMixTracks}
-          childArray={playMixTracks.map((track, id) => (
-            <section key={`${track.id}${track.type}`} className="playmix-track">
-              <span>{`${id + 1} `}</span>
-              {/* {console.log(track)} */}
-              <TrackSelector id={id} track={track} saveTrack={saveTrack} />
-            </section>
-          ))}
-        />
-      )}
-      {/* {playMixTracks && <MixTracks playMixTracks={playMixTracks} />} */}
-      {/* {playMixSongs &&
-        playMixSongs.map((song) => <div key={song.uri}>{song.name}</div>)} */}
+      <p>Create your PlayMix</p>
+      {playMixTracks &&
+        playMixTracks.map((track, id) => (
+          <section key={`${track.id}${track.type}`} className="playmix-track">
+            {/* {console.log(track)} */}
+            {/* <TrackSelector id={id} track={track} saveTrack={saveTrack} /> */}
+            <ShowTrack id={id} track={track} saveTrack={saveTrack} />
+          </section>
+        ))}
     </div>
   );
 };

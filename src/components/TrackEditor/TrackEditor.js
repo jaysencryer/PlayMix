@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
 import PlaylistSelector from '../PlayListSelector';
+import Toggle from '../Toggle/Toggle';
+import SelectBar from '../SelectBar/SelectBar';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
-import './TrackSelector.css';
+import './TrackEditor.css';
 
-const TrackSelector = ({ track, id, saveTrack }) => {
+const TrackEditor = ({ track, id, saveTrack }) => {
   const [selectType, setSelectType] = useState(track.type);
   const [randomMode, setRandomMode] = useState(track.mode);
   const [repeat, setRepeat] = useState(false);
@@ -44,42 +46,41 @@ const TrackSelector = ({ track, id, saveTrack }) => {
       setSelectType(trackType.SONG);
     }
   };
+  console.log(Object.keys(trackMode).map((key) => trackMode[key]));
 
   return (
-    <div id="playmix-trackselector">
-      {selectType === trackType.SONG ? (
-        <button
-          type="button"
-          className="btn-track-type"
-          aria-label="switch to random"
+    <div id="playmix-trackeditor">
+      <div className="toggle-display">
+        <Toggle
+          on={selectType === trackType.RANDOM}
           onClick={toggleTrackType}
-        >
-          <img
-            className="icon-song"
-            src="https://img.icons8.com/external-kiranshastry-solid-kiranshastry/64/000000/external-vinyl-music-kiranshastry-solid-kiranshastry.png"
-          />
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="btn-track-type"
-          aria-label="switch to song"
-          onClick={toggleTrackType}
-        >
-          <span className="icon-random">?</span>
-        </button>
-      )}
-
-      {selectType === trackType.SONG && (
-        <SpotifySearchBar
-          onSelect={(selected) => selectTrack(selected)}
-          type="track"
-          library="spotify"
         />
-      )}
+        <p>{selectType}</p>
+      </div>
+      <div className="selector">
+        {selectType === trackType.SONG && (
+          <SpotifySearchBar
+            onSelect={(selected) => selectTrack(selected)}
+            type="track"
+            library="spotify"
+          />
+        )}
+      </div>
       {selectType === trackType.RANDOM && (
         <>
-          <select
+          <SelectBar
+            options={[trackMode.SPOTIFY, trackMode.PLAYLIST, trackMode.ARTIST]}
+            onClick={(selected) => {
+              if (selected === trackMode.SPOTIFY) {
+                selectTrack({
+                  mode: trackMode.SPOTIFY,
+                  label: trackMode.SPOTIFY,
+                });
+              }
+              setRandomMode(selected);
+            }}
+          />
+          {/* <select
             name="randomMode"
             id="randomMode"
             value={randomMode}
@@ -98,7 +99,7 @@ const TrackSelector = ({ track, id, saveTrack }) => {
             <option value={trackMode.SPOTIFY}>Spotify</option>
             <option value={trackMode.ARTIST}>Artist</option>
             <option value={trackMode.GENRE}>Genre</option>
-          </select>
+          </select> */}
           {randomMode === trackMode.PLAYLIST && (
             <PlaylistSelector setTracks={selectTrack} track={track} />
           )}
@@ -140,4 +141,4 @@ const TrackSelector = ({ track, id, saveTrack }) => {
   );
 };
 
-export default TrackSelector;
+export default TrackEditor;

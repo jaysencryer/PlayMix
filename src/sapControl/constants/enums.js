@@ -1,7 +1,7 @@
 export const trackType = {
   DEFAULT: 'select',
-  RANDOM: 'random',
-  SONG: 'song',
+  RANDOM: 'Random',
+  SONG: 'Song',
 };
 
 export const trackMode = {
