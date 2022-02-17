@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 
 import './SelectBar.css';
 
-const SelectBar = ({ options = ['Yes', 'No'], onClick = () => {} }) => {
-  const [activeOption, setActiveOption] = useState(options?.[0]);
+const SelectBar = ({
+  options = ['Yes', 'No'],
+  onClick = () => {},
+  selected,
+}) => {
+  const [activeOption, setActiveOption] = useState(selected || options?.[0]);
 
   return (
     <div id="select-bar">

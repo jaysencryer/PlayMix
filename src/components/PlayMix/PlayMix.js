@@ -13,7 +13,7 @@ import './PlayMix.css';
 
 const newTrack = {
   type: trackType.SONG,
-  mode: trackMode.DEFAULT,
+  mode: trackMode.SPOTIFY,
 };
 
 const newSong = {
@@ -140,7 +140,12 @@ const PlayMix = () => {
           <section key={`${track.id}${track.type}`} className="playmix-track">
             {/* {console.log(track)} */}
             {/* <TrackSelector id={id} track={track} saveTrack={saveTrack} /> */}
-            <ShowTrack id={id} track={track} saveTrack={saveTrack} />
+            <ShowTrack
+              id={id}
+              track={track}
+              saveTrack={saveTrack}
+              edit={track?.label ?? true}
+            />
           </section>
         ))}
     </div>

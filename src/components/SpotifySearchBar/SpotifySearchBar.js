@@ -12,15 +12,12 @@ const SpotifySearchBar = ({ type, onSelect, library, value }) => {
       const { data: response } = await axios.get(
         `/search/${type}?query=${inputValue}`,
       );
-      // console.log(response.data);
       if (type === 'track') {
-        // console.log(`returning tracks`);
         return response.data.map((song) => ({
           label: `${song.title} - ${song.artist}`,
           uri: song.uri,
         }));
       } else if (type === 'artist') {
-        // console.log(`returning artists`);
         return response.data.map((artist) => ({
           label: artist.name,
         }));
@@ -39,7 +36,7 @@ const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   };
 
   const changeHandler = (selected) => {
-    setNewValue(selected);
+    console.log(`Input is changing to ${selected.label}`);
     onSelect(selected);
   };
 
@@ -50,6 +47,7 @@ const SpotifySearchBar = ({ type, onSelect, library, value }) => {
         cacheOptions
         loadOptions={promiseOptions}
         inputValue={newValue}
+        onInputChange={(input) => setNewValue(input)}
       />
     </div>
   );

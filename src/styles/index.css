@@ -16,6 +16,14 @@ body {
   font-size: 18px;
 }
 
+button {
+  background-color: black;
+  border: 1px solid var(--color-main);
+  color: var(--color-main);
+  border-radius: none;
+  padding: 8px;
+  font-size: 18px;
+}
 /* .track-type-selector-dropdown {
   width: 200px;
 } */
@@ -43,11 +51,11 @@ body {
   display: flex;
   flex-direction: column;
 }
-#main-app button {
+/* #main-app button {
   padding: 6px;
   background-color: azure;
   border-radius: 8px;
-}
+} */
 
 .nav-menu {
   display: flex;

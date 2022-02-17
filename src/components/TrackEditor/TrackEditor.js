@@ -9,14 +9,13 @@ import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 import './TrackEditor.css';
 
-const TrackEditor = ({ track, id, saveTrack }) => {
+const TrackEditor = ({ track, id, saveTrack, onSave }) => {
   const [selectType, setSelectType] = useState(track.type);
   const [randomMode, setRandomMode] = useState(track.mode);
   const [repeat, setRepeat] = useState(false);
   const [repeatTimes, setRepeatTimes] = useState(1);
-  const [trackGenre, setTrackGenre] = useState('');
-
-  console.log(track.label);
+  // const [trackGenre, setTrackGenre] = useState('');
+  // const [label, setLabel] = useState(track.label);
 
   const selectTrack = ({
     label,
@@ -46,7 +45,6 @@ const TrackEditor = ({ track, id, saveTrack }) => {
       setSelectType(trackType.SONG);
     }
   };
-  console.log(Object.keys(trackMode).map((key) => trackMode[key]));
 
   return (
     <div id="playmix-trackeditor">
@@ -63,6 +61,7 @@ const TrackEditor = ({ track, id, saveTrack }) => {
             onSelect={(selected) => selectTrack(selected)}
             type="track"
             library="spotify"
+            value={track.label}
           />
         )}
       </div>
@@ -79,27 +78,8 @@ const TrackEditor = ({ track, id, saveTrack }) => {
               }
               setRandomMode(selected);
             }}
+            selected={randomMode}
           />
-          {/* <select
-            name="randomMode"
-            id="randomMode"
-            value={randomMode}
-            onChange={(event) => {
-              if (event.target.value === trackMode.SPOTIFY) {
-                selectTrack({
-                  mode: trackMode.SPOTIFY,
-                  label: trackMode.SPOTIFY,
-                });
-              }
-              setRandomMode(event.target.value);
-            }}
-          >
-            <option value={trackMode.DEFAULT}>select mode</option>
-            <option value={trackMode.PLAYLIST}>Play List</option>
-            <option value={trackMode.SPOTIFY}>Spotify</option>
-            <option value={trackMode.ARTIST}>Artist</option>
-            <option value={trackMode.GENRE}>Genre</option>
-          </select> */}
           {randomMode === trackMode.PLAYLIST && (
             <PlaylistSelector setTracks={selectTrack} track={track} />
           )}
@@ -110,33 +90,31 @@ const TrackEditor = ({ track, id, saveTrack }) => {
               library="spotify"
               value={track.label}
             />
-            // value={track.label ?? ''}
-          )}
-          {randomMode === trackMode.GENRE && (
-            <input
-              type="text"
-              value={trackGenre}
-              onChange={(e) => setTrackGenre(e.target.value)}
-              onBlur={() => selectTrack({ label: trackGenre })}
-            />
           )}
         </>
       )}
-      <input
-        type="checkbox"
-        checked={repeat}
-        onChange={() => setRepeat(!repeat)}
-      />
-      {repeat && (
+      <div className="toolBar">
+        <button type="button" onClick={onSave}>
+          Save
+        </button>
+        <label htmlFor="repeat-check">Repeat:</label>
         <input
-          type="number"
-          value={repeatTimes}
-          onChange={(e) => {
-            console.log(e.target);
-            setRepeatTimes(e.target.value);
-          }}
+          type="checkbox"
+          id="repeat-check"
+          checked={repeat}
+          onChange={() => setRepeat(!repeat)}
         />
-      )}
+        {repeat && (
+          <input
+            type="number"
+            value={repeatTimes}
+            onChange={(e) => {
+              console.log(e.target);
+              setRepeatTimes(e.target.value);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
