@@ -21,7 +21,7 @@ const newSong = {
   uri: '',
 };
 
-const PlayMix = () => {
+const PlayMix = ({ client }) => {
   const [playMixTracks, setPlayMixTracks] = useState([]);
   // const [addTrack, setAddTrack] = useState(false);
   const [playMixSongs, setPlayMixSongs] = useState([]);
@@ -29,7 +29,7 @@ const PlayMix = () => {
   const saveTrack = async (id, track, repeat = 1) => {
     const newTrackList = [];
     const newSongList = [];
-
+    console.log(id, track, repeat);
     // Set PlayMix Tracks
     for (let i = 0; i < repeat; i++) {
       console.log(`i = ${i}`);
@@ -62,7 +62,7 @@ const PlayMix = () => {
     let addedSong;
     if (track.type === trackType.RANDOM) {
       do {
-        addedSong = await generateSong(track);
+        addedSong = await generateSong(client, track);
         console.log(addedSong.uri);
       } while (!songList.every((song) => song.uri !== addedSong.uri));
     } else {
@@ -91,18 +91,20 @@ const PlayMix = () => {
       .map((song) => song.uri);
     console.log(songUris);
 
-    const data = await axios.post('/playsong', { songs: songUris });
-    if (data.status !== 200) {
-      console.log('There was an error!');
-      console.error(data.statusText);
-    }
+    await client.playSong(songUris);
+    // const data = await axios.post('/playsong', { songs: songUris });
+    // if (data.status !== 200) {
+    //   console.log('There was an error!');
+    //   console.error(data.statusText);
+    // }
   };
 
   const saveAsPlayList = async () => {
     const date = new Date();
     const name = `PlayMix ${date.toLocaleDateString()}`;
     const uris = playMixSongs.map((song) => song.uri);
-    const response = axios.post('/playlist', { name: name, uris: uris });
+    const response = await client.addSpotifyPlayList(name, uris);
+    // const response = axios.post('/playlist', { name: name, uris: uris });
     console.log(response);
   };
 
@@ -141,6 +143,7 @@ const PlayMix = () => {
             {/* {console.log(track)} */}
             {/* <TrackSelector id={id} track={track} saveTrack={saveTrack} /> */}
             <ShowTrack
+              client={client}
               id={id}
               track={track}
               saveTrack={saveTrack}

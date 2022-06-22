@@ -30,6 +30,7 @@ export const selectRandomSpotifySong = async function (
 
   try {
     do {
+      console.log(url);
       let { data } = await this.spotAxios.execute.get(
         `${url}&offset=${offset}`,
       );

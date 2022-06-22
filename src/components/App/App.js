@@ -9,6 +9,8 @@ import RandomSong from '../RandomSong/RandomSong';
 import TestBed from '../TestBed/TestBed';
 
 import './App.css';
+import axios from 'axios';
+import { spotifyClientBuilder } from '../../sapControl/spotify/API/spotifyClient';
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
@@ -17,15 +19,48 @@ export function App({ initialData }) {
   const [user, setUser] = useState('');
   const [avatar, setAvatar] = useState('');
   const [view, setView] = useState('testing');
+  const [client, setClient] = useState();
 
+  const hackSpotifyAccess = async () => {
+    console.log(spotifyProfile.accessToken);
+    const response = await axios.get('https://api.spotify.com/v1/me', {
+      headers: { Authorization: `Bearer ${spotifyProfile.accessToken}` },
+    });
+    console.log(response.data);
+    setUser(response.data.display_name);
+    setAvatar(response.data.images[0].url);
+    const spotifyClient = await spotifyClientBuilder()
+      .useTokens(spotifyProfile.accessToken, spotifyProfile.refreshToken)
+      .build();
+
+    setClient(spotifyClient);
+    console.log(client);
+    // const song = await spotifyClient.getRandomSong();
+    // console.log(song);
+    // spotifyClient.playSong([song.uri]);
+    // return { display_name: response?.data?.display_name, images: response.data;
+  };
   // console.log(spotifyProfile);
   React.useEffect(() => {
-    if (spotifyProfile && user === '') {
-      setUser(spotifyProfile.user);
-      setAvatar(spotifyProfile.avatar);
+    console.log('showing spotifyProfile');
+    console.log(spotifyProfile);
+    if (spotAuthorized && spotifyProfile && user === '') {
+      hackSpotifyAccess();
+      // spotifyProfile.avatar = ;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spotifyProfile]);
+  }, [spotifyProfile, spotAuthorized]);
+
+  React.useEffect(() => {
+    const asyncFun = async () => {
+      if (client) {
+        const song = await client.getRandomSong();
+        console.log(song);
+        client.playSong([song.uri]);
+      }
+    };
+    asyncFun();
+  }, [client]);
 
   if (!spotAuthorized) {
     return (
@@ -44,16 +79,16 @@ export function App({ initialData }) {
           <>
             <ul>
               <li>
-                <RandomSong />
+                <RandomSong client={client} />
               </li>
               <li>
-                <RandomList />
+                <RandomList client={client} />
               </li>
             </ul>
             <TestBed />
           </>
         )}
-        {view === 'playmix' && <PlayMix sapControl={spotifyProfile} />}
+        {view === 'playmix' && <PlayMix client={client} />}
       </div>
     </main>
   );

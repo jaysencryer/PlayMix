@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { getRandomSong } from '../RandomSong/RandomSong';
 
-const RandomList = () => {
+const RandomList = ({ client }) => {
   const [songUris, setSongUris] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -10,7 +10,7 @@ const RandomList = () => {
     let existingUris = [];
     setIsLoading(true);
     for (let i = 0; i < 20; i++) {
-      let randSong = await getRandomSong();
+      let randSong = await client.getRandomSong();
       existingUris.push(randSong.uri);
     }
     setIsLoading(false);
@@ -18,10 +18,11 @@ const RandomList = () => {
   };
 
   const playSongs = async () => {
-    const data = await axios.post('/playsong', { songs: songUris });
-    if (!data.error) {
-      console.log('no error?');
-    }
+    // const data = await axios.post('/playsong', { songs: songUris });
+    await client.playSong(songUris);
+    // if (!data.error) {
+    //   console.log('no error?');
+    // }
   };
   return (
     <div>

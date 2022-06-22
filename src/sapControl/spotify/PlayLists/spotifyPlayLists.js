@@ -53,6 +53,8 @@ export const getTracks = async function (trackSource, sourceUri) {
 };
 
 export const addSpotifyPlayList = async function (playListName, uris) {
+  console.log(this);
+  console.log(this.userId);
   try {
     if (!Array.isArray(uris)) throw new Error(`Array of uri's must be sent`);
     const { data } = await this.spotAxios.execute.post(

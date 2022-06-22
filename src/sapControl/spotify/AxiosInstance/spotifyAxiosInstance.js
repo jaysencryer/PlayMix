@@ -5,59 +5,69 @@ import * as SPOTIFY from '../../helpers/spotify/spotifyConstants';
 
 export function SpotAxiosBuilder() {
   return {
-    useAuthBuffer: function (authbuffer) {
-      this.authbuffer = authbuffer;
+    useTokens: function (accessToken, refreshToken) {
+      this.accessToken = accessToken;
+      this.refreshToken = refreshToken;
       return this;
     },
+
     build: function () {
-      return new spotAxios(this.authbuffer);
+      return new spotAxios(this.accessToken, this.refreshToken);
     },
   };
 }
 
-function spotAxios(authbuffer) {
-  this.authBuffer = authbuffer;
+function spotAxios(accessToken, refreshToken) {
+  this.accessToken = accessToken;
+  this.refreshToken = refreshToken;
   this.execute = axios.create({
     baseURL: SPOTIFY.API_BASE_URL,
   });
+  this.setSpotAxiosHeader();
 }
 
-spotAxios.prototype.initialize = async function (postBody) {
-  await this.getAccessToken(postBody);
-  this.setSpotAxiosHeader();
-  this.setSpotAxiosInterceptors();
-};
+// spotAxios.prototype.initialize = async function (postBody) {
+// const { accessToken, refreshToken } = await this.getAccessToken(postBody);
+// this.setSpotAxiosInterceptors();
+// return { accessToken, refreshToken };
+// };
 
-spotAxios.prototype.getAccessToken = async function (postBody) {
-  const accessTokenHeader = {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-      'Authorization': `Basic ${this.authBuffer}`,
-    },
-  };
-  try {
-    const response = await this.execute.post(
-      'https://accounts.spotify.com/api/token',
-      postBody,
-      accessTokenHeader,
-    );
-    this._accessToken = response?.data?.access_token;
-    this._refreshToken = response?.data?.refresh_token ?? this._refreshToken;
-  } catch (err) {
-    console.error('spotAxios.getAccessToken: Error');
-    return Promise.reject(err);
-  }
-};
+// spotAxios.prototype.getAccessToken = async function (postBody) {
+//   const accessTokenHeader = {
+//     headers: {
+//       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+//       'Authorization': `Basic ${this.authBuffer}`,
+//     },
+//   };
+//   try {
+//     const response = await this.execute.post(
+//       'https://accounts.spotify.com/api/token',
+//       postBody,
+//       accessTokenHeader,
+//     );
+//     // don't store it in server!
+//     // this._accessToken = response?.data?.access_token;
+//     // this._refreshToken = response?.data?.refresh_token ?? this._refreshToken;
+//     return {
+//       accessToken: response?.data?.access_token,
+//       refreshToken: response?.data?.refresh_token,
+//     };
+//   } catch (err) {
+//     console.error('spotAxios.getAccessToken: Error');
+//     return Promise.reject(err);
+//   }
+// };
 
-spotAxios.prototype.refreshAccessToken = async function () {
+spotAxios.prototype.refreshAccessToken = async function (refreshToken) {
   console.info('Refreshing access token');
   const postBody = {
     grant_type: 'refresh_token',
-    refresh_token: this._refreshToken,
+    refresh_token: refreshToken,
   };
   await this.getAccessToken(uriEncode(postBody));
 };
 
+// TO DO - how do we make this take in an access token....
 spotAxios.prototype.responseErrorInterceptor = async function (error) {
   console.error(
     `spotAxios response Error Interceptor : ${error.response.status}`,
@@ -94,7 +104,7 @@ spotAxios.prototype.responseErrorInterceptor = async function (error) {
 spotAxios.prototype.setSpotAxiosHeader = function () {
   this.execute.defaults.headers.common[
     'Authorization'
-  ] = `Bearer ${this._accessToken}`;
+  ] = `Bearer ${this.accessToken}`;
 };
 
 spotAxios.prototype.setSpotAxiosInterceptors = function () {

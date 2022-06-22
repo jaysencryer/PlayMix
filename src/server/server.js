@@ -64,7 +64,7 @@ let authorized = false;
 
 app.get('/', async (req, res) => {
   try {
-    const vars = await serverRenderer(authorized, spotifyControl);
+    const vars = await serverRenderer(authorized, spotifyProfile);
     res.render('index', vars);
   } catch (err) {
     console.error(err);
@@ -77,10 +77,14 @@ app.get('/connectSpotify', (req, res) => {
 });
 
 app.get('/authorized', async (req, res) => {
-  spotifyControl.authorize(req, res);
+  const { authorizedUrl, accessToken, refreshToken } =
+    await spotifyControl.authorize(req);
   // if ('error' in response) {
   //   res.render('error', { error: response.error });
   // }
+  spotifyProfile['accessToken'] = accessToken;
+  spotifyProfile['refreshToken'] = refreshToken;
+  res.redirect(authorizedUrl);
 });
 
 app.get('/spotifycomplete', async (req, res) => {
@@ -90,7 +94,6 @@ app.get('/spotifycomplete', async (req, res) => {
     id: spotifyProfile.id,
     user: spotifyProfile.user,
     avatar: spotifyProfile.avatar,
-    accessToken: spotifyProfile.accessToken,
   } = await spotifyControl.getProfile());
   res.redirect('/');
 });

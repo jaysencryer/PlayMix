@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { generateRandomString, uriEncode } from '../../helpers/helpers';
 import * as SPOTIFY from '../../helpers/spotify/spotifyConstants';
 
@@ -18,7 +19,7 @@ export const connect = function (res) {
   res.redirect(connectionUrl);
 };
 
-export const authorize = async function (req, res) {
+export const authorize = async function (req) {
   const code = req.query.code || null;
   const state = req.query.state || null;
   const storedState = req.cookies ? req.cookies[SPOTIFY.STATE_KEY] : null;
@@ -33,11 +34,39 @@ export const authorize = async function (req, res) {
     grant_type: 'authorization_code',
   });
 
-  await this.spotAxios.initialize(tokenPostBody);
+  // const { accessToken, refreshToken } = await this.spotAxios.initialize(
+  //   tokenPostBody,
+  // );
 
-  await this.configureSpotifyProfile();
+  const accessTokenHeader = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'Authorization': `Basic ${this.authBuffer}`,
+    },
+  };
+  try {
+    const response = await axios.post(
+      'https://accounts.spotify.com/api/token',
+      tokenPostBody,
+      accessTokenHeader,
+    );
+    // don't store it in server!
+    // this._accessToken = response?.data?.access_token;
+    // this._refreshToken = response?.data?.refresh_token ?? this._refreshToken;
+    return {
+      authorizedUrl: this.authorizedUrl,
+      accessToken: response?.data?.access_token,
+      refreshToken: response?.data?.refresh_token,
+    };
+  } catch (err) {
+    console.error('spotAxios.getAccessToken: Error');
+    return Promise.reject(err);
+  }
 
-  res.redirect(this.authorizedUrl);
+  // await this.configureSpotifyProfile();
+
+  // return { authorizedUrl: this.authorizedUrl, accessToken, refreshToken };
+  // res.redirect(this.authorizedUrl);
 };
 
 export const configureSpotifyProfile = async function () {

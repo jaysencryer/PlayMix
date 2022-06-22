@@ -9,7 +9,7 @@ import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 import './TrackEditor.css';
 
-const TrackEditor = ({ track, id, saveTrack, onSave }) => {
+const TrackEditor = ({ client, track, id, saveTrack, onSave }) => {
   const [selectType, setSelectType] = useState(track.type);
   const [randomMode, setRandomMode] = useState(track.mode);
   const [repeat, setRepeat] = useState(false);
@@ -24,6 +24,7 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
     option = null,
   }) => {
     // we've selected a track
+    console.log('Selected a track');
     saveTrack(
       id,
       {
@@ -70,6 +71,7 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
           <SelectBar
             options={[trackMode.SPOTIFY, trackMode.PLAYLIST, trackMode.ARTIST]}
             onClick={(selected) => {
+              console.log(selected);
               if (selected === trackMode.SPOTIFY) {
                 selectTrack({
                   mode: trackMode.SPOTIFY,
@@ -81,7 +83,11 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
             selected={randomMode}
           />
           {randomMode === trackMode.PLAYLIST && (
-            <PlaylistSelector setTracks={selectTrack} track={track} />
+            <PlaylistSelector
+              client={client}
+              setTracks={selectTrack}
+              track={track}
+            />
           )}
           {randomMode === trackMode.ARTIST && (
             <SpotifySearchBar

@@ -2,14 +2,18 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import PlayLists from './PlayLists';
 
-const PlayListSelector = ({ setTracks, track }) => {
+const PlayListSelector = ({ client, setTracks, track }) => {
   const [playListOption, setPlayListOption] = useState();
   const [options, setOptions] = useState([{ label: '', uri: '' }]);
 
   const getPlayLists = async () => {
-    const { data: response } = await axios.get('/playlists');
+    // let response;
+    if (client.playLists.length === 0) {
+      client.playLists = await client.getPlayLists();
+    }
+    // const { data: response } = await axios.get('/playlists');
     // console.log(response);
-    return response.map((list) => ({
+    return client.playLists.map((list) => ({
       label: list.name,
       tracks: list.tracks.href,
       uri: list.uri,

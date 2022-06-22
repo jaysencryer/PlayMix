@@ -2,23 +2,25 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import Song from '../Song/Song';
 
-export const getRandomSong = async () => {
-  const { data: randSong } = await axios.get(`/random`);
-  return randSong;
-};
+// export const getRandomSong = async () => {
+//   const { data: randSong } = await axios.get(`/random`);
+//   return randSong;
+// };
 
-const RandomSong = () => {
+const RandomSong = ({ client }) => {
   const [song, setSong] = useState({});
+  console.log(client);
 
   const clickHandler = async () => {
-    const randSong = await getRandomSong();
+    const randSong = await client.getRandomSong();
+    // console.log(data);
     setSong(randSong);
   };
 
   return (
     <div>
       <button onClick={() => clickHandler()}>Pick Random Song</button>
-      {song && <Song name={song.name} uri={song.uri} />}
+      {song && <Song client={client} name={song.name} uri={song.uri} />}
     </div>
   );
 };

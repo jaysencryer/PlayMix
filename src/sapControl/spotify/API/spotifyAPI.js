@@ -68,10 +68,11 @@ function spotifyAPI(authBuffer, clientId, redirectUrl, authorizedUrl) {
   this.clientId = clientId;
   this.redirectUrl = redirectUrl;
   this.authorizedUrl = authorizedUrl ?? '/spotifycomplete';
+  this.authBuffer = authBuffer;
 
   this.playLists = [];
 
-  this.spotAxios = SpotAxiosBuilder().useAuthBuffer(authBuffer).build();
+  // this.spotAxios = SpotAxiosBuilder().useAuthBuffer(authBuffer).build();
 }
 
 spotifyAPI.prototype.getProfile = function () {
