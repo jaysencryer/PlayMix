@@ -14,7 +14,7 @@ import { spotifyClientBuilder } from '../../sapControl/spotify/API/spotifyClient
 
 export function App({ initialData }) {
   // console.log(initialData.spotAuthorized);
-  const { spotAuthorized, spotifyProfile } = initialData;
+  const { spotifyProfile } = initialData;
 
   const [user, setUser] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -22,15 +22,17 @@ export function App({ initialData }) {
   const [client, setClient] = useState();
 
   const hackSpotifyAccess = async () => {
-    console.log(spotifyProfile.accessToken);
+    console.log(spotifyProfile.sessionData.accessToken);
+    const { accessToken, refreshToken } = spotifyProfile.sessionData;
+
     const response = await axios.get('https://api.spotify.com/v1/me', {
-      headers: { Authorization: `Bearer ${spotifyProfile.accessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
     console.log(response.data);
     setUser(response.data.display_name);
     setAvatar(response.data.images[0].url);
     const spotifyClient = await spotifyClientBuilder()
-      .useTokens(spotifyProfile.accessToken, spotifyProfile.refreshToken)
+      .useTokens(accessToken, refreshToken)
       .build();
 
     setClient(spotifyClient);
@@ -44,12 +46,16 @@ export function App({ initialData }) {
   React.useEffect(() => {
     console.log('showing spotifyProfile');
     console.log(spotifyProfile);
-    if (spotAuthorized && spotifyProfile && user === '') {
+    if (
+      spotifyProfile?.sessionData?.authorized &&
+      spotifyProfile &&
+      user === ''
+    ) {
       hackSpotifyAccess();
       // spotifyProfile.avatar = ;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spotifyProfile, spotAuthorized]);
+  }, [spotifyProfile]);
 
   React.useEffect(() => {
     const asyncFun = async () => {
@@ -62,7 +68,7 @@ export function App({ initialData }) {
     asyncFun();
   }, [client]);
 
-  if (!spotAuthorized) {
+  if (!spotifyProfile?.sessionData?.authorized) {
     return (
       <main id="not-authorized">
         <h1>PlayMix</h1>

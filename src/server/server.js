@@ -1,4 +1,5 @@
 import express from 'express';
+import sessions from 'express-session';
 import morgan from 'morgan';
 import serialize from 'serialize-javascript';
 import dotenv from 'dotenv';
@@ -24,6 +25,16 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(
+  sessions({
+    secret: 'thisismysecrctekeyfhrgfgrfrty84fwir767',
+    saveUninitialized: true,
+    cookie: { maxAge: oneDay },
+    resave: false,
+  }),
+);
 
 app.locals.serialize = serialize;
 
@@ -62,7 +73,11 @@ const spotifyControl = SapControlBuilder()
 let spotifyProfile = {};
 let authorized = false;
 
+let session;
+
 app.get('/', async (req, res) => {
+  session = req.session;
+  spotifyProfile.sessionData = session;
   try {
     const vars = await serverRenderer(authorized, spotifyProfile);
     res.render('index', vars);
@@ -77,18 +92,23 @@ app.get('/connectSpotify', (req, res) => {
 });
 
 app.get('/authorized', async (req, res) => {
+  session = req.session;
   const { authorizedUrl, accessToken, refreshToken } =
     await spotifyControl.authorize(req);
   // if ('error' in response) {
   //   res.render('error', { error: response.error });
   // }
-  spotifyProfile['accessToken'] = accessToken;
-  spotifyProfile['refreshToken'] = refreshToken;
+  session.accessToken = accessToken;
+  session.refreshToken = refreshToken;
+  // spotifyProfile['accessToken'] = accessToken;
+  // spotifyProfile['refreshToken'] = refreshToken;
   res.redirect(authorizedUrl);
 });
 
 app.get('/spotifycomplete', async (req, res) => {
-  authorized = true;
+  session = req.session;
+  session.authorized = true;
+  // authorized = true;
   // Keep this until all other endpoints rewritten
   ({
     id: spotifyProfile.id,
