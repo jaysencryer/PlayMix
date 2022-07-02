@@ -29,8 +29,8 @@ export function App({ initialData }) {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     console.log(response.data);
-    setUser(response.data.display_name);
-    setAvatar(response.data.images[0].url);
+    setUser(response?.data?.display_name);
+    setAvatar(response?.data?.images?.[0]?.url);
     const spotifyClient = await spotifyClientBuilder()
       .useTokens(accessToken, refreshToken)
       .build();
