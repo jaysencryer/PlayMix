@@ -3,11 +3,10 @@ import * as ReactDOMServer from 'react-dom/server';
 
 import { App } from 'components/App/App';
 
-export async function serverRenderer(authToken = false, spotifyProfile = {}) {
+export async function serverRenderer(sessionData = {}) {
   const initialData = {
     appName: 'PlayMix',
-    spotAuthorized: authToken,
-    spotifyProfile: spotifyProfile,
+    sessionData,
   };
 
   const pageData = {

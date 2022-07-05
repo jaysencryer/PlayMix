@@ -32,7 +32,8 @@ const getSpotifySearchUrlBase = (searchString, searchType) => {
 export const getSpotifySongSearchUrl = (searchString, searchType) => {
   validateSearchType(searchType);
   const url = getSpotifySearchUrlBase(searchString, searchType);
-  return `${url}%20NOT%20karaoke&type=track`;
+  // return `${url}%20NOT%20karaoke&type=track`;
+  return `${url}&type=track`;
 };
 
 export const getSpotifySearchUrlByType = (searchString, searchType) => {

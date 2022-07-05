@@ -3,22 +3,32 @@ import AsyncSelect from 'react-select/async';
 import axios from 'axios';
 
 import './SpotifySearchBar.css';
+import { useSpotify } from '../../context/spotifyContext';
 
 const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const [newValue, setNewValue] = useState(value);
+  const { spotifyClient } = useSpotify();
+
   console.log(`spotify searchBar value = ${value}`);
   const getOptions = async (inputValue) => {
+    console.log(`About to get options input ${inputValue} type ${type}`);
     if (library === 'spotify') {
-      const { data: response } = await axios.get(
-        `/search/${type}?query=${inputValue}`,
+      const searchByType = type === 'artist' ? true : false;
+      const response = await spotifyClient.searchSpotify(
+        inputValue,
+        type,
+        searchByType,
       );
+      console.log('Got the options');
+      console.log(response);
+      // axios.get(        `/search/${type}?query=${inputValue}`,);
       if (type === 'track') {
-        return response.data.map((song) => ({
+        return response.map((song) => ({
           label: `${song.title} - ${song.artist}`,
           uri: song.uri,
         }));
       } else if (type === 'artist') {
-        return response.data.map((artist) => ({
+        return response.map((artist) => ({
           label: artist.name,
         }));
       }
