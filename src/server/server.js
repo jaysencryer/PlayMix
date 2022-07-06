@@ -102,96 +102,17 @@ app.get('/spotifycomplete', async (req, res) => {
   res.redirect('/');
 });
 
-// // Load spotify playlists for current user
-// app.get('/playlists', async (req, res) => {
-//   // check to see if we already have playlists loaded.
-//   if (spotifyControl.playLists.length === 0) {
-//     console.log('getting playlists');
-//     // If not load all users playlists
-//     spotifyProfile['playLists'] = await spotifyControl.getPlayLists();
-//   }
-//   // send back json list of playlists
-//   res.send(spotifyControl.playLists);
-// });
-
-// // Dev only
-// app.get('/sapinfo', (req, res) => {
-//   if (config.isDev) res.send(spotifyControl);
-//   res.send('Dev Only');
-// });
-
-// // Search spotify API endpoint
-// app.get('/search', async (req, res) => {
-//   const data = await spotifyControl.searchSpotify(
-//     req.query.query,
-//     SEARCHTYPE.TRACK,
-//   );
-//   res.send(data);
-// });
-
-// app.get('/search/:type', async (req, res) => {
-//   const data = await spotifyControl.searchSpotify(
-//     req.query.query,
-//     req.params.type,
-//     true,
-//   );
-//   res.send({
-//     type: req.params.type,
-//     data,
-//   });
-// });
-
-// app.get('/random/:type', async (req, res) => {
-//   const searchType = req.params.type;
-//   const searchString = req.query.query;
-
-//   const data = await spotifyControl.getRandomSong(searchString, searchType);
-//   res.send(data);
-// });
-
-// // Random spotify API endpoint
-// app.get('/random', async (req, res) => {
-//   // const data = await randomSong(spotifyProfile.accessToken, req.query.query);
-//   const data = await spotifyControl.getRandomSong();
-//   res.send(data);
-// });
-
-// app.post('/playsong', async (req, res) => {
-//   const songUris = req.body.songs; // array of song uri's
-//   try {
-//     const response = await spotifyControl.playSong(songUris);
-//     res.send(response);
-//   } catch (err) {
-//     console.log(err);
-//     res.send(err);
-//   }
-// });
-
-// app.post('/playlist', async (req, res) => {
-//   // TO DO
-//   // Body contains - song uris, playlist id (if adding or modifying)
-//   // console.log(req.body);
-//   // create the new playlist - if no playlist id given
-//   const response = await spotifyControl.addSpotifyPlayList(
-//     req.body.name,
-//     req.body.uris,
-//   );
-//   res.send(response);
-// });
-
-// app.get('/tracks', async (req, res) => {
-//   const uri = req.query.uri;
-//   const trackSource = req.query.source;
-//   try {
-//     // const data = await getSpotifyTracks(url, spotifyProfile.accessToken);
-//     const data = await spotifyControl.getTracks(trackSource, uri);
-//     res.send(data);
-//   } catch (err) {
-//     console.log(err.message);
-//     console.log('fail');
-//     res.send('too bad');
-//   }
-// });
+app.get('/refreshToken', async (req, res) => {
+  session = req.session;
+  const { accessToken, refreshToken } = await spotifyControl.refreshAccessToken(
+    session?.playMixData?.refreshToken,
+  );
+  session.playMixData.accessToken =
+    accessToken ?? session?.playMixData?.accessToken;
+  session.playMixData.refreshToken =
+    refreshToken ?? session?.playMixData?.refreshToken;
+  res.send({ accessToken, refreshToken });
+});
 
 // const getRandomQualifier = () => {
 //   const qualifiers = [

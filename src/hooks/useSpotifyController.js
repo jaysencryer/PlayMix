@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { spotifyClientBuilder } from '../sapControl/spotify/API/spotifyClient';
+import * as SPOTIFY_CONSTANTS from '../sapControl/helpers/spotify/spotifyConstants';
 
 const useSpotifyController = (profile) => {
   const [spotifyProfile, setSpotifyProfile] = useState(profile);
@@ -10,7 +11,7 @@ const useSpotifyController = (profile) => {
     const initializeSpotifyClient = async () => {
       console.log(profile);
       const { accessToken, refreshToken } = profile;
-      const response = await axios.get('https://api.spotify.com/v1/me', {
+      const response = await axios.get(`${SPOTIFY_CONSTANTS.API_BASE_URL}/me`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       console.log(response.data);
@@ -29,6 +30,10 @@ const useSpotifyController = (profile) => {
 
     initializeSpotifyClient();
   }, []);
+
+  useEffect(() => {
+    console.log(`profile changed`);
+  }, [profile]);
 
   return { spotifyClient, spotifyProfile };
 };

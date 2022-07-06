@@ -2,6 +2,8 @@ import {
   authorize,
   configureSpotifyProfile,
   connect,
+  getAccessToken,
+  refreshAccessToken,
 } from '../Auth/spotifyAuth';
 
 import { SpotAxiosBuilder } from '../AxiosInstance/spotifyAxiosInstance';
@@ -90,11 +92,13 @@ Object.assign(spotifyAPI.prototype, {
   authorize,
   configureSpotifyProfile,
   connect,
+  getAccessToken,
   getAllUsersPlaylists,
   getPlayLists,
   getRandomSong,
   getTracks,
   playSong,
+  refreshAccessToken,
   searchSpotify,
   searchSpotifyArtists,
   searchSpotifySongs,

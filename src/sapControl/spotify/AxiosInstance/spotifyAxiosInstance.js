@@ -24,6 +24,7 @@ function spotAxios(accessToken, refreshToken) {
     baseURL: SPOTIFY.API_BASE_URL,
   });
   this.setSpotAxiosHeader();
+  this.setSpotAxiosInterceptors();
 }
 
 // spotAxios.prototype.initialize = async function (postBody) {
@@ -58,13 +59,18 @@ function spotAxios(accessToken, refreshToken) {
 //   }
 // };
 
-spotAxios.prototype.refreshAccessToken = async function (refreshToken) {
-  console.info('Refreshing access token');
-  const postBody = {
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
-  };
-  await this.getAccessToken(uriEncode(postBody));
+spotAxios.prototype.refreshAccessToken = async function () {
+  console.info('SpotAxios - Refreshing access token');
+  // const postBody = {
+  //   grant_type: 'refresh_token',
+  //   refresh_token: refreshToken,
+  // };
+  // const { refreshToken, accessToken } = await axios.get('/refreshToken');
+  const { data } = await axios.get('/refreshToken');
+  this.accessToken = data?.accessToken || this.accessToken;
+  this.refreshToken = data?.refreshToken || this.refreshToken;
+  // console.log(this);
+  // await this.getAccessToken(uriEncode(postBody));
 };
 
 // TO DO - how do we make this take in an access token....
@@ -83,7 +89,7 @@ spotAxios.prototype.responseErrorInterceptor = async function (error) {
 
     const refreshedHeader = {
       ...originalRequest.headers,
-      Authorization: `Bearer ${this._accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
     };
 
     return this.execute({
