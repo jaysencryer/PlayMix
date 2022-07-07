@@ -1,4 +1,12 @@
-const addTrack = (trackList, id, track, repeat) => {};
+const addTrack = (trackList, id, track, repeat) => {
+  const newTrackList = [];
+  for (let i = 0; i < repeat; i++) {
+    const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
+    newTrackList.push({ ...track, id: trackId });
+  }
+  trackList.splice(id, 1, ...newTrackList);
+  return trackList;
+};
 
 export default function trackReducer(trackList, action) {
   switch (action?.type) {

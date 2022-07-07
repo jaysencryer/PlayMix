@@ -12,7 +12,8 @@ const usePlayMixTracks = () => {
   const [trackList, dispatch] = useReducer(trackReducer, initialTrackList);
 
   const trackController = {
-    addTrack: (track) => dispatch({ type: 'add', track }),
+    addTrack: (id, track, repeat) =>
+      dispatch({ type: 'add', track, data: { id, repeat } }),
   };
   return { trackList, trackController };
 };
