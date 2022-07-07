@@ -11,6 +11,7 @@ import { validUri } from '../../sapControl/helpers/spotify/spotifyHelpers';
 
 import './PlayMix.css';
 import { useSpotify } from '../../context/spotifyContext';
+import usePlayMixTracks from '../../hooks/usePlayMixTracks';
 
 const newTrack = {
   type: trackType.SONG,
@@ -23,7 +24,8 @@ const newSong = {
 };
 
 const PlayMix = () => {
-  const [playMixTracks, setPlayMixTracks] = useState([]);
+  // const [playMixTracks, setPlayMixTracks] = useState([]);
+  const { playMixTracks, trackController } = usePlayMixTracks();
   // const [addTrack, setAddTrack] = useState(false);
   const [playMixSongs, setPlayMixSongs] = useState([]);
   const { spotifyClient } = useSpotify();
