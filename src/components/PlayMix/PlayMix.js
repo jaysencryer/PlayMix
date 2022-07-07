@@ -31,22 +31,24 @@ const PlayMix = () => {
   const { spotifyClient } = useSpotify();
 
   const saveTrack = async (id, track, repeat = 1) => {
-    const newTrackList = [];
+    // const newTrackList = [];
     const newSongList = [];
     console.log(id, track, repeat);
     // Set PlayMix Tracks
-    for (let i = 0; i < repeat; i++) {
-      console.log(`i = ${i}`);
-      // create new unique track id
-      const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
-      newTrackList.push({ ...track, id: trackId });
-    }
-    const oldTrackList = [...playMixTracks];
+    // for (let i = 0; i < repeat; i++) {
+    //   console.log(`i = ${i}`);
+    //   // create new unique track id
+    //   const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
+    //   newTrackList.push({ ...track, id: trackId });
+    // }
+    // const oldTrackList = [...playMixTracks];
 
-    // add the new track into the list
-    oldTrackList.splice(id, 1, ...newTrackList);
-    console.table(oldTrackList);
-    setPlayMixTracks(oldTrackList);
+    // // add the new track into the list
+    // oldTrackList.splice(id, 1, ...newTrackList);
+    // console.table(oldTrackList);
+    // setPlayMixTracks(oldTrackList);
+
+    trackController.addTrack(id, track, repeat);
 
     // Set actual songs (this is async and takes more time)
     for (let i = 0; i < repeat; i++) {
@@ -126,9 +128,10 @@ const PlayMix = () => {
         <button
           type="button"
           onClick={() => {
-            const trackId = playMixTracks.length ?? 0;
+            const trackId = playMixTracks?.length ?? 0;
             console.log(`trackId = ${trackId}`);
-            setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
+            trackController.addTrack(trackId, { ...newTrack, id: trackId });
+            // setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
             setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
           }}
         >

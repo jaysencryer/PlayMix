@@ -1,11 +1,16 @@
 const addTrack = (trackList, id, track, repeat) => {
-  const newTrackList = [];
+  console.log(`in reducer addTrack with id ${id}, repeat ${repeat}`);
+  console.log(track);
+  const tmpTrackList = [];
   for (let i = 0; i < repeat; i++) {
     const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
-    newTrackList.push({ ...track, id: trackId });
+    tmpTrackList.push({ ...track, id: trackId });
   }
-  trackList.splice(id, 1, ...newTrackList);
-  return trackList;
+  console.log(tmpTrackList);
+  const newTrackList = [...trackList];
+  newTrackList.splice(id, 1, ...tmpTrackList);
+  console.log(newTrackList);
+  return newTrackList;
 };
 
 export default function trackReducer(trackList, action) {

@@ -10,13 +10,13 @@ const initialTrackList = [
 ];
 
 const usePlayMixTracks = () => {
-  const [trackList, dispatch] = useReducer(trackReducer, initialTrackList);
+  const [playMixTracks, dispatch] = useReducer(trackReducer, []);
 
   const trackController = {
-    addTrack: (id, track, repeat) =>
+    addTrack: (id, track, repeat = 1) =>
       dispatch({ type: 'add', track, data: { id, repeat } }),
   };
-  return { trackList, trackController };
+  return { playMixTracks, trackController };
 };
 
 export default usePlayMixTracks;
