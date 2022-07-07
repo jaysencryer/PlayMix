@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TrackEditor from '../TrackEditor/TrackEditor';
 
-const ShowTrack = ({ client, track, id, saveTrack, edit }) => {
+const ShowTrack = ({ track, id, saveTrack, edit }) => {
   const [editMode, setEditMode] = useState(edit || false);
   return (
     <>
@@ -13,7 +13,6 @@ const ShowTrack = ({ client, track, id, saveTrack, edit }) => {
       )}
       {editMode && (
         <TrackEditor
-          client={client}
           id={id}
           track={track}
           saveTrack={saveTrack}

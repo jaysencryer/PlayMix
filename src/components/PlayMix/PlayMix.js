@@ -91,14 +91,10 @@ const PlayMix = () => {
     const songUris = playMixSongs
       .filter((song) => !song?.uri?.inValid)
       .map((song) => song.uri);
-    console.log(songUris);
+    // console.log(songUris);
 
     await spotifyClient.playSong(songUris);
-    // const data = await axios.post('/playsong', { songs: songUris });
-    // if (data.status !== 200) {
-    //   console.log('There was an error!');
-    //   console.error(data.statusText);
-    // }
+    // TODO - add error handling here?  or in client controller?
   };
 
   const saveAsPlayList = async () => {
@@ -106,8 +102,7 @@ const PlayMix = () => {
     const name = `PlayMix ${date.toLocaleDateString()}`;
     const uris = playMixSongs.map((song) => song.uri);
     const response = await spotifyClient.addSpotifyPlayList(name, uris);
-    // const response = axios.post('/playlist', { name: name, uris: uris });
-    console.log(response);
+    // TODO - add error handling here
   };
 
   return (
@@ -142,10 +137,7 @@ const PlayMix = () => {
       {playMixTracks &&
         playMixTracks.map((track, id) => (
           <section key={`${track.id}${track.type}`} className="playmix-track">
-            {/* {console.log(track)} */}
-            {/* <TrackSelector id={id} track={track} saveTrack={saveTrack} /> */}
             <ShowTrack
-              client={spotifyClient}
               id={id}
               track={track}
               saveTrack={saveTrack}

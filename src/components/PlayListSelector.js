@@ -1,19 +1,19 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import PlayLists from './PlayLists';
+import { useSpotify } from '../context/spotifyContext';
 
-const PlayListSelector = ({ client, setTracks, track }) => {
+const PlayListSelector = ({ setTracks, track }) => {
   const [playListOption, setPlayListOption] = useState();
   const [options, setOptions] = useState([{ label: '', uri: '' }]);
+  const { spotifyClient } = useSpotify();
 
   const getPlayLists = async () => {
     // let response;
-    if (client.playLists.length === 0) {
-      client.playLists = await client.getPlayLists();
+    if (spotifyClient.playLists.length === 0) {
+      spotifyClient.playLists = await spotifyClient.getPlayLists();
     }
     // const { data: response } = await axios.get('/playlists');
     // console.log(response);
-    return client.playLists.map((list) => ({
+    return spotifyClient.playLists.map((list) => ({
       label: list.name,
       tracks: list.tracks.href,
       uri: list.uri,
