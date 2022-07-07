@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useSpotify } from '../../context/spotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 
 import NavMenu from '../NavMenu/NavMenu';
 import PlayMix from '../PlayMix/PlayMix';

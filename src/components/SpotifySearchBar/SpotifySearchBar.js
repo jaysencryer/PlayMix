@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import AsyncSelect from 'react-select/async';
-import axios from 'axios';
 
 import './SpotifySearchBar.css';
-import { useSpotify } from '../../context/spotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 
 const SpotifySearchBar = ({ type, onSelect, library, value }) => {
   const [newValue, setNewValue] = useState(value);

@@ -10,7 +10,7 @@ import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { validUri } from '../../sapControl/helpers/spotify/spotifyHelpers';
 
 import './PlayMix.css';
-import { useSpotify } from '../../context/spotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 import usePlayMixTracks from '../../hooks/usePlayMixTracks';
 
 const newTrack = {
@@ -131,7 +131,6 @@ const PlayMix = () => {
             const trackId = playMixTracks?.length ?? 0;
             console.log(`trackId = ${trackId}`);
             trackController.addTrack(trackId, { ...newTrack, id: trackId });
-            // setPlayMixTracks([...playMixTracks, { ...newTrack, id: trackId }]);
             setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
           }}
         >

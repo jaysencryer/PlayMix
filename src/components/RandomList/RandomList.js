@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSpotify } from '../../context/spotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 
 const RandomList = () => {
   const [songUris, setSongUris] = useState([]);

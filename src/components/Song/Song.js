@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSpotify } from '../../context/spotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 
 const Song = ({ name, uri }) => {
   const { spotifyClient } = useSpotify();

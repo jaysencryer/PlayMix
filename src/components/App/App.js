@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import ConnectSpotify from '../ConnectSpotify/ConnectSpotify';
 import TestScreen from '../TestScreen/TestScreen';
 
 import './App.css';
-import { SpotifyProvider } from '../../context/spotifyContext';
+import { SpotifyProvider } from '../../context/SpotifyContext';
 
 export function App({ initialData }) {
   const { sessionData } = initialData;

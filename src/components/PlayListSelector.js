@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSpotify } from '../context/spotifyContext';
+import { useSpotify } from '../context/SpotifyContext';
 
 const PlayListSelector = ({ setTracks, track }) => {
   const [playListOption, setPlayListOption] = useState();
