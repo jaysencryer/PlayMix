@@ -15,3 +15,25 @@
   align-items: center;
   width: 100%;
 }
+
+#edit-name-container {
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#edit-name-container input {
+  height: 44px;
+  padding: 5px;
+  margin: 22.4px 8px;
+  outline: none;
+  font-size: 20px;
+}
+
+.edit-name-button {
+  height: 44px;
+  border-radius: 8px;
+  padding: 5px;
+  margin: 8px;
+}

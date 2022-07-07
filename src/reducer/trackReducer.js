@@ -1,16 +1,10 @@
-const addTrack = (trackList, id, track, repeat) => {
-  console.log(`in reducer addTrack with id ${id}, repeat ${repeat}`);
-  console.log(track);
+const addTrack = (id, track, repeat) => {
   const tmpTrackList = [];
   for (let i = 0; i < repeat; i++) {
     const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
     tmpTrackList.push({ ...track, id: trackId });
   }
-  console.log(tmpTrackList);
-  const newTrackList = [...trackList];
-  newTrackList.splice(id, 1, ...tmpTrackList);
-  console.log(newTrackList);
-  return newTrackList;
+  return tmpTrackList;
 };
 
 export default function trackReducer(trackList, action) {
@@ -18,8 +12,12 @@ export default function trackReducer(trackList, action) {
     case 'add': {
       const { id, repeat } = action?.data;
       const { track } = action;
-      const newTrackList = addTrack(trackList, id, track, repeat);
-      return newTrackList;
+      if (repeat > 1) {
+        trackList.splice(id, 1, ...addTrack(id, track, repeat));
+      } else {
+        trackList.splice(id, 1, track);
+      }
+      return trackList;
     }
     default:
       throw new Error(`Unhandled action ${action?.type}`);

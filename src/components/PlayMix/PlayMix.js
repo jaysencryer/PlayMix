@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 
-// import TrackSelector from '../TrackSelector/TrackSelector';
 import ShowTrack from '../ShowTrack/ShowTrack';
-// import DragTest from '../DragTest/DragTest';
-import generateSong from '../../helpers/generateSong';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
-import { validUri } from '../../sapControl/helpers/spotify/spotifyHelpers';
 
 import './PlayMix.css';
-import { useSpotify } from '../../context/SpotifyContext';
 import usePlayMixTracks from '../../hooks/usePlayMixTracks';
 
 const newTrack = {
@@ -18,111 +12,58 @@ const newTrack = {
   mode: trackMode.SPOTIFY,
 };
 
-const newSong = {
-  name: '',
-  uri: '',
-};
-
 const PlayMix = () => {
-  // const [playMixTracks, setPlayMixTracks] = useState([]);
-  const { playMixTracks, trackController } = usePlayMixTracks();
-  // const [addTrack, setAddTrack] = useState(false);
-  const [playMixSongs, setPlayMixSongs] = useState([]);
-  const { spotifyClient } = useSpotify();
+  const {
+    playMixTracks,
+    playMixSongs,
+    playMixName,
+    setPlayMixName,
+    playMixController,
+  } = usePlayMixTracks();
+  const [editName, setEditName] = useState(false);
+  const editNameRef = useRef(null);
 
-  const saveTrack = async (id, track, repeat = 1) => {
-    // const newTrackList = [];
-    const newSongList = [];
-    console.log(id, track, repeat);
-    // Set PlayMix Tracks
-    // for (let i = 0; i < repeat; i++) {
-    //   console.log(`i = ${i}`);
-    //   // create new unique track id
-    //   const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
-    //   newTrackList.push({ ...track, id: trackId });
-    // }
-    // const oldTrackList = [...playMixTracks];
-
-    // // add the new track into the list
-    // oldTrackList.splice(id, 1, ...newTrackList);
-    // console.table(oldTrackList);
-    // setPlayMixTracks(oldTrackList);
-
-    trackController.addTrack(id, track, repeat);
-
-    // Set actual songs (this is async and takes more time)
-    for (let i = 0; i < repeat; i++) {
-      const addedSong = await getUniqueSong(track, newSongList);
-      const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
-      newSongList.push({ ...addedSong, id: trackId });
+  useEffect(() => {
+    if (editName && editNameRef) {
+      editNameRef.current.focus();
     }
-
-    const oldSongList = [...playMixSongs];
-    oldSongList.splice(id, 1, ...newSongList);
-
-    console.table(oldSongList);
-    setPlayMixSongs(oldSongList);
-  };
-
-  const getUniqueSong = async (track, songList) => {
-    let addedSong;
-    if (track.type === trackType.RANDOM) {
-      do {
-        addedSong = await generateSong(spotifyClient, track);
-        console.log(addedSong.uri);
-      } while (!songList.every((song) => song.uri !== addedSong.uri));
-    } else {
-      addedSong = { name: track.label, uri: track.uri, id: track.id };
-    }
-    if (!validUri(addedSong.uri)) {
-      addedSong = { ...addedSong, inValid: true };
-    }
-    return addedSong;
-  };
-
-  const regenerateSongs = async () => {
-    const newSongList = [];
-    for (let track of playMixTracks) {
-      const addedSong = await getUniqueSong(track, newSongList);
-      newSongList.push({ ...addedSong });
-    }
-
-    console.table(newSongList);
-    setPlayMixSongs(newSongList);
-  };
-
-  const sendToSpotify = async () => {
-    const songUris = playMixSongs
-      .filter((song) => !song?.uri?.inValid)
-      .map((song) => song.uri);
-    // console.log(songUris);
-
-    await spotifyClient.playSong(songUris);
-    // TODO - add error handling here?  or in client controller?
-  };
-
-  const saveAsPlayList = async () => {
-    const date = new Date();
-    const name = `PlayMix ${date.toLocaleDateString()}`;
-    const uris = playMixSongs.map((song) => song.uri);
-    const response = await spotifyClient.addSpotifyPlayList(name, uris);
-    // TODO - add error handling here
-  };
-
+  }, [editName]);
   return (
     <div id="playmix-screen-container">
+      <div id="edit-name-container">
+        {editName ? (
+          <input
+            type="text"
+            value={playMixName}
+            onChange={(e) => setPlayMixName(e.target.value)}
+            onBlur={() => setEditName(false)}
+            ref={editNameRef}
+          />
+        ) : (
+          <h2>{playMixName}</h2>
+        )}
+        <button
+          type="button"
+          className="edit-name-button"
+          onClick={() => {
+            setEditName(true);
+          }}
+        >
+          EDIT
+        </button>
+      </div>
       <div className="playmix-controller">
         {playMixSongs.length > 5 && (
           <>
-            <button type="button" onClick={sendToSpotify}>
+            <button type="button" onClick={playMixController.addToQueue}>
               Send to Spotify
             </button>
-            <button type="button" onClick={saveAsPlayList}>
+            <button type="button" onClick={playMixController.savePlayList}>
               Save as PlayList
             </button>
-            <button type="button" onClick={regenerateSongs}>
+            {/* <button type="button" onClick={regenerateSongs}>
               Regenerate List
-            </button>
+            </button> */}
           </>
         )}
         <button
@@ -130,8 +71,7 @@ const PlayMix = () => {
           onClick={() => {
             const trackId = playMixTracks?.length ?? 0;
             console.log(`trackId = ${trackId}`);
-            trackController.addTrack(trackId, { ...newTrack, id: trackId });
-            setPlayMixSongs([...playMixSongs, { ...newSong, id: trackId }]);
+            playMixController.addTrack(trackId, { ...newTrack, id: trackId });
           }}
         >
           Add Track
@@ -144,7 +84,7 @@ const PlayMix = () => {
             <ShowTrack
               id={id}
               track={track}
-              saveTrack={saveTrack}
+              saveTrack={playMixController.addTrack}
               edit={track?.label ?? true}
             />
           </section>

@@ -10,10 +10,15 @@
   box-sizing: border-box;
 }
 
+
 body {
   background-color: var(--background-color);
   color: var(--color-main);
   font-size: 18px;
+}
+
+input {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 button {
