@@ -2,7 +2,6 @@ import { SpotAxiosBuilder } from '../AxiosInstance/spotifyAxiosInstance';
 
 import { playSong } from '../Play/spotifyPlay';
 
-import { configureSpotifyProfile } from '../Auth/spotifyAuth';
 import {
   addSpotifyPlayList,
   getPlayLists,
@@ -51,12 +50,16 @@ function spotifyClient(accessToken, refreshToken) {
     .useTokens(this.accessToken, this.refreshToken)
     .build();
   this.configureSpotifyProfile();
-  //   this.spotAxios.initialize();
 }
+
+spotifyClient.prototype.configureSpotifyProfile = async function () {
+  const profile = await this.spotAxios.execute.get('/me');
+  ({ id: this.userId, display_name: this.user } = profile.data);
+  this.avatar = profile.data.images[0].url;
+};
 
 Object.assign(spotifyClient.prototype, {
   addSpotifyPlayList,
-  configureSpotifyProfile,
   getAllUsersPlaylists,
   getPlayLists,
   getRandomSong,

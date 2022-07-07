@@ -1,32 +1,10 @@
 import {
   authorize,
-  configureSpotifyProfile,
+  // configureSpotifyProfile,
   connect,
   getAccessToken,
   refreshAccessToken,
 } from '../Auth/spotifyAuth';
-
-import { SpotAxiosBuilder } from '../AxiosInstance/spotifyAxiosInstance';
-
-import { playSong } from '../Play/spotifyPlay';
-
-import {
-  addSpotifyPlayList,
-  getPlayLists,
-  getAllUsersPlaylists,
-  getTracks,
-} from '../PlayLists/spotifyPlayLists';
-
-import {
-  getRandomSong,
-  selectRandomSpotifySong,
-} from '../Random/spotifyRandom';
-
-import {
-  searchSpotify,
-  searchSpotifySongs,
-  searchSpotifyArtists,
-} from '../Search/spotifySearch';
 
 export function spotifyAPIBuilder() {
   return {
@@ -71,36 +49,11 @@ function spotifyAPI(authBuffer, clientId, redirectUrl, authorizedUrl) {
   this.redirectUrl = redirectUrl;
   this.authorizedUrl = authorizedUrl ?? '/spotifycomplete';
   this.authBuffer = authBuffer;
-
-  this.playLists = [];
-
-  // this.spotAxios = SpotAxiosBuilder().useAuthBuffer(authBuffer).build();
 }
 
-spotifyAPI.prototype.getProfile = function () {
-  return {
-    id: this.userId,
-    user: this.user,
-    avatar: this.avatar,
-    accessToken: this.accessToken,
-    refreshToken: this.refreshToken,
-  };
-};
-
 Object.assign(spotifyAPI.prototype, {
-  addSpotifyPlayList,
   authorize,
-  configureSpotifyProfile,
   connect,
   getAccessToken,
-  getAllUsersPlaylists,
-  getPlayLists,
-  getRandomSong,
-  getTracks,
-  playSong,
   refreshAccessToken,
-  searchSpotify,
-  searchSpotifyArtists,
-  searchSpotifySongs,
-  selectRandomSpotifySong,
 });

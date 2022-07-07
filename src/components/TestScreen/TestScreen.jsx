@@ -9,7 +9,7 @@ import RandomSong from '../RandomSong/RandomSong';
 import TestBed from '../TestBed/TestBed';
 
 const TestScreen = () => {
-  const { spotifyClient, spotifyProfile } = useSpotify();
+  const { spotifyProfile } = useSpotify();
   const [view, setView] = useState('testing');
 
   return (
@@ -24,16 +24,16 @@ const TestScreen = () => {
           <>
             <ul>
               <li>
-                <RandomSong client={spotifyClient} />
+                <RandomSong />
               </li>
               <li>
-                <RandomList client={spotifyClient} />
+                <RandomList />
               </li>
             </ul>
             <TestBed />
           </>
         )}
-        {view === 'playmix' && <PlayMix client={spotifyClient} />}
+        {view === 'playmix' && <PlayMix />}
       </div>
     </main>
   );

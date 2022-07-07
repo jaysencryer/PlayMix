@@ -31,10 +31,6 @@ const useSpotifyController = (profile) => {
     initializeSpotifyClient();
   }, []);
 
-  useEffect(() => {
-    console.log(`profile changed`);
-  }, [profile]);
-
   return { spotifyClient, spotifyProfile };
 };
 

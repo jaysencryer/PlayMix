@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import ConnectSpotify from '../ConnectSpotify/ConnectSpotify';
 import TestScreen from '../TestScreen/TestScreen';
@@ -18,6 +18,7 @@ export function App({ initialData }) {
       </main>
     );
   }
+
   return (
     <SpotifyProvider profile={sessionData}>
       <TestScreen />

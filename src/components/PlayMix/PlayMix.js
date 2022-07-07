@@ -10,6 +10,7 @@ import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { validUri } from '../../sapControl/helpers/spotify/spotifyHelpers';
 
 import './PlayMix.css';
+import { useSpotify } from '../../context/spotifyContext';
 
 const newTrack = {
   type: trackType.SONG,
@@ -21,10 +22,11 @@ const newSong = {
   uri: '',
 };
 
-const PlayMix = ({ client }) => {
+const PlayMix = () => {
   const [playMixTracks, setPlayMixTracks] = useState([]);
   // const [addTrack, setAddTrack] = useState(false);
   const [playMixSongs, setPlayMixSongs] = useState([]);
+  const { spotifyClient } = useSpotify();
 
   const saveTrack = async (id, track, repeat = 1) => {
     const newTrackList = [];
@@ -62,7 +64,7 @@ const PlayMix = ({ client }) => {
     let addedSong;
     if (track.type === trackType.RANDOM) {
       do {
-        addedSong = await generateSong(client, track);
+        addedSong = await generateSong(spotifyClient, track);
         console.log(addedSong.uri);
       } while (!songList.every((song) => song.uri !== addedSong.uri));
     } else {
@@ -91,7 +93,7 @@ const PlayMix = ({ client }) => {
       .map((song) => song.uri);
     console.log(songUris);
 
-    await client.playSong(songUris);
+    await spotifyClient.playSong(songUris);
     // const data = await axios.post('/playsong', { songs: songUris });
     // if (data.status !== 200) {
     //   console.log('There was an error!');
@@ -103,7 +105,7 @@ const PlayMix = ({ client }) => {
     const date = new Date();
     const name = `PlayMix ${date.toLocaleDateString()}`;
     const uris = playMixSongs.map((song) => song.uri);
-    const response = await client.addSpotifyPlayList(name, uris);
+    const response = await spotifyClient.addSpotifyPlayList(name, uris);
     // const response = axios.post('/playlist', { name: name, uris: uris });
     console.log(response);
   };
@@ -143,7 +145,7 @@ const PlayMix = ({ client }) => {
             {/* {console.log(track)} */}
             {/* <TrackSelector id={id} track={track} saveTrack={saveTrack} /> */}
             <ShowTrack
-              client={client}
+              client={spotifyClient}
               id={id}
               track={track}
               saveTrack={saveTrack}

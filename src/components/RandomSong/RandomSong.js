@@ -1,18 +1,13 @@
-import axios from 'axios';
 import React, { useState } from 'react';
+import { useSpotify } from '../../context/spotifyContext';
 import Song from '../Song/Song';
 
-// export const getRandomSong = async () => {
-//   const { data: randSong } = await axios.get(`/random`);
-//   return randSong;
-// };
-
-const RandomSong = ({ client }) => {
+const RandomSong = () => {
   const [song, setSong] = useState({});
-  console.log(client);
+  const { spotifyClient } = useSpotify();
 
   const clickHandler = async () => {
-    const randSong = await client.getRandomSong();
+    const randSong = await spotifyClient.getRandomSong();
     // console.log(data);
     setSong(randSong);
   };
@@ -20,7 +15,7 @@ const RandomSong = ({ client }) => {
   return (
     <div>
       <button onClick={() => clickHandler()}>Pick Random Song</button>
-      {song && <Song client={client} name={song.name} uri={song.uri} />}
+      {song && <Song name={song.name} uri={song.uri} />}
     </div>
   );
 };
