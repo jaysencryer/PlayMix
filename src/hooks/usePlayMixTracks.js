@@ -25,25 +25,34 @@ const usePlayMixTracks = () => {
   const getUniqueSong = async (track, songList) => {
     let addedSong;
     if (track.type === trackType.RANDOM) {
+      let duplicateTrackerCount = 0;
       do {
+        if (duplicateTrackerCount > 5) {
+          // If we've picked a song that exists in the playmix already more than 5 times
+          // we'll keep it - but mark it as invalid.
+          addedSong.inValid = true;
+          console.log(
+            "given up on making sure it's not in playlist - just making it invalid",
+          );
+          console.log(addedSong);
+          break;
+        }
         addedSong = await generateSong(spotifyClient, track);
+        duplicateTrackerCount++;
       } while (!songList.every((song) => song.uri !== addedSong.uri));
     } else {
       addedSong = { name: track.label, uri: track.uri, id: track.id };
     }
-    if (!validUri(addedSong.uri)) {
-      addedSong = { ...addedSong, inValid: true };
-    }
+    addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
     return addedSong;
   };
 
-  const generateSongs = async () => {
+  const refreshSongs = async () => {
     const newSongList = [];
     for (let track of playMixTracks) {
       const addedSong = await getUniqueSong(track, newSongList);
       newSongList.push({ ...addedSong });
     }
-
     return newSongList;
   };
 
@@ -52,8 +61,8 @@ const usePlayMixTracks = () => {
       const newSongList = await Promise.all(
         playMixTracks.map(async (track) => {
           const song = playMixSongs.find((song) => song?.id === track?.id);
-          if (song) {
-            // song not found - add one
+          if (!song || !song?.uri) {
+            // song not found or uri not established - add one
             const newSong = await getUniqueSong(track, playMixSongs);
             return newSong;
           } else {
@@ -61,6 +70,7 @@ const usePlayMixTracks = () => {
           }
         }),
       );
+      console.table(newSongList);
       setPlayMixSongs(newSongList);
     };
 
@@ -70,22 +80,6 @@ const usePlayMixTracks = () => {
   const playMixController = {
     addTrack: async (track) => {
       dispatch({ type: 'add', track });
-      //   const newSongList = [];
-      //   const oldSongList = [...playMixSongs];
-      //   //   console.table(oldSongList);
-      //   if (repeat > 1) {
-      //     for (let i = 0; i < repeat; i++) {
-      //       const addedSong = await getUniqueSong(track, newSongList);
-      //       const trackId = `${track?.id}${String.fromCharCode(i + 97)}`;
-      //       newSongList.push({ ...addedSong, id: trackId });
-      //     }
-      //     oldSongList.splice(id, 1, ...newSongList);
-      //   } else {
-      //     const addedSong = await getUniqueSong(track, playMixSongs);
-      //     oldSongList.splice(id, 1, { ...addedSong, id });
-      //   }
-      //   //   console.table(oldSongList);
-      //   setPlayMixSongs(oldSongList);
     },
     updateTrack: async (track) => dispatch({ type: 'edit', track }),
     duplicateTrack: async (track) => dispatch({ type: 'duplicate', track }),
@@ -95,16 +89,20 @@ const usePlayMixTracks = () => {
         uris.push(...playMixSongs.map((song) => song?.uri));
       } else {
         console.log('generating songs before save');
-        const songs = await generateSongs();
-        uris.push(...songs.map((song) => song?.uri));
+        const songs = await refreshSongs();
+        const songUris = songs
+          .filter((song) => !song?.inValid)
+          .map((song) => song.uri);
+        uris.push(...songUris);
       }
       await spotifyClient.addSpotifyPlayList(playMixName, uris);
     },
     addToQueue: async () => {
-      const songs = await generateSongs();
+      const songs = await refreshSongs();
       const songUris = songs
-        .filter((song) => !song?.uri?.inValid)
+        .filter((song) => !song?.inValid)
         .map((song) => song.uri);
+      console.table(songUris);
       await spotifyClient.playSong(songUris);
       setPlayMixSongs(songs);
     },
