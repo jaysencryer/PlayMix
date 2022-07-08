@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PlayMixProvider } from '../../context/PlayMixContext';
 
 import { useSpotify } from '../../context/SpotifyContext';
 
@@ -33,7 +34,11 @@ const TestScreen = () => {
             <TestBed />
           </>
         )}
-        {view === 'playmix' && <PlayMix />}
+        {view === 'playmix' && (
+          <PlayMixProvider>
+            <PlayMix />
+          </PlayMixProvider>
+        )}
       </div>
     </main>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import './SelectBar.css';
 
@@ -8,7 +8,10 @@ const SelectBar = ({
   selected,
 }) => {
   const [activeOption, setActiveOption] = useState(selected || options?.[0]);
-
+  console.log(`activeOption = ${activeOption}`);
+  useEffect(() => {
+    onClick(options?.[0]);
+  }, []);
   return (
     <div id="select-bar">
       {options &&

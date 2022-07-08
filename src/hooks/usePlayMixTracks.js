@@ -10,9 +10,8 @@ const usePlayMixTracks = () => {
   const [playMixTracks, dispatch] = useReducer(trackReducer, []);
   const [playMixSongs, setPlayMixSongs] = useState([]);
   const [playMixName, setPlayMixName] = useState();
-  const [initial, setInitial] = useState(true);
+  //   const [initial, setInitial] = useState(true);
   const { spotifyClient } = useSpotify();
-  //   let initial = true;
 
   const initializePlayMixName = () => {
     const date = new Date();
@@ -28,7 +27,6 @@ const usePlayMixTracks = () => {
     if (track.type === trackType.RANDOM) {
       do {
         addedSong = await generateSong(spotifyClient, track);
-        console.log(addedSong.uri);
       } while (!songList.every((song) => song.uri !== addedSong.uri));
     } else {
       addedSong = { name: track.label, uri: track.uri, id: track.id };
@@ -39,7 +37,7 @@ const usePlayMixTracks = () => {
     return addedSong;
   };
 
-  const regenerateSongs = async () => {
+  const generateSongs = async () => {
     const newSongList = [];
     for (let track of playMixTracks) {
       const addedSong = await getUniqueSong(track, newSongList);
@@ -50,44 +48,44 @@ const usePlayMixTracks = () => {
   };
 
   const playMixController = {
-    addTrack: async (id, track, repeat = 1) => {
-      dispatch({ type: 'add', track, data: { id, repeat } });
-      const newSongList = [];
-      const oldSongList = [...playMixSongs];
-      if (repeat > 1) {
-        for (let i = 0; i < repeat; i++) {
-          const addedSong = await getUniqueSong(track, newSongList);
-          const trackId = `${track.id}${String.fromCharCode(i + 97)}`;
-          newSongList.push({ ...addedSong, id: trackId });
-        }
-        oldSongList.splice(id, 1, ...newSongList);
-      } else {
-        const addedSong = await getUniqueSong(track, playMixSongs);
-        oldSongList.splice(id, 1, { ...addedSong, id: id });
-      }
-      console.table(oldSongList);
-      setPlayMixSongs(oldSongList);
+    addTrack: async (track) => {
+      dispatch({ type: 'add', track });
+      //   const newSongList = [];
+      //   const oldSongList = [...playMixSongs];
+      //   //   console.table(oldSongList);
+      //   if (repeat > 1) {
+      //     for (let i = 0; i < repeat; i++) {
+      //       const addedSong = await getUniqueSong(track, newSongList);
+      //       const trackId = `${track?.id}${String.fromCharCode(i + 97)}`;
+      //       newSongList.push({ ...addedSong, id: trackId });
+      //     }
+      //     oldSongList.splice(id, 1, ...newSongList);
+      //   } else {
+      //     const addedSong = await getUniqueSong(track, playMixSongs);
+      //     oldSongList.splice(id, 1, { ...addedSong, id });
+      //   }
+      //   //   console.table(oldSongList);
+      //   setPlayMixSongs(oldSongList);
     },
+    updateTrack: async (track) => dispatch({ type: 'edit', track }),
+    duplicateTrack: async (track) => dispatch({ type: 'duplicate', track }),
     savePlayList: async () => {
-      const uris = playMixSongs.map((song) => song.uri);
+      const uris = [];
+      if (playMixSongs.length > 0) {
+        uris.push(...playMixSongs.map((song) => song?.uri));
+      } else {
+        const songs = await generateSongs();
+        uris.push(...songs);
+      }
       await spotifyClient.addSpotifyPlayList(playMixName, uris);
     },
     addToQueue: async () => {
-      const songs = [];
-      if (!initial) {
-        console.log('not initial');
-        const genSongs = await regenerateSongs();
-        songs.push(...genSongs);
-      } else {
-        console.log('initial');
-        songs.push(...playMixSongs);
-      }
+      const songs = await generateSongs();
       const songUris = songs
         .filter((song) => !song?.uri?.inValid)
         .map((song) => song.uri);
       await spotifyClient.playSong(songUris);
       setPlayMixSongs(songs);
-      setInitial(false);
     },
   };
   return {

@@ -8,14 +8,20 @@ import SelectBar from '../SelectBar/SelectBar';
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 import './TrackEditor.css';
+import { usePlayMix } from '../../context/PlayMixContext';
 
-const TrackEditor = ({ track, id, saveTrack, onSave }) => {
-  const [selectType, setSelectType] = useState(track.type);
-  const [randomMode, setRandomMode] = useState(track.mode);
-  const [repeat, setRepeat] = useState(false);
-  const [repeatTimes, setRepeatTimes] = useState(1);
+const TrackEditor = ({ track, onSave }) => {
+  const [selectType, setSelectType] = useState(track?.type || trackType.SONG);
+  const [randomMode, setRandomMode] = useState(track?.mode);
+  // const [repeat, setRepeat] = useState(false);
+  // const [repeatTimes, setRepeatTimes] = useState(1);
+  const { playMixController } = usePlayMix();
+  const [editTrack, setEditTrack] = useState(track);
   // const [trackGenre, setTrackGenre] = useState('');
   // const [label, setLabel] = useState(track.label);
+
+  // console.log('In Track Editor');
+  // console.table(playMixTracks);
 
   const selectTrack = ({
     label,
@@ -24,19 +30,20 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
     option = null,
   }) => {
     // we've selected a track
-    console.log('Selected a track');
-    saveTrack(
-      id,
-      {
-        type: selectType,
-        mode: mode,
-        label: label,
-        option: option,
-        uri: uri,
-        id: track.id,
-      },
-      repeatTimes,
-    );
+    // console.log('Selected a track');
+    setEditTrack({
+      type: selectType,
+      mode,
+      label,
+      option,
+      uri,
+      id: editTrack?.id,
+    });
+  };
+
+  const saveHandler = async () => {
+    await playMixController.updateTrack(editTrack);
+    onSave();
   };
 
   const toggleTrackType = () => {
@@ -62,7 +69,7 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
             onSelect={(selected) => selectTrack(selected)}
             type="track"
             library="spotify"
-            value={track.label}
+            value={editTrack?.label ?? ''}
           />
         )}
       </div>
@@ -83,23 +90,23 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
             selected={randomMode}
           />
           {randomMode === trackMode.PLAYLIST && (
-            <PlaylistSelector setTracks={selectTrack} track={track} />
+            <PlaylistSelector setTracks={selectTrack} track={editTrack} />
           )}
           {randomMode === trackMode.ARTIST && (
             <SpotifySearchBar
               onSelect={(selected) => selectTrack({ label: selected.label })}
               type={SEARCHTYPE.ARTIST}
               library="spotify"
-              value={track.label}
+              value={editTrack?.label}
             />
           )}
         </>
       )}
       <div className="toolBar">
-        <button type="button" onClick={onSave}>
+        <button type="button" onClick={saveHandler}>
           Save
         </button>
-        <label htmlFor="repeat-check">Repeat:</label>
+        {/* <label htmlFor="repeat-check">Repeat:</label>
         <input
           type="checkbox"
           id="repeat-check"
@@ -115,7 +122,7 @@ const TrackEditor = ({ track, id, saveTrack, onSave }) => {
               setRepeatTimes(e.target.value);
             }}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

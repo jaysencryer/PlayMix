@@ -5,7 +5,7 @@ import ShowTrack from '../ShowTrack/ShowTrack';
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 
 import './PlayMix.css';
-import usePlayMixTracks from '../../hooks/usePlayMixTracks';
+import { usePlayMix } from '../../context/PlayMixContext';
 
 const newTrack = {
   type: trackType.SONG,
@@ -13,21 +13,20 @@ const newTrack = {
 };
 
 const PlayMix = () => {
-  const {
-    playMixTracks,
-    playMixSongs,
-    playMixName,
-    setPlayMixName,
-    playMixController,
-  } = usePlayMixTracks();
+  const { playMixTracks, playMixName, setPlayMixName, playMixController } =
+    usePlayMix();
   const [editName, setEditName] = useState(false);
   const editNameRef = useRef(null);
+
+  console.log('In PlayMix.js');
+  console.table(playMixTracks);
 
   useEffect(() => {
     if (editName && editNameRef) {
       editNameRef.current.focus();
     }
   }, [editName]);
+
   return (
     <div id="playmix-screen-container">
       <div id="edit-name-container">
@@ -53,7 +52,7 @@ const PlayMix = () => {
         </button>
       </div>
       <div className="playmix-controller">
-        {playMixSongs.length > 5 && (
+        {playMixTracks.length > 5 && (
           <>
             <button type="button" onClick={playMixController.addToQueue}>
               Send to Spotify
@@ -69,9 +68,8 @@ const PlayMix = () => {
         <button
           type="button"
           onClick={() => {
-            const trackId = playMixTracks?.length ?? 0;
-            console.log(`trackId = ${trackId}`);
-            playMixController.addTrack(trackId, { ...newTrack, id: trackId });
+            const trackId = playMixTracks?.length;
+            playMixController.addTrack({ ...newTrack, id: trackId });
           }}
         >
           Add Track
@@ -79,15 +77,10 @@ const PlayMix = () => {
       </div>
       <p>Create your PlayMix</p>
       {playMixTracks &&
-        playMixTracks.map((track, id) => (
-          <section key={`${track.id}${track.type}`} className="playmix-track">
-            <ShowTrack
-              id={id}
-              track={track}
-              saveTrack={playMixController.addTrack}
-              edit={track?.label ?? true}
-            />
-          </section>
+        playMixTracks.map((track, index) => (
+          <div key={`${index}${track?.id}`} className="playmix-track">
+            <ShowTrack track={track} edit={track?.label ? false : true} />
+          </div>
         ))}
     </div>
   );

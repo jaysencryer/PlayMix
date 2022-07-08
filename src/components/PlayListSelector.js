@@ -28,7 +28,7 @@ const PlayListSelector = ({ setTracks, track }) => {
     const getOptions = async () => {
       const plOptions = await getPlayLists();
       console.log(plOptions);
-      setPlayListOption([findIndex(track.label, plOptions) + 2]);
+      setPlayListOption([findIndex(track?.label, plOptions) + 2]);
       setOptions(plOptions);
     };
 
@@ -79,7 +79,6 @@ const PlayListSelector = ({ setTracks, track }) => {
             name="playListSelector"
             value={playListOption}
             onChange={selectHandler}
-            multiple
           >
             {/* size={5} */}
             {/* defaultValue={['default']} */}
