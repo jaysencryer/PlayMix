@@ -47,6 +47,28 @@ const usePlayMixTracks = () => {
     return newSongList;
   };
 
+  useEffect(() => {
+    const generateSongList = async () => {
+      const newSongList = await Promise.all(
+        playMixTracks.map(async (track) => {
+          const songIndex = playMixSongs.findIndex(
+            (song) => song.id === track.id,
+          );
+          if (songIndex < 0) {
+            // song not found - add one
+            const newSong = await getUniqueSong(track, playMixSongs);
+            return newSong;
+          } else {
+            return playMixSongs[songIndex];
+          }
+        }),
+      );
+      setPlayMixSongs(newSongList);
+    };
+
+    generateSongList();
+  }, [playMixTracks]);
+
   const playMixController = {
     addTrack: async (track) => {
       dispatch({ type: 'add', track });
@@ -74,8 +96,9 @@ const usePlayMixTracks = () => {
       if (playMixSongs.length > 0) {
         uris.push(...playMixSongs.map((song) => song?.uri));
       } else {
+        console.log('generating songs before save');
         const songs = await generateSongs();
-        uris.push(...songs);
+        uris.push(...songs.map((song) => song?.uri));
       }
       await spotifyClient.addSpotifyPlayList(playMixName, uris);
     },
