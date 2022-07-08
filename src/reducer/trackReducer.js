@@ -42,7 +42,8 @@ export default function trackReducer(trackList, action) {
       const { track } = action;
       const newTrackList = [...trackList];
       const tracksToAdd = [track, { ...track, id: getId() }];
-      newTrackList.splice(track?.id, 1, ...tracksToAdd);
+      const index = newTrackList.findIndex((t) => t.id === track.id);
+      newTrackList.splice(index, 1, ...tracksToAdd);
       return newTrackList;
     }
     default:

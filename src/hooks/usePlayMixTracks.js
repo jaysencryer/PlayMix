@@ -51,15 +51,13 @@ const usePlayMixTracks = () => {
     const generateSongList = async () => {
       const newSongList = await Promise.all(
         playMixTracks.map(async (track) => {
-          const songIndex = playMixSongs.findIndex(
-            (song) => song.id === track.id,
-          );
-          if (songIndex < 0) {
+          const song = playMixSongs.find((song) => song?.id === track?.id);
+          if (song) {
             // song not found - add one
             const newSong = await getUniqueSong(track, playMixSongs);
             return newSong;
           } else {
-            return playMixSongs[songIndex];
+            return song;
           }
         }),
       );
