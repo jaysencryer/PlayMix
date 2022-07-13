@@ -5,14 +5,19 @@ import { useSpotify } from '../../context/SpotifyContext';
 
 import NavMenu from '../NavMenu/NavMenu';
 import PlayMix from '../PlayMix/PlayMix';
+import PlayMixes from '../PlayMixes/PlayMixes';
 import RandomList from '../RandomList/RandomList';
 import RandomSong from '../RandomSong/RandomSong';
-import TestBed from '../TestBed/TestBed';
 
 const TestScreen = () => {
   const { spotifyProfile } = useSpotify();
   const [view, setView] = useState('testing');
+  const [mix, setMix] = useState();
 
+  const selectMix = (selectedMix) => {
+    setMix(selectedMix);
+    setView('playmix');
+  };
   return (
     <main id="main-app">
       <NavMenu
@@ -31,11 +36,11 @@ const TestScreen = () => {
                 <RandomList />
               </li>
             </ul>
-            <TestBed />
+            <PlayMixes selectMix={selectMix} />
           </>
         )}
         {view === 'playmix' && (
-          <PlayMixProvider>
+          <PlayMixProvider selectedMix={mix}>
             <PlayMix />
           </PlayMixProvider>
         )}

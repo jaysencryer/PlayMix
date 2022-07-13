@@ -5,14 +5,17 @@ import serialize from 'serialize-javascript';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 
 import config from 'server/config';
 import { serverRenderer } from 'renderers/server';
 
 import { SapControlBuilder } from '../sapControl/sapControl';
 
-import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
-import { randomItem } from '../sapControl/helpers/helpers';
+import playMixRoutes from './playMixRoutes';
+
+// import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
+// import { randomItem } from '../sapControl/helpers/helpers';
 
 const app = express();
 app.enable('trust proxy');
@@ -59,10 +62,18 @@ const client_secret = process.env.SPOT_SECRET;
 const redirect_uri =
   process.env.SPOT_REDIRECT_URL || 'http://localhost:1234/authorized';
 
+const mongoUrl = process.env.MONGOURL;
+
+mongoose.connect(mongoUrl, () => {
+  console.log('Connected to Mongo DB Successfully!!');
+});
+
 // // encode the client_id and secret for passing to spotify
 // const authBuffer = Buffer.from(`${client_id}:${client_secret}`).toString(
 //   'base64',
 // );
+
+app.use('/playMix', playMixRoutes);
 
 const spotifyControl = SapControlBuilder()
   .useStreamer('spotify')
@@ -75,6 +86,7 @@ let session;
 app.get('/', async (req, res) => {
   session = req.session;
   const sessionData = session.playMixData;
+  console.log(session);
   try {
     const vars = await serverRenderer(sessionData);
     res.render('index', vars);
@@ -90,8 +102,10 @@ app.get('/connectSpotify', (req, res) => {
 
 app.get('/authorized', async (req, res) => {
   session = req.session;
-  const { authorizedUrl, accessToken, refreshToken } =
-    await spotifyControl.authorize(req);
+  const response = await spotifyControl.authorize(req);
+  console.log(response);
+  const { authorizedUrl, accessToken, refreshToken } = response;
+
   session.playMixData = { accessToken, refreshToken };
   res.redirect(authorizedUrl);
 });
@@ -112,6 +126,16 @@ app.get('/refreshToken', async (req, res) => {
   session.playMixData.refreshToken =
     refreshToken ?? session?.playMixData?.refreshToken;
   res.send({ accessToken, refreshToken });
+});
+
+app.post('/setSessionUser', (req, res) => {
+  if (req.body.accessToken === req.session.playMixData.accessToken) {
+    req.session.playMixData.userId = req.body.userId;
+  }
+
+  console.log(`set session userId to ${req.body.userId}`);
+  console.log(req.session.playMixData);
+  res.send('okay');
 });
 
 // const getRandomQualifier = () => {

@@ -13,10 +13,16 @@ const useSpotifyController = (profile) => {
       const response = await axios.get(`${SPOTIFY_CONSTANTS.API_BASE_URL}/me`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+      // TODO - leverage the client builder getProfile?
       setSpotifyProfile({
         ...spotifyProfile,
         user: response?.data?.display_name,
+        userId: response?.data?.id,
         avatar: response?.data?.images?.[0]?.url,
+      });
+      axios.post('/setSessionUser', {
+        userId: response?.data?.id,
+        accessToken,
       });
       const client = await spotifyClientBuilder()
         .useTokens(accessToken, refreshToken)

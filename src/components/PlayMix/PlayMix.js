@@ -18,9 +18,6 @@ const PlayMix = () => {
   const [editName, setEditName] = useState(false);
   const editNameRef = useRef(null);
 
-  console.log('In PlayMix.js');
-  console.table(playMixTracks);
-
   useEffect(() => {
     if (editName && editNameRef) {
       editNameRef.current.focus();
@@ -56,6 +53,9 @@ const PlayMix = () => {
           <>
             <button type="button" onClick={playMixController.addToQueue}>
               Send to Spotify
+            </button>
+            <button type="button" onClick={playMixController.savePlayMix}>
+              Save
             </button>
             <button type="button" onClick={playMixController.savePlayList}>
               Save as PlayList

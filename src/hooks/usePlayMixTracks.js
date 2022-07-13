@@ -5,21 +5,29 @@ import { trackType, trackMode } from '../sapControl/constants/enums';
 import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
 import generateSong from '../helpers/generateSong';
 import { useSpotify } from '../context/SpotifyContext';
+import axios from 'axios';
+import { uriEncode } from '../sapControl/helpers/helpers';
 
-const usePlayMixTracks = () => {
+const usePlayMixTracks = (mix) => {
   const [playMixTracks, dispatch] = useReducer(trackReducer, []);
   const [playMixSongs, setPlayMixSongs] = useState([]);
   const [playMixName, setPlayMixName] = useState();
+  const id = mix?._id;
   //   const [initial, setInitial] = useState(true);
-  const { spotifyClient } = useSpotify();
+  const { spotifyClient, spotifyProfile } = useSpotify();
 
   const initializePlayMixName = () => {
     const date = new Date();
-    setPlayMixName(`PlayMix ${date.toLocaleDateString()}`);
+    setPlayMixName(mix?.name || `PlayMix ${date.toLocaleDateString()}`);
+  };
+
+  const initializePlayMixTracks = () => {
+    dispatch({ type: 'initialize', tracks: mix?.tracks });
   };
 
   useEffect(() => {
     initializePlayMixName();
+    initializePlayMixTracks();
   }, []);
 
   const getUniqueSong = async (track, songList) => {
@@ -105,6 +113,18 @@ const usePlayMixTracks = () => {
       console.table(songUris);
       await spotifyClient.playSong(songUris);
       setPlayMixSongs(songs);
+    },
+    savePlayMix: async () => {
+      const postBody = {
+        playmix: {
+          _id: id,
+          name: playMixName,
+          ownerId: spotifyProfile?.userId,
+          tracks: playMixTracks,
+        },
+      };
+      const response = await axios.post('/playmix/save', postBody);
+      console.log(response);
     },
   };
   return {

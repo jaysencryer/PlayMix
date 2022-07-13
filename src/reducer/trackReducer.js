@@ -46,6 +46,14 @@ export default function trackReducer(trackList, action) {
       newTrackList.splice(index, 1, ...tracksToAdd);
       return newTrackList;
     }
+    case 'initialize': {
+      const tracks = action?.tracks.map((track) => ({
+        ...track,
+        id: track?._id || getId(),
+      }));
+
+      return tracks;
+    }
     default:
       throw new Error(`Unhandled action ${action?.type}`);
   }

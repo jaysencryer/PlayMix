@@ -4,8 +4,8 @@ import usePlayMixTracks from '../hooks/usePlayMixTracks';
 
 export const PlayMixContext = createContext(null);
 
-export const PlayMixProvider = ({ children }) => {
-  const contextValue = usePlayMixTracks();
+export const PlayMixProvider = ({ selectedMix, children }) => {
+  const contextValue = usePlayMixTracks(selectedMix);
   return (
     <PlayMixContext.Provider value={contextValue}>
       {children}
