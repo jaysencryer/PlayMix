@@ -1,0 +1,15 @@
+#playmix-container {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+
+#playmix-container > li {
+    height: 44px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 600;
+    justify-content: space-between;
+}
