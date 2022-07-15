@@ -3,7 +3,7 @@ import trackReducer from '../reducer/trackReducer';
 
 import { trackType, trackMode } from '../sapControl/constants/enums';
 import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
-import generateSong from '../helpers/generateSong';
+import { generateSong } from '../helpers/generateSong';
 import { useSpotify } from '../context/SpotifyContext';
 import axios from 'axios';
 import { uriEncode } from '../sapControl/helpers/helpers';
@@ -22,6 +22,7 @@ const usePlayMixTracks = (mix) => {
   };
 
   const initializePlayMixTracks = () => {
+    if (!mix?.tracks) return;
     dispatch({ type: 'initialize', tracks: mix?.tracks });
   };
 

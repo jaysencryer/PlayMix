@@ -1,11 +1,23 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { PlayMixProvider } from '../../context/PlayMixContext';
 import { useSpotify } from '../../context/SpotifyContext';
+
+import { mapTracksToSongUris } from '../../helpers/generateSong';
+
+import './PlayMixes.css';
 
 const PlayMixes = ({ selectMix }) => {
   const [playMixes, setPlayMixes] = useState([]);
-  const { spotifyProfile } = useSpotify();
+  const { spotifyProfile, spotifyClient } = useSpotify();
   const userId = spotifyProfile?.userId;
+
+  const playPlayMix = async (mix) => {
+    console.log(mix);
+    const songUris = await mapTracksToSongUris(spotifyClient, mix?.tracks);
+    console.log(songUris);
+    spotifyClient.playSong(songUris);
+  };
 
   useEffect(() => {
     const loadMixes = async () => {
@@ -19,14 +31,21 @@ const PlayMixes = ({ selectMix }) => {
   }, [spotifyProfile]);
 
   return (
-    <div>
+    <ul id="playmix-container">
       {playMixes.length > 0 &&
         playMixes.map((mix) => (
-          <div key={mix._id} onClick={() => selectMix(mix)}>
-            {mix.name}
-          </div>
+          <li key={mix._id}>
+            <span onClick={() => selectMix(mix)}>{mix.name}</span>
+            <button
+              aria-label={`Play ${mix.name} Play Mix now`}
+              onClick={() => playPlayMix(mix)}
+              type="button"
+            >
+              Play
+            </button>
+          </li>
         ))}
-    </div>
+    </ul>
   );
 };
 
