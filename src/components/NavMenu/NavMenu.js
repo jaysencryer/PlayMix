@@ -6,7 +6,7 @@ const menuOptions = [
   { name: 'Play Lists', view: 'playlists' },
   { name: 'Testing', view: 'testing' },
   { name: '+ Play List', label: 'Create Play List', view: 'create' },
-  { name: '+ Play Mix', label: 'Create Play Mix', view: 'playmix' },
+  { name: '+ Play Mix', label: 'Create Play Mix', view: 'new-playmix' },
 ];
 
 const NavMenu = ({ user, avatar, setView }) => (

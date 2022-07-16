@@ -97,30 +97,23 @@ export const getUniqueSong = async (client, track, songList) => {
 
 export const generateSongList = async (client, trackList) => {
   // for each track, generate a song make sure song is not already in list
-  const newSongList = [];
+  const tmpSongList = [];
   console.log(trackList);
   if (!trackList) {
-    console.log('trackList empty');
     return [];
   }
   // const emptyVar = await Promise.all(
   const songList = await Promise.all(
     trackList.map(async (track) => {
-      const newSong = await getUniqueSong(client, track, newSongList);
-      console.log(newSong);
-      console.log(newSongList);
-      newSongList.push(newSong);
+      const newSong = await getUniqueSong(client, track, tmpSongList);
+      tmpSongList.push(newSong);
       return newSong;
     }),
   );
-  // );
-  console.log('This never happens');
-  console.log(newSongList);
-  console.log(songList);
   return songList;
 };
 
-const getUris = (songList) =>
+export const getUris = (songList) =>
   songList?.filter((song) => !song?.inValid).map((song) => song.uri);
 
 export const mapTracksToSongUris = async (client, trackList) => {

@@ -16,7 +16,7 @@ const TestScreen = () => {
 
   const selectMix = (selectedMix) => {
     setMix(selectedMix);
-    setView('playmix');
+    setView('edit-playmix');
   };
   return (
     <main id="main-app">
@@ -39,8 +39,13 @@ const TestScreen = () => {
             <PlayMixes selectMix={selectMix} />
           </>
         )}
-        {view === 'playmix' && (
+        {view === 'edit-playmix' && (
           <PlayMixProvider selectedMix={mix}>
+            <PlayMix />
+          </PlayMixProvider>
+        )}
+        {view === 'new-playmix' && (
+          <PlayMixProvider>
             <PlayMix />
           </PlayMixProvider>
         )}
