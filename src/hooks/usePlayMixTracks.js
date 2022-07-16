@@ -3,13 +3,7 @@ import trackReducer from '../reducer/trackReducer';
 
 import { trackType, trackMode } from '../sapControl/constants/enums';
 import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
-import {
-  generateSong,
-  generateSongList,
-  getUniqueSong,
-  getUris,
-  mapTracksToSongUris,
-} from '../helpers/generateSong';
+import { generateSongList, getUris } from '../helpers/generateSong';
 import { useSpotify } from '../context/SpotifyContext';
 import axios from 'axios';
 import { uriEncode } from '../sapControl/helpers/helpers';
