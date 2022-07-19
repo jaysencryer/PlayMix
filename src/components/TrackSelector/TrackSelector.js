@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
-import PlaylistSelector from '../PlayListSelector';
+import PlaylistSelector from '../PlayListSelector/PlayListSelector';
 
 import { trackType, trackMode } from '../../sapControl/constants/enums';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';

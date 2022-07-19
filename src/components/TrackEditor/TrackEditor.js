@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
-import PlaylistSelector from '../PlayListSelector';
+import PlaylistSelector from '../PlayListSelector/PlayListSelector';
 import Toggle from '../Toggle/Toggle';
 import SelectBar from '../SelectBar/SelectBar';
 

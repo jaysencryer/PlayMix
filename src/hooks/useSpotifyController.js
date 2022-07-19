@@ -13,6 +13,7 @@ const useSpotifyController = (profile) => {
       const response = await axios.get(`${SPOTIFY_CONSTANTS.API_BASE_URL}/me`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+      console.log(response);
       // TODO - leverage the client builder getProfile?
       setSpotifyProfile({
         ...spotifyProfile,
@@ -30,7 +31,7 @@ const useSpotifyController = (profile) => {
 
       setSpotifyClient(client);
     };
-
+    console.log('this happens');
     initializeSpotifyClient();
   }, []);
 

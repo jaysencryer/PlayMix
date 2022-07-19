@@ -1,20 +1,18 @@
-import { spotifyAPIBuilder } from '../API/spotifyAPI';
 import { source } from '../../constants/enums';
+import { spotifyClientBuilder } from '../API/spotifyClient';
 
 afterEach(() => {
   jest.clearAllMocks();
 });
 
-const mockId = '1234';
-const mockSecret = 'abcdefg';
-const mockUrl = 'http://test';
+const mockAccessToken = 'access';
+const mockRefreshToken = 'refresh';
 
-const testSpotify = spotifyAPIBuilder()
-  .useCredentials(mockId, mockSecret)
-  .useRedirect(mockUrl)
+const testSpotify = spotifyClientBuilder()
+  .useTokens(mockAccessToken, mockRefreshToken)
   .build();
 
-describe('spotifyAPI.getPlayLists() tests', () => {
+describe('spotifyClient.getPlayLists() tests', () => {
   const mockPlayListsFirst50 = [
     { name: '1' },
     { name: '2' },
@@ -76,12 +74,11 @@ describe('spotifyAPI.getPlayLists() tests', () => {
   });
 });
 
-describe('spotifyAPI.getTracks', () => {
+describe('spotifyClient.getTracks', () => {
   const mockTrackList = [1, 2, 3, 4, 5];
 
-  const testSpotify = spotifyAPIBuilder()
-    .useCredentials(mockId, mockSecret)
-    .useRedirect(mockUrl)
+  const testSpotify = spotifyClientBuilder()
+    .useTokens(mockAccessToken, mockRefreshToken)
     .build();
 
   test('successfully return a playlists tracks', async () => {
