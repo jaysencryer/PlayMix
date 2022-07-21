@@ -1,8 +1,13 @@
 import { spotifyAPIBuilder } from '../API/spotifyAPI';
 
+import axios from 'axios';
+import { uriEncode } from '../../helpers/helpers';
+
 afterEach(() => {
   jest.clearAllMocks();
 });
+
+jest.mock('axios');
 
 const mockId = '1234';
 const mockSecret = 'abcdefg';
@@ -12,6 +17,13 @@ const mockProfileinfo = {
     id: '9876',
     display_name: 'test user',
     images: [{ url: 'http://image.png' }],
+  },
+};
+
+const mockTokenResponse = {
+  data: {
+    access_token: 'access',
+    refresh_token: 'refresh',
   },
 };
 
@@ -41,14 +53,20 @@ describe('spotifyAPI.authorize() tests', () => {
   };
 
   test('on spotifyAPI authorize success redirect to /spotifycomplete', async () => {
+    jest.resetAllMocks();
+    axios.post = jest.fn(() => mockTokenResponse);
     const mockReq = {
       query: { code: 'code', state: 'state' },
       cookies: { spotify_auth_state: 'state' },
     };
 
-    await testSpotify.authorize(mockReq, mockRes);
+    const response = await testSpotify.authorize(mockReq, mockRes);
 
-    expect(mockRes.redirect).toBeCalledWith('/spotifycomplete');
+    expect(response).toEqual({
+      authorizedUrl: '/spotifycomplete',
+      accessToken: 'access',
+      refreshToken: 'refresh',
+    });
   });
 
   test('mismatching state causes authorize error', async () => {
@@ -98,5 +116,41 @@ describe('spotifyAPI.connect() tests', () => {
     testSpotify.connect(mockRes);
     expect(mockRes.cookie).toHaveBeenCalledTimes(1);
     expect(mockRes.redirect).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('spotifyAPI.getAccessToken/refreshAccesToken tests', () => {
+  const testSpotify = spotifyAPIBuilder()
+    .useCredentials(mockId, mockSecret)
+    .useRedirect(mockUrl)
+    .useAuthorizedUrl('/spotifycomplete')
+    .build();
+  test('calls getAccessToken with correct body', async () => {
+    const mockRefreshBody = uriEncode({
+      grant_type: 'refresh_token',
+      refresh_token: 'refresh',
+    });
+
+    const saveFunction = testSpotify.getAccessToken;
+    testSpotify.getAccessToken = jest.fn();
+    await testSpotify.refreshAccessToken('refresh');
+    expect(testSpotify.getAccessToken).toBeCalledWith(mockRefreshBody);
+    testSpotify.getAccessToken = saveFunction;
+  });
+
+  test('getAccessToken returns tokens', async () => {
+    axios.post = jest.fn(() => mockTokenResponse);
+
+    const response = await testSpotify.getAccessToken();
+    expect(response).toEqual({
+      authorizedUrl: '/spotifycomplete',
+      accessToken: 'access',
+      refreshToken: 'refresh',
+    });
+  });
+
+  test('getAccessToken rejects if Axios fails', async () => {
+    axios.post = jest.fn(() => Promise.reject());
+    expect(testSpotify.getAccessToken).rejects.toBeTruthy();
   });
 });

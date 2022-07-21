@@ -1,5 +1,4 @@
 import { searchType as SEARCHTYPE } from '../../constants/enums';
-import { selectRandomSpotifySong } from './spotifyRandom';
 import { spotifyClientBuilder } from '../API/spotifyClient';
 
 afterEach(() => {

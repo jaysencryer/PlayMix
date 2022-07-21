@@ -1,4 +1,3 @@
-import { spotifyAPIBuilder } from '../API/spotifyAPI';
 import { spotifyClientBuilder } from '../API/spotifyClient';
 
 afterEach(() => {
