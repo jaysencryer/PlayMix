@@ -69,7 +69,10 @@ export const sanitizedSpotifySongList = (spotifyResponseData) => {
 };
 
 export const validUri = (uri) => {
+  if (typeof uri !== 'string') return false;
+
   const uriElements = uri?.split(':');
+
   if (uriElements?.length !== 3 || uriElements?.[0] !== 'spotify') return false;
 
   return uriElements?.[2]?.length === 22;

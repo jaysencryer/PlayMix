@@ -90,6 +90,7 @@ export const getUniqueSong = async (client, track, songList) => {
   } else {
     addedSong = { name: track.label, uri: track.uri, id: track.id };
   }
+  console.log(`validating uri ${addedSong.uri}`);
   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
   console.log('leaving unique song');
   return addedSong;

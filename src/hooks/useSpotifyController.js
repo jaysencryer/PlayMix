@@ -6,6 +6,7 @@ import * as SPOTIFY_CONSTANTS from '../sapControl/helpers/spotify/spotifyConstan
 const useSpotifyController = (profile) => {
   const [spotifyProfile, setSpotifyProfile] = useState(profile);
   const [spotifyClient, setSpotifyClient] = useState();
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const initializeSpotifyClient = async () => {
@@ -30,12 +31,13 @@ const useSpotifyController = (profile) => {
         .build();
 
       setSpotifyClient(client);
+      setInitialized(true);
     };
     console.log('this happens');
     initializeSpotifyClient();
   }, []);
 
-  return { spotifyClient, spotifyProfile };
+  return { spotifyClient, spotifyProfile, initialized };
 };
 
 export default useSpotifyController;
