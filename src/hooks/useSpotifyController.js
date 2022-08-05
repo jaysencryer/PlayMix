@@ -6,7 +6,6 @@ import * as SPOTIFY_CONSTANTS from '../sapControl/helpers/spotify/spotifyConstan
 const useSpotifyController = (profile) => {
   const [spotifyProfile, setSpotifyProfile] = useState(profile);
   const [spotifyClient, setSpotifyClient] = useState();
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const initializeSpotifyClient = async () => {
@@ -14,7 +13,6 @@ const useSpotifyController = (profile) => {
       const response = await axios.get(`${SPOTIFY_CONSTANTS.API_BASE_URL}/me`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      console.log(response);
       // TODO - leverage the client builder getProfile?
       setSpotifyProfile({
         ...spotifyProfile,
@@ -26,18 +24,16 @@ const useSpotifyController = (profile) => {
         userId: response?.data?.id,
         accessToken,
       });
+
       const client = await spotifyClientBuilder()
         .useTokens(accessToken, refreshToken)
         .build();
-
       setSpotifyClient(client);
-      setInitialized(true);
     };
-    console.log('this happens');
     initializeSpotifyClient();
   }, []);
 
-  return { spotifyClient, spotifyProfile, initialized };
+  return { spotifyClient, spotifyProfile };
 };
 
 export default useSpotifyController;

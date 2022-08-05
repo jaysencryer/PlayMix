@@ -192,4 +192,8 @@ describe('validUri tests', () => {
   test('invalid length of Id returns false', () => {
     expect(validUri(invalidId)).toBeFalsy();
   });
+
+  test('uri that is not a string is invalid', () => {
+    expect(validUri({})).toBeFalsy();
+  });
 });
