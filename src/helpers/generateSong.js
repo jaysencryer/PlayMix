@@ -1,11 +1,11 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { trackMode, trackType, source } from '../sapControl/constants/enums';
 import { randomItem } from '../sapControl/helpers/helpers';
 import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
 
 const getPlayListSongs = async (client, playListUri) => {
   const response = await client.getTracks(source.PLAYLIST, playListUri);
-  console.log(response);
+  // console.log(response);
   return response.items.map((item) => item.track);
 };
 
@@ -47,7 +47,7 @@ export const generateSong = async (client, track) => {
         // TODO - if we have users playlists maybe don't do the get.
         // we need to know users playlists.
         if (client.playLists.length === 0) {
-          console.log('getting playlists');
+          // console.log('getting playlists');
           // If not load all users playlists
           client.playLists = await client.getPlayLists();
         }
@@ -90,16 +90,16 @@ export const getUniqueSong = async (client, track, songList) => {
   } else {
     addedSong = { name: track.label, uri: track.uri, id: track.id };
   }
-  console.log(`validating uri ${addedSong.uri}`);
+  // console.log(`validating uri ${addedSong.uri}`);
   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
-  console.log('leaving unique song');
+  // console.log('leaving unique song');
   return addedSong;
 };
 
 export const generateSongList = async (client, trackList) => {
   // for each track, generate a song make sure song is not already in list
   const tmpSongList = [];
-  console.log(trackList);
+  // console.log(trackList);
   if (!trackList) {
     return [];
   }
@@ -119,6 +119,6 @@ export const getUris = (songList) =>
 
 export const mapTracksToSongUris = async (client, trackList) => {
   const songList = await generateSongList(client, trackList);
-  console.log(songList);
+  // console.log(songList);
   return getUris(songList);
 };

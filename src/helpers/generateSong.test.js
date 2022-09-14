@@ -1,21 +1,9 @@
-import generateSong from './generateSong';
+import { generateSong, mapTracksToSongUris } from './generateSong';
 import { source, trackType, trackMode } from '../sapControl/constants/enums';
-import axios from 'axios';
 
 afterEach(() => {
   jest.clearAllMocks();
 });
-
-jest.mock('axios', () => ({
-  get: (url) => {
-    if (url === '/playlists') {
-      return { data: [{ uri: 'mock:uri:1' }] };
-    }
-    return { data: { items: [{ track: {} }] } };
-  },
-}));
-
-jest.spyOn(axios, 'get');
 
 const mockArtistTrack = {
   type: trackType.RANDOM,
@@ -43,40 +31,73 @@ const mockPlayListTrack = {
   label: 'All Playlists',
 };
 
-const mockPlayListCall = `/tracks?source=${source.PLAYLIST}&uri=1`;
+const mockPlayLists = [
+  { uri: 'mock:playlist:uri1' },
+  { uri: 'mock:playlist:uri2' },
+  { uri: 'mock:playlist:uri3' },
+];
+
+const mockSong = {
+  name: 'never gonna give you up',
+  uri: 'abcdef:12345',
+  id: 'abc',
+};
+
+const mockGetTrackResponse = {
+  items: [{ track: mockSong }],
+};
+
+const mockClient = {
+  playLists: [],
+  getPlayLists: jest.fn().mockReturnValue(mockPlayLists),
+  getRandomSong: jest.fn().mockReturnValue(mockSong),
+  getTracks: jest.fn().mockReturnValue(mockGetTrackResponse),
+};
 
 describe('generateSong tests', () => {
   test('generateSong called for Artist test', async () => {
-    await generateSong(mockArtistTrack);
-    expect(axios.get).toBeCalledWith(
-      `/random/${mockArtistTrack.mode}?query=${mockArtistTrack.label}`,
-    );
+    await generateSong(mockClient, mockArtistTrack);
+    expect(mockClient.getRandomSong.mock.calls[0]).toEqual([
+      mockArtistTrack.label,
+      trackMode.ARTIST,
+    ]);
   });
 
   test('generateSong called for Genre test', async () => {
-    await generateSong(mockGenreTrack);
-    expect(axios.get).toBeCalledWith(
-      `/random/${mockGenreTrack.mode}?query=${mockGenreTrack.label}`,
-    );
+    await generateSong(mockClient, mockGenreTrack);
+    expect(mockClient.getRandomSong.mock.calls[0]).toEqual([
+      mockGenreTrack.label,
+      trackMode.GENRE,
+    ]);
   });
 
   test('generateSong called with anything else test', async () => {
-    await generateSong(mockTrack);
-    expect(axios.get).toBeCalledWith('/random');
+    await generateSong(mockClient, mockTrack);
+    expect(mockClient.getRandomSong.mock.calls[0]).toEqual([]);
   });
 
   test('generateSong called with one playlist', async () => {
-    await generateSong({ ...mockPlayListTrack, label: 'anything else' });
-    expect(axios.get).toBeCalledWith(mockPlayListCall);
+    await generateSong(mockClient, {
+      ...mockPlayListTrack,
+      label: 'anything else',
+    });
+    expect(mockClient.getTracks).toBeCalledWith(source.PLAYLIST, '1');
   });
   test('generateSong called with All PlayLists', async () => {
-    await generateSong(mockPlayListTrack);
-    expect(axios.get).toHaveBeenNthCalledWith(1, '/playlists');
-    expect(axios.get).toHaveBeenNthCalledWith(2, mockPlayListCall);
+    await generateSong(mockClient, mockPlayListTrack);
+    expect(mockClient.getPlayLists).toBeCalledTimes(1);
+    expect(mockClient.getTracks).toBeCalledTimes(1);
   });
 
   test('generateSong called somehow without Random!', async () => {
-    await generateSong({ type: trackType.SONG });
-    expect(axios.get).not.toBeCalled();
+    await generateSong(mockClient, { type: trackType.SONG });
+    expect(mockClient.getRandomSong).not.toHaveBeenCalled();
   });
 });
+
+// describe('mapTracksToSongUris tests', () => {
+//   test('returns array of uris', () => {
+//     const result = mapTracksToSongUris(mockClient, mockTrackList);
+//     expect(result).toEqual(['uri1', 'uri2']);
+//   });
+// });
