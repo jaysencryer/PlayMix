@@ -26,6 +26,7 @@ export const generateSong = async (client, track) => {
 
   if (type !== trackType.RANDOM) {
     // why are we here?
+    console.log('non Random track - returning');
     return;
   }
 
@@ -74,25 +75,31 @@ export const generateSong = async (client, track) => {
 // export default generateSong;
 
 export const getUniqueSong = async (client, track, songList) => {
+  console.log('Entering getUnique with songList');
+  console.log(songList);
   let addedSong;
   if (track.type === trackType.RANDOM) {
     let duplicateTrackerCount = 0;
     do {
+      console.log(duplicateTrackerCount);
       if (duplicateTrackerCount > 5) {
         // If we've picked a song that exists in the playmix already more than 5 times
         // we'll keep it - but mark it as invalid.
         addedSong.inValid = true;
         break;
       }
+      console.log('Calling generateSong');
       addedSong = await generateSong(client, track);
+      console.log(addedSong);
       duplicateTrackerCount++;
+      console.log(!songList?.every((song) => song.uri !== addedSong.uri));
     } while (!songList?.every((song) => song.uri !== addedSong.uri));
   } else {
     addedSong = { name: track.label, uri: track.uri, id: track.id };
   }
   // console.log(`validating uri ${addedSong.uri}`);
   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
-  // console.log('leaving unique song');
+  console.log('leaving unique song');
   return addedSong;
 };
 
@@ -108,6 +115,7 @@ export const generateSongList = async (client, trackList) => {
     trackList.map(async (track) => {
       const newSong = await getUniqueSong(client, track, tmpSongList);
       tmpSongList.push(newSong);
+      console.log(tmpSongList);
       return newSong;
     }),
   );

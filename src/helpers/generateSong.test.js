@@ -1,4 +1,8 @@
-import { generateSong, mapTracksToSongUris } from './generateSong';
+import {
+  generateSong,
+  generateSongList,
+  mapTracksToSongUris,
+} from './generateSong';
 import { source, trackType, trackMode } from '../sapControl/constants/enums';
 
 afterEach(() => {
@@ -39,7 +43,7 @@ const mockPlayLists = [
 
 const mockSong = {
   name: 'never gonna give you up',
-  uri: 'abcdef:12345',
+  uri: 'spotify:12345:abcdefghijklmnopqrstuv',
   id: 'abc',
 };
 
@@ -95,9 +99,40 @@ describe('generateSong tests', () => {
   });
 });
 
-// describe('mapTracksToSongUris tests', () => {
-//   test('returns array of uris', () => {
-//     const result = mapTracksToSongUris(mockClient, mockTrackList);
-//     expect(result).toEqual(['uri1', 'uri2']);
-//   });
-// });
+describe('mapTracksToSongUris tests', () => {
+  const mockTrackList = [mockArtistTrack, mockGenreTrack];
+
+  test('returns array of uris', async () => {
+    const result = await mapTracksToSongUris(mockClient, mockTrackList);
+    expect(result).toEqual([mockSong.uri, mockSong.uri]);
+  });
+});
+
+describe('generateSongList tests', () => {
+  test('sending empty tracklist returns empty songlist', async () => {
+    const songList = await generateSongList(mockClient, []);
+    expect(songList).toEqual([]);
+  });
+
+  test('generateSongList returns a list of songs with no repeats', async () => {
+    const mockSong2 = {
+      ...mockSong,
+      uri: 'spotify:unique:vutsrqponmlkjihgfedcba',
+    };
+    mockClient.getRandomSong = jest
+      .fn()
+      .mockReturnValueOnce(mockSong)
+      .mockReturnValue(mockSong2);
+    const songList = await generateSongList(mockClient, [
+      mockArtistTrack,
+      mockArtistTrack,
+      mockArtistTrack,
+    ]);
+    console.log(songList);
+    // client.getRandomSong mocked to return the same song every time, so second song should be
+    // marked as invalid
+    console.log(mockClient.getRandomSong.mock.calls);
+    expect(songList[0].uri).toBe(mockSong.uri);
+    expect(songList[1].uri).toBe(mockSong2.uri);
+  });
+});
