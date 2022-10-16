@@ -15,13 +15,15 @@ const ShowTrack = ({ track, edit }) => {
   return (
     <>
       {!editMode && (
-        <div>
+        <>
           <p>{`${track?.type} from ${track?.label}`}</p>
-          <button onClick={() => setEditMode(true)}>Edit</button>
-          <button type="button" onClick={dupHandler} disabled={disableDup}>
-            Duplicate
+          <button type="button" onClick={() => setEditMode(true)}>
+            Edit
           </button>
-        </div>
+          <button type="button" onClick={dupHandler} disabled={disableDup}>
+            Dup
+          </button>
+        </>
       )}
       {editMode && (
         <TrackEditor track={track} onSave={() => setEditMode(false)} />

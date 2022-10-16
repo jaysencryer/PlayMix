@@ -3,9 +3,9 @@ import React from 'react';
 import './NavMenu.css';
 
 const menuOptions = [
-  { name: 'Play Lists', view: 'playlists' },
-  { name: 'Testing', view: 'testing' },
-  { name: '+ Play List', label: 'Create Play List', view: 'create' },
+  // { name: 'Play Lists', view: 'playlists' },
+  { name: 'Home', view: 'home' },
+  // { name: '+ Play List', label: 'Create Play List', view: 'create' },
   { name: '+ Play Mix', label: 'Create Play Mix', view: 'new-playmix' },
 ];
 

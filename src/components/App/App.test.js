@@ -3,11 +3,15 @@ import '@testing-library/jest-dom/extend-expect';
 
 import { App } from './App';
 
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 const mockSpotProfile = {
   user: 'testUser',
-  avater: 'mockAvater',
+  avatar: 'mockAvater',
+};
+
+const mockSessionData = {
+  authorized: true,
 };
 
 describe('App', () => {
@@ -15,15 +19,31 @@ describe('App', () => {
     render(<App initialData={{ appName: 'TEST' }} />);
   });
 
-  it('renders main app once spotify connected', () => {
+  it('renders main app once user authorized connected', () => {
     render(
       <App
         initialData={{
           appName: 'TEST',
-          spotAuthorized: true,
+          sessionData: mockSessionData,
           spotifyProfile: mockSpotProfile,
         }}
       />,
     );
+    const authorized = screen.getByTestId('authorized-view');
+
+    expect(authorized).toBeInTheDocument();
+  });
+
+  test('renders connect to spotify button if not-authorized', () => {
+    render(
+      <App
+        initialData={{
+          appName: 'TEST',
+        }}
+      />,
+    );
+    const unauthorized = screen.getByTestId('not-authorized');
+
+    expect(unauthorized).toBeInTheDocument();
   });
 });

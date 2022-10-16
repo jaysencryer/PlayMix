@@ -138,7 +138,7 @@ describe('getSpotifySongSearchUrl tests', () => {
     const encodedSearch = encodeURIComponent(mockSearch);
     const result = getSpotifySongSearchUrl(mockSearch, SEARCHTYPE.TRACK);
     expect(result).toBe(
-      `/search?query=${SEARCHTYPE.TRACK}%3A${encodedSearch}%20NOT%20karaoke&type=track`,
+      `/search?query=${SEARCHTYPE.TRACK}%3A${encodedSearch}&type=track`,
     );
   });
 
@@ -147,7 +147,7 @@ describe('getSpotifySongSearchUrl tests', () => {
     const encodedSearch = encodeURIComponent(mockArtist);
     const result = getSpotifySongSearchUrl(mockArtist, SEARCHTYPE.ARTIST);
     expect(result).toBe(
-      `/search?query=${SEARCHTYPE.ARTIST}%3A%22${encodedSearch}%22%20NOT%20karaoke&type=track`,
+      `/search?query=${SEARCHTYPE.ARTIST}%3A%22${encodedSearch}&type=track`,
     );
   });
 
@@ -191,5 +191,9 @@ describe('validUri tests', () => {
   });
   test('invalid length of Id returns false', () => {
     expect(validUri(invalidId)).toBeFalsy();
+  });
+
+  test('uri that is not a string is invalid', () => {
+    expect(validUri({})).toBeFalsy();
   });
 });

@@ -22,13 +22,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: black;
+    width: 100%;
+    z-index: 200;
 }
 
 .nav-menu ul {
   display: flex;
-  padding: 6px;
-  /* margin-right: 16px; */
+  padding: 6px 6px 0 6px;
   flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.nav-menu li {
+  margin-left: 6px;
 }
 
 .nav-menu h1 {
@@ -71,6 +78,7 @@
     flex-direction: column;
     flex-wrap: nowrap;
     margin: 4px;
+    padding: 6px;
     align-items: center;
   }
 }

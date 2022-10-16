@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSpotify } from '../context/SpotifyContext';
+import { useSpotify } from '../../context/SpotifyContext';
 
 const PlayListSelector = ({ setTracks, track }) => {
   const [playListOption, setPlayListOption] = useState();
@@ -7,12 +7,9 @@ const PlayListSelector = ({ setTracks, track }) => {
   const { spotifyClient } = useSpotify();
 
   const getPlayLists = async () => {
-    // let response;
     if (spotifyClient.playLists.length === 0) {
       spotifyClient.playLists = await spotifyClient.getPlayLists();
     }
-    // const { data: response } = await axios.get('/playlists');
-    // console.log(response);
     return spotifyClient.playLists.map((list) => ({
       label: list.name,
       tracks: list.tracks.href,

@@ -24,13 +24,12 @@ const useSpotifyController = (profile) => {
         userId: response?.data?.id,
         accessToken,
       });
+
       const client = await spotifyClientBuilder()
         .useTokens(accessToken, refreshToken)
         .build();
-
       setSpotifyClient(client);
     };
-
     initializeSpotifyClient();
   }, []);
 

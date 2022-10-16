@@ -32,7 +32,6 @@ export const getAccessToken = async function (postBody) {
       postBody,
       accessTokenHeader,
     );
-    console.log(response?.data);
     return {
       authorizedUrl: this.authorizedUrl,
       accessToken: response?.data?.access_token,

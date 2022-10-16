@@ -1,12 +1,12 @@
 import { useEffect, useReducer, useState } from 'react';
 import trackReducer from '../reducer/trackReducer';
 
-import { trackType, trackMode } from '../sapControl/constants/enums';
-import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
+// import { trackType, trackMode } from '../sapControl/constants/enums';
+// import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
 import { generateSongList, getUris } from '../helpers/generateSong';
 import { useSpotify } from '../context/SpotifyContext';
 import axios from 'axios';
-import { uriEncode } from '../sapControl/helpers/helpers';
+// import { uriEncode } from '../sapControl/helpers/helpers';
 
 const usePlayMixTracks = (mix) => {
   const [playMixTracks, dispatch] = useReducer(trackReducer, []);

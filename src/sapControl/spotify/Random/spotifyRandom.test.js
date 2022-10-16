@@ -1,23 +1,20 @@
-import { spotifyAPIBuilder } from '../API/spotifyAPI';
 import { searchType as SEARCHTYPE } from '../../constants/enums';
-import { selectRandomSpotifySong } from './spotifyRandom';
+import { spotifyClientBuilder } from '../API/spotifyClient';
 
 afterEach(() => {
   jest.clearAllMocks();
 });
 
-const mockId = '1234';
-const mockSecret = 'abcdefg';
-const mockUrl = 'http://test';
+const mockAccessToken = 'access';
+const mockRefreshToken = 'refresh';
 
-const testSpotify = spotifyAPIBuilder()
-  .useCredentials(mockId, mockSecret)
-  .useRedirect(mockUrl)
+const testSpotify = spotifyClientBuilder()
+  .useTokens(mockAccessToken, mockRefreshToken)
   .build();
 
 const saveOriginalFunction = testSpotify.selectRandomSpotifySong;
 
-describe('spotifyAPI.getRandomSong tests', () => {
+describe('spotifyClient.getRandomSong tests', () => {
   test('getRandomSong selects a Random song', async () => {
     testSpotify.selectRandomSpotifySong = jest.fn();
     await testSpotify.getRandomSong('test', SEARCHTYPE.ARTIST);

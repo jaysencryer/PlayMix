@@ -28,8 +28,14 @@
 }
 
 #playmix-trackeditor {
+  position: fixed;
+  top: 80px;
+  background: black;
+  z-index:300;
+  height: 100%;
+  width: 92%;
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   flex-direction: column;
   flex-grow: 1;
 }
@@ -85,5 +91,5 @@
 .playlist-selector {
   font-size: 20px;
   width: 100%;
-  flex-grow: 1;
+  /* flex-grow: 1; */
 }

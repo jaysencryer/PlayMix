@@ -1,9 +1,12 @@
 import { searchType as SEARCHTYPE } from '../../constants/enums';
-import { spotifyAPIBuilder } from '../API/spotifyAPI';
+// import { spotifyAPIBuilder } from '../API/spotifyAPI';
+import { spotifyClientBuilder } from '../API/spotifyClient';
 
-const mockId = '1234';
-const mockSecret = 'abcdefg';
-const mockUrl = 'http://test';
+// const mockId = '1234';
+// const mockSecret = 'abcdefg';
+const mockAccesToken = 'access';
+const mockRefreshToken = 'refresh';
+// const mockUrl = 'http://test';
 
 const mockSpotifyResponseData = {
   tracks: {
@@ -26,9 +29,8 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-const testSpotify = spotifyAPIBuilder()
-  .useCredentials(mockId, mockSecret)
-  .useRedirect(mockUrl)
+const testSpotify = spotifyClientBuilder()
+  .useTokens(mockAccesToken, mockRefreshToken)
   .build();
 
 const safeArtists = testSpotify.searchSpotifyArtists;
@@ -104,7 +106,7 @@ describe('searchSpotifySongs tests', () => {
     testSpotify.searchSpotifySongs = safeSongs;
     await testSpotify.searchSpotifySongs('test', SEARCHTYPE.TRACK);
     expect(testSpotify.spotAxios.execute.get).toBeCalledWith(
-      `/search?query=${SEARCHTYPE.TRACK}%3Atest%20NOT%20karaoke&type=track`,
+      `/search?query=${SEARCHTYPE.TRACK}%3Atest&type=track`,
     );
   });
 

@@ -5,15 +5,22 @@
   justify-content: center;
   align-items: stretch;
   flex-wrap: wrap;
-  margin-top: 20px;
+  margin-top: 175px;
+  z-index: -100;
 }
 
 .playmix-track {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
+  padding: 6px;
+}
+
+.playmix-track button {
+  min-width: 42px;
+  min-height: 42px;
 }
 
 #edit-name-container {

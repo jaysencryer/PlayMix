@@ -1,24 +1,13 @@
-import { generateRandomString } from '../sapControl/helpers/helpers';
+import { getId } from '../helpers/getId';
 
-const randomCheck = {};
-
-const addTrack = (track, repeat) => {
-  const tmpTrackList = [];
-  for (let i = 0; i < repeat; i++) {
-    const trackId = `${track?.id}${String.fromCharCode(i + 97)}`;
-    tmpTrackList.push({ ...track, id: trackId });
-  }
-  return tmpTrackList;
-};
-
-const getId = () => {
-  let id = generateRandomString(8);
-  while (randomCheck[id]) {
-    id = generateRandomString(8);
-  }
-  randomCheck[id] = id;
-  return id;
-};
+// const addTrack = (track, repeat) => {
+//   const tmpTrackList = [];
+//   for (let i = 0; i < repeat; i++) {
+//     const trackId = `${track?.id}${String.fromCharCode(i + 97)}`;
+//     tmpTrackList.push({ ...track, id: trackId });
+//   }
+//   return tmpTrackList;
+// };
 
 export default function trackReducer(trackList, action) {
   switch (action?.type) {
@@ -30,11 +19,11 @@ export default function trackReducer(trackList, action) {
     }
     case 'edit': {
       const { track } = action;
-      console.log('editing this track');
-      console.log(track);
+      // console.log('editing this track');
+      // console.log(track);
       const newTrackList = [...trackList];
       const index = newTrackList.findIndex((t) => t.id === track.id);
-      console.log(index);
+      // console.log(index);
       newTrackList.splice(index, 1, track);
       return newTrackList;
     }

@@ -1,11 +1,11 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { trackMode, trackType, source } from '../sapControl/constants/enums';
 import { randomItem } from '../sapControl/helpers/helpers';
 import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
 
 const getPlayListSongs = async (client, playListUri) => {
   const response = await client.getTracks(source.PLAYLIST, playListUri);
-  console.log(response);
+  // console.log(response);
   return response.items.map((item) => item.track);
 };
 
@@ -26,6 +26,7 @@ export const generateSong = async (client, track) => {
 
   if (type !== trackType.RANDOM) {
     // why are we here?
+    console.log('non Random track - returning');
     return;
   }
 
@@ -47,7 +48,7 @@ export const generateSong = async (client, track) => {
         // TODO - if we have users playlists maybe don't do the get.
         // we need to know users playlists.
         if (client.playLists.length === 0) {
-          console.log('getting playlists');
+          // console.log('getting playlists');
           // If not load all users playlists
           client.playLists = await client.getPlayLists();
         }
@@ -74,22 +75,29 @@ export const generateSong = async (client, track) => {
 // export default generateSong;
 
 export const getUniqueSong = async (client, track, songList) => {
+  console.log('Entering getUnique with songList');
+  console.log(songList);
   let addedSong;
   if (track.type === trackType.RANDOM) {
     let duplicateTrackerCount = 0;
     do {
+      console.log(duplicateTrackerCount);
       if (duplicateTrackerCount > 5) {
         // If we've picked a song that exists in the playmix already more than 5 times
         // we'll keep it - but mark it as invalid.
         addedSong.inValid = true;
         break;
       }
+      console.log('Calling generateSong');
       addedSong = await generateSong(client, track);
+      console.log(addedSong);
       duplicateTrackerCount++;
+      console.log(!songList?.every((song) => song.uri !== addedSong.uri));
     } while (!songList?.every((song) => song.uri !== addedSong.uri));
   } else {
     addedSong = { name: track.label, uri: track.uri, id: track.id };
   }
+  // console.log(`validating uri ${addedSong.uri}`);
   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
   console.log('leaving unique song');
   return addedSong;
@@ -98,7 +106,7 @@ export const getUniqueSong = async (client, track, songList) => {
 export const generateSongList = async (client, trackList) => {
   // for each track, generate a song make sure song is not already in list
   const tmpSongList = [];
-  console.log(trackList);
+  // console.log(trackList);
   if (!trackList) {
     return [];
   }
@@ -107,6 +115,7 @@ export const generateSongList = async (client, trackList) => {
     trackList.map(async (track) => {
       const newSong = await getUniqueSong(client, track, tmpSongList);
       tmpSongList.push(newSong);
+      console.log(tmpSongList);
       return newSong;
     }),
   );
@@ -118,6 +127,6 @@ export const getUris = (songList) =>
 
 export const mapTracksToSongUris = async (client, trackList) => {
   const songList = await generateSongList(client, trackList);
-  console.log(songList);
+  // console.log(songList);
   return getUris(songList);
 };
