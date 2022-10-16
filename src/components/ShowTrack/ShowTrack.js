@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { usePlayMix } from '../../context/PlayMixContext';
 import TrackEditor from '../TrackEditor/TrackEditor';
 
+import './ShowTrack.css';
+
 const ShowTrack = ({ track, edit }) => {
   const [editMode, setEditMode] = useState(edit || false);
   const [disableDup, setDisableDup] = useState(false);
@@ -16,13 +18,15 @@ const ShowTrack = ({ track, edit }) => {
     <>
       {!editMode && (
         <>
-          <p>{`${track?.type} from ${track?.label}`}</p>
-          <button type="button" onClick={() => setEditMode(true)}>
-            Edit
-          </button>
-          <button type="button" onClick={dupHandler} disabled={disableDup}>
-            Dup
-          </button>
+          <p>{`${track?.type} : ${track?.label}`}</p>
+          <div className="track-buttons">
+            <button type="button" onClick={() => setEditMode(true)}>
+              Edit
+            </button>
+            <button type="button" onClick={dupHandler} disabled={disableDup}>
+              Dup
+            </button>
+          </div>
         </>
       )}
       {editMode && (
