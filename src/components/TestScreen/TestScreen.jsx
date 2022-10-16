@@ -11,7 +11,7 @@ import RandomSong from '../RandomSong/RandomSong';
 
 const TestScreen = () => {
   const { spotifyProfile } = useSpotify();
-  const [view, setView] = useState('testing');
+  const [view, setView] = useState('home');
   const [mix, setMix] = useState();
 
   const selectMix = (selectedMix) => {
@@ -26,7 +26,7 @@ const TestScreen = () => {
         setView={setView}
       />
       <div id="view-container">
-        {view === 'testing' && (
+        {view === 'home' && (
           <>
             <ul>
               <li>

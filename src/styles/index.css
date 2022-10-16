@@ -26,8 +26,15 @@ button {
   border: 1px solid var(--color-main);
   color: var(--color-main);
   border-radius: none;
+  border-width: 2px;
   padding: 8px;
   font-size: 18px;
+}
+
+button:disabled {
+  color: #203d20;
+  border-color: #274327;
+  border-radius: 2px;
 }
 /* .track-type-selector-dropdown {
   width: 200px;
