@@ -138,63 +138,6 @@ app.post('/setSessionUser', (req, res) => {
   res.send('okay');
 });
 
-// const getRandomQualifier = () => {
-//   const qualifiers = [
-//     ['pop', 'rock', 'jazz'],
-//     ['hip-hop', "r'n'b", 'alternative', 'traditional'],
-//   ];
-
-//   const randomDistribution = Math.floor(Math.random() * 8) + 1;
-
-//   let randomListOfQualifiers = [];
-
-//   for (let i = 0; i < randomDistribution; i++) {
-//     randomListOfQualifiers.push(0);
-//   }
-//   for (let j = 0; j < randomDistribution - 2; j++) {
-//     randomListOfQualifiers.push(1);
-//   }
-
-//   const result = randomItem(qualifiers[randomItem(randomListOfQualifiers)]);
-
-//   return result;
-// };
-
-// app.get('/xmix', async (req, res) => {
-//   let songList = new Set();
-//   let type;
-//   let searchString;
-//   let message = [];
-//   let response;
-//   try {
-//     do {
-//       type = getRandomQualifier();
-//       searchString = `${type} AND Christmas`;
-//       message.push(`Searching for ${searchString}`);
-
-//       response = await spotifyControl.getRandomSong(
-//         searchString,
-//         SEARCHTYPE.GENRE,
-//       );
-//       if (response?.uri) {
-//         songList.add(response.uri);
-//       }
-//     } while (songList.size < 120);
-//     const uriList = Array.from(songList);
-//     spotifyControl.playSong(uriList);
-
-//     const date = new Date();
-//     const mixName = `XMix ${date.toLocaleDateString()}`;
-
-//     spotifyControl.addSpotifyPlayList(mixName, uriList.slice(0, 100));
-//     res.send({ message, uriList });
-//   } catch (err) {
-//     console.error('this is what happens');
-//     console.error(err);
-//     res.send(err);
-//   }
-// });
-
 const server = app.listen(config.port || 1234, config.host, () => {
   console.info(`Running on ${config.host}:${config.port}...`);
 });
