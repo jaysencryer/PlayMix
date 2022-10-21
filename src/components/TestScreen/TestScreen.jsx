@@ -8,6 +8,7 @@ import PlayMix from '../PlayMix/PlayMix';
 import PlayMixes from '../PlayMixes/PlayMixes';
 import RandomList from '../RandomList/RandomList';
 import RandomSong from '../RandomSong/RandomSong';
+import Xmix from '../Xmix/Xmix';
 
 const TestScreen = () => {
   const { spotifyProfile } = useSpotify();
@@ -20,11 +21,7 @@ const TestScreen = () => {
   };
   return (
     <main id="main-app">
-      <NavMenu
-        user={spotifyProfile.user}
-        avatar={spotifyProfile.avatar}
-        setView={setView}
-      />
+      <NavMenu setView={setView} />
       <div id="view-container">
         {view === 'home' && (
           <>
@@ -49,6 +46,7 @@ const TestScreen = () => {
             <PlayMix />
           </PlayMixProvider>
         )}
+        {view === 'xmix' && <Xmix />}
       </div>
     </main>
   );
