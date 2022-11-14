@@ -25,7 +25,7 @@ const PlayListSelector = ({ setTracks, track }) => {
     const getOptions = async () => {
       const plOptions = await getPlayLists();
       console.log(plOptions);
-      setPlayListOption([findIndex(track?.label, plOptions) + 2]);
+      setPlayListOption([findIndex(track?.sources[0]?.label, plOptions) + 2]);
       setOptions(plOptions);
     };
 
@@ -40,18 +40,18 @@ const PlayListSelector = ({ setTracks, track }) => {
     const options = target.selectedOptions;
     console.log(options);
     let newOptions = [];
-    let uriList = [];
+    let uri;
 
     for (let option of options) {
       if (option.value == 1) {
         // If 'All PlayLists' is selected - just set that one
         newOptions = [1];
-        uriList = [target[1]?.dataset?.uri];
+        uri = target[1]?.dataset?.uri;
         break;
       }
       newOptions.push(option.value);
       const playList = parseInt(option.value);
-      uriList.push(target[playList]?.dataset?.uri);
+      uri = target[playList]?.dataset?.uri;
     }
 
     // Set up label for track rendering
@@ -62,8 +62,7 @@ const PlayListSelector = ({ setTracks, track }) => {
     setPlayListOption(newOptions);
     setTracks({
       label,
-      option: newOptions,
-      uri: uriList,
+      uri,
     });
   };
 

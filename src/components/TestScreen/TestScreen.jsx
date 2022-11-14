@@ -11,7 +11,7 @@ import RandomSong from '../RandomSong/RandomSong';
 import Xmix from '../Xmix/Xmix';
 
 const TestScreen = () => {
-  const { spotifyProfile } = useSpotify();
+  // const { spotifyProfile } = useSpotify();
   const [view, setView] = useState('home');
   const [mix, setMix] = useState();
 

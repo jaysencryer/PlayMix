@@ -10,29 +10,45 @@ afterEach(() => {
 });
 
 const mockArtistTrack = {
-  type: trackType.RANDOM,
-  mode: trackMode.ARTIST,
-  label: 'Nate Dogg',
-  id: 1,
+  sources: [
+    {
+      type: trackType.RANDOM,
+      mode: trackMode.ARTIST,
+      label: 'Nate Dogg',
+      id: 1,
+    },
+  ],
 };
 
 const mockGenreTrack = {
-  type: trackType.RANDOM,
-  mode: trackMode.GENRE,
-  label: 'classical',
-  id: 1,
+  sources: [
+    {
+      type: trackType.RANDOM,
+      mode: trackMode.GENRE,
+      label: 'classical',
+      id: 1,
+    },
+  ],
 };
 
 const mockTrack = {
-  type: trackType.RANDOM,
-  mode: trackMode.SPOTIFY,
+  sources: [
+    {
+      type: trackType.RANDOM,
+      mode: trackMode.SPOTIFY,
+    },
+  ],
 };
 
 const mockPlayListTrack = {
-  type: trackType.RANDOM,
-  mode: trackMode.PLAYLIST,
-  uri: ['mock:uri:1'],
-  label: 'All Playlists',
+  sources: [
+    {
+      type: trackType.RANDOM,
+      mode: trackMode.PLAYLIST,
+      uri: 'mock:uri:1',
+      label: 'All Playlists',
+    },
+  ],
 };
 
 const mockPlayLists = [
@@ -60,35 +76,35 @@ const mockClient = {
 
 describe('generateSong tests', () => {
   test('generateSong called for Artist test', async () => {
-    await generateSong(mockClient, mockArtistTrack);
+    await generateSong(mockClient, mockArtistTrack.sources[0]);
     expect(mockClient.getRandomSong.mock.calls[0]).toEqual([
-      mockArtistTrack.label,
+      mockArtistTrack.sources[0].label,
       trackMode.ARTIST,
     ]);
   });
 
   test('generateSong called for Genre test', async () => {
-    await generateSong(mockClient, mockGenreTrack);
+    await generateSong(mockClient, mockGenreTrack.sources[0]);
     expect(mockClient.getRandomSong.mock.calls[0]).toEqual([
-      mockGenreTrack.label,
+      mockGenreTrack.sources[0].label,
       trackMode.GENRE,
     ]);
   });
 
   test('generateSong called with anything else test', async () => {
-    await generateSong(mockClient, mockTrack);
+    await generateSong(mockClient, mockTrack.sources[0]);
     expect(mockClient.getRandomSong.mock.calls[0]).toEqual([]);
   });
 
   test('generateSong called with one playlist', async () => {
     await generateSong(mockClient, {
-      ...mockPlayListTrack,
+      ...mockPlayListTrack.sources[0],
       label: 'anything else',
     });
     expect(mockClient.getTracks).toBeCalledWith(source.PLAYLIST, '1');
   });
   test('generateSong called with All PlayLists', async () => {
-    await generateSong(mockClient, mockPlayListTrack);
+    await generateSong(mockClient, mockPlayListTrack.sources[0]);
     expect(mockClient.getPlayLists).toBeCalledTimes(1);
     expect(mockClient.getTracks).toBeCalledTimes(1);
   });
@@ -128,7 +144,7 @@ describe('generateSongList tests', () => {
       mockArtistTrack,
       mockArtistTrack,
     ]);
-    console.log(songList);
+    // console.log(songList);
     // client.getRandomSong mocked to return the same song every time, so second song should be
     // marked as invalid
     console.log(mockClient.getRandomSong.mock.calls);

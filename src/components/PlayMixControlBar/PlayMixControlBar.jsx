@@ -7,8 +7,12 @@ import { trackMode, trackType } from '../../sapControl/constants/enums';
 import './PlayMixControlBar.css';
 
 const newTrack = {
-  type: trackType.SONG,
-  mode: trackMode.SPOTIFY,
+  sources: [
+    {
+      type: trackType.SONG,
+      mode: trackMode.SPOTIFY,
+    },
+  ],
 };
 
 const PlayMixControlBar = () => {

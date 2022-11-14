@@ -11,25 +11,26 @@ import './TrackEditor.css';
 import { usePlayMix } from '../../context/PlayMixContext';
 
 const TrackEditor = ({ track, onSave }) => {
-  const [selectType, setSelectType] = useState(track?.type || trackType.SONG);
-  const [randomMode, setRandomMode] = useState(track?.mode);
+  const [selectType, setSelectType] = useState(
+    track?.sources[0].type || trackType.SONG,
+  );
+  const [randomMode, setRandomMode] = useState(track?.sources[0].mode);
   const { playMixController } = usePlayMix();
   const [editTrack, setEditTrack] = useState(track);
 
-  const selectTrack = ({
-    label,
-    mode = randomMode,
-    uri = 'generate',
-    option = null,
-  }) => {
+  const selectTrack = ({ label, mode = randomMode, uri = 'generate' }) => {
     // we've selected a track
     setEditTrack({
-      type: selectType,
-      mode,
       label,
-      option,
-      uri,
       id: editTrack?.id,
+      sources: [
+        {
+          type: selectType,
+          mode,
+          label,
+          uri,
+        },
+      ],
     });
   };
 

@@ -18,7 +18,7 @@ const ShowTrack = ({ track, edit }) => {
     <>
       {!editMode && (
         <>
-          <p>{`${track?.type} : ${track?.label}`}</p>
+          <p>{`${track?.label} ${track?.sources?.length} sources`}</p>
           <div className="track-buttons">
             <button type="button" onClick={() => setEditMode(true)}>
               Edit

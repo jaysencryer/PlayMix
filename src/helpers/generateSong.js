@@ -21,8 +21,9 @@ const getRandomSong = async (
 };
 
 export const generateSong = async (client, track) => {
-  const { type, mode, uri: trackUris, label, id } = track;
+  const { type, mode, uri, label, id } = track;
   let song;
+  console.log('Received track', track);
 
   if (type !== trackType.RANDOM) {
     // why are we here?
@@ -43,7 +44,8 @@ export const generateSong = async (client, track) => {
     // TODO: Figure this out
 
     case trackMode.PLAYLIST: {
-      let allPlayListUris = [];
+      let playListUri;
+
       if (label === 'All Playlists') {
         // TODO - if we have users playlists maybe don't do the get.
         // we need to know users playlists.
@@ -53,13 +55,15 @@ export const generateSong = async (client, track) => {
           client.playLists = await client.getPlayLists();
         }
         // const { data: usersPlayLists } = await axios.get('/playlists');
-        allPlayListUris = client.playLists.map(
+        const allPlayListUris = client.playLists.map(
           (list) => list.uri.split(':')[2],
         );
+        playListUri = randomItem(allPlayListUris);
       } else {
-        allPlayListUris = trackUris.map((uri) => uri.split(':')[2]);
+        // allPlayListUris = trackUris.map((uri) => uri.split(':')[2]);
+        // TO DO - playList uri needs to be sent
+        playListUri = uri.split(':')[2];
       }
-      const playListUri = randomItem(allPlayListUris);
       const playListSongs = await getPlayListSongs(client, playListUri);
       song = randomItem(playListSongs);
       break;
@@ -77,8 +81,12 @@ export const generateSong = async (client, track) => {
 export const getUniqueSong = async (client, track, songList) => {
   console.log('Entering getUnique with songList');
   console.log(songList);
+  //    track contains array of sources.  Randomly pick one of those
+  const selectedSource = randomItem(track.sources);
+  console.log('SelectedSource');
+  console.log(selectedSource);
   let addedSong;
-  if (track.type === trackType.RANDOM) {
+  if (selectedSource.type === trackType.RANDOM) {
     let duplicateTrackerCount = 0;
     do {
       console.log(duplicateTrackerCount);
@@ -89,13 +97,17 @@ export const getUniqueSong = async (client, track, songList) => {
         break;
       }
       console.log('Calling generateSong');
-      addedSong = await generateSong(client, track);
+      addedSong = await generateSong(client, selectedSource);
       console.log(addedSong);
       duplicateTrackerCount++;
       console.log(!songList?.every((song) => song.uri !== addedSong.uri));
     } while (!songList?.every((song) => song.uri !== addedSong.uri));
   } else {
-    addedSong = { name: track.label, uri: track.uri, id: track.id };
+    addedSong = {
+      name: selectedSource.label,
+      uri: selectedSource.uri,
+      id: selectedSource.id,
+    };
   }
   // console.log(`validating uri ${addedSong.uri}`);
   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
