@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
+import { trackSourceSchema } from './TrackSource';
 
 export const trackSchema = mongoose.Schema({
-  type: { type: String, required: true },
-  mode: { type: String, required: true },
   label: { type: String, required: true },
-  option: [Number],
-  uri: { type: [String], required: true },
+  sources: [trackSourceSchema],
 });
 
 export default mongoose.model('Track', trackSchema);

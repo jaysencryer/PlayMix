@@ -1,104 +1,78 @@
 import React, { useState } from 'react';
 
-import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
-import PlaylistSelector from '../PlayListSelector/PlayListSelector';
-import Toggle from '../Toggle/Toggle';
-import SelectBar from '../SelectBar/SelectBar';
+import SourceEditor from '../SourceEditor/SourceEditor';
 
-import { trackType, trackMode } from '../../sapControl/constants/enums';
-import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 import './TrackEditor.css';
 import { usePlayMix } from '../../context/PlayMixContext';
 
 const TrackEditor = ({ track, onSave }) => {
-  const [selectType, setSelectType] = useState(track?.type || trackType.SONG);
-  const [randomMode, setRandomMode] = useState(track?.mode);
   const { playMixController } = usePlayMix();
-  const [editTrack, setEditTrack] = useState(track);
+  const [addMode, setAddMode] = useState(track?.sources?.length == 0);
 
-  const selectTrack = ({
-    label,
-    mode = randomMode,
-    uri = 'generate',
-    option = null,
-  }) => {
-    // we've selected a track
-    setEditTrack({
-      type: selectType,
-      mode,
-      label,
-      option,
-      uri,
-      id: editTrack?.id,
-    });
-  };
-
-  const saveHandler = async () => {
-    await playMixController.updateTrack(editTrack);
-    onSave();
-  };
-
-  const toggleTrackType = () => {
-    if (selectType === trackType.SONG) {
-      setSelectType(trackType.RANDOM);
-    } else {
-      setSelectType(trackType.SONG);
+  const generateLabel = (track) => {
+    const sourceCount = track?.sources.length;
+    switch (sourceCount) {
+      case 0:
+        return 'no source';
+      case 1:
+        return track.sources[0].label;
+      default:
+        return `Random from ${sourceCount} sources`;
     }
+  };
+
+  const saveHandler = async (newSource) => {
+    // update track with new source
+    // TODO update track label
+    const prevSources = [...track?.sources];
+    const newSources = [...prevSources, newSource];
+    const updatedTrack = { ...track, sources: newSources };
+    updatedTrack.label = generateLabel(updatedTrack);
+    await playMixController.updateTrack(updatedTrack);
+    setAddMode(false);
+  };
+
+  const deleteHandler = async (index) => {
+    const currentSources = [...track?.sources];
+    currentSources.splice(index, 1);
+
+    const updatedTrack = { ...track, sources: currentSources };
+    await playMixController.updateTrack(updatedTrack);
+  };
+
+  const addHandler = () => {
+    setAddMode(true);
   };
 
   return (
     <div id="playmix-trackeditor">
-      <div className="toggle-display">
-        <Toggle
-          on={selectType === trackType.RANDOM}
-          onClick={toggleTrackType}
-        />
-        <p>{selectType}</p>
-      </div>
-      <div className="selector">
-        {selectType === trackType.SONG && (
-          <SpotifySearchBar
-            onSelect={(selected) => selectTrack(selected)}
-            type="track"
-            library="spotify"
-            value={editTrack?.label ?? ''}
-          />
-        )}
-      </div>
-      {selectType === trackType.RANDOM && (
+      {!addMode && (
         <>
-          <SelectBar
-            options={[trackMode.SPOTIFY, trackMode.PLAYLIST, trackMode.ARTIST]}
-            onClick={(selected) => {
-              console.log(selected);
-              if (selected === trackMode.SPOTIFY) {
-                selectTrack({
-                  mode: trackMode.SPOTIFY,
-                  label: trackMode.SPOTIFY,
-                });
-              }
-              setRandomMode(selected);
-            }}
-            selected={randomMode}
-          />
-          {randomMode === trackMode.PLAYLIST && (
-            <PlaylistSelector setTracks={selectTrack} track={editTrack} />
-          )}
-          {randomMode === trackMode.ARTIST && (
-            <SpotifySearchBar
-              onSelect={(selected) => selectTrack({ label: selected.label })}
-              type={SEARCHTYPE.ARTIST}
-              library="spotify"
-              value={editTrack?.label}
-            />
-          )}
+          <div className="track-sources">
+            {track?.sources &&
+              track.sources.map((source, index) => (
+                <div
+                  key={`${source.label}${index}`}
+                  className="track-source-detail"
+                >
+                  {source.label}
+                  <button type="button" onClick={() => deleteHandler(index)}>
+                    Delete
+                  </button>
+                </div>
+              ))}
+          </div>
+          <div className="toolBar">
+            <button type="button" onClick={addHandler}>
+              Add Source
+            </button>
+            <button type="button" onClick={() => onSave()}>
+              Save
+            </button>
+          </div>
         </>
       )}
-      <div className="toolBar">
-        <button type="button" onClick={saveHandler}>
-          Save
-        </button>
-      </div>
+      {addMode && <SourceEditor onSave={saveHandler} />}
     </div>
   );
 };

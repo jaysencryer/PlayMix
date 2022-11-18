@@ -1,19 +1,15 @@
 import { useEffect, useReducer, useState } from 'react';
 import trackReducer from '../reducer/trackReducer';
 
-// import { trackType, trackMode } from '../sapControl/constants/enums';
-// import { validUri } from '../sapControl/helpers/spotify/spotifyHelpers';
 import { generateSongList, getUris } from '../helpers/generateSong';
 import { useSpotify } from '../context/SpotifyContext';
 import axios from 'axios';
-// import { uriEncode } from '../sapControl/helpers/helpers';
 
 const usePlayMixTracks = (mix) => {
   const [playMixTracks, dispatch] = useReducer(trackReducer, []);
   const [playMixSongs, setPlayMixSongs] = useState([]);
   const [playMixName, setPlayMixName] = useState();
   const id = mix?._id;
-  //   const [initial, setInitial] = useState(true);
   const { spotifyClient, spotifyProfile } = useSpotify();
 
   const initializePlayMixName = () => {
@@ -30,61 +26,6 @@ const usePlayMixTracks = (mix) => {
     initializePlayMixName();
     initializePlayMixTracks();
   }, []);
-
-  // const getUniqueSong = async (track, songList) => {
-  //   let addedSong;
-  //   if (track.type === trackType.RANDOM) {
-  //     let duplicateTrackerCount = 0;
-  //     do {
-  //       if (duplicateTrackerCount > 5) {
-  //         // If we've picked a song that exists in the playmix already more than 5 times
-  //         // we'll keep it - but mark it as invalid.
-  //         addedSong.inValid = true;
-  //         console.log(
-  //           "given up on making sure it's not in playlist - just making it invalid",
-  //         );
-  //         console.log(addedSong);
-  //         break;
-  //       }
-  //       addedSong = await generateSong(spotifyClient, track);
-  //       duplicateTrackerCount++;
-  //     } while (!songList.every((song) => song.uri !== addedSong.uri));
-  //   } else {
-  //     addedSong = { name: track.label, uri: track.uri, id: track.id };
-  //   }
-  //   addedSong.inValid = addedSong?.inValid ?? !validUri(addedSong.uri);
-  //   return addedSong;
-  // };
-
-  // const refreshSongs = async () => {
-  //   const newSongList = [];
-  //   for (let track of playMixTracks) {
-  //     const addedSong = await getUniqueSong(track, newSongList);
-  //     newSongList.push({ ...addedSong });
-  //   }
-  //   return newSongList;
-  // };
-
-  // useEffect(() => {
-  //   const generateSongList = async () => {
-  //     const newSongList = await Promise.all(
-  //       playMixTracks.map(async (track) => {
-  //         const song = playMixSongs.find((song) => song?.id === track?.id);
-  //         if (!song || !song?.uri) {
-  //           // song not found or uri not established - add one
-  //           const newSong = await getUniqueSong(track, playMixSongs);
-  //           return newSong;
-  //         } else {
-  //           return song;
-  //         }
-  //       }),
-  //     );
-  //     console.table(newSongList);
-  //     setPlayMixSongs(newSongList);
-  //   };
-
-  //   generateSongList();
-  // }, [playMixTracks]);
 
   const playMixController = {
     addTrack: async (track) => {
