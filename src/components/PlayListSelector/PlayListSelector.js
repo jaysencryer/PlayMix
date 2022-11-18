@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSpotify } from '../../context/SpotifyContext';
 
-const PlayListSelector = ({ setTracks, track }) => {
+const PlayListSelector = ({ setSource, source }) => {
   const [playListOption, setPlayListOption] = useState();
   const [options, setOptions] = useState([{ label: '', uri: '' }]);
   const { spotifyClient } = useSpotify();
@@ -25,7 +25,7 @@ const PlayListSelector = ({ setTracks, track }) => {
     const getOptions = async () => {
       const plOptions = await getPlayLists();
       console.log(plOptions);
-      setPlayListOption([findIndex(track?.sources[0]?.label, plOptions) + 2]);
+      setPlayListOption([findIndex(source?.label, plOptions) + 2]);
       setOptions(plOptions);
     };
 
@@ -60,7 +60,7 @@ const PlayListSelector = ({ setTracks, track }) => {
     // console.log(newOptions);
     // console.log(label);
     setPlayListOption(newOptions);
-    setTracks({
+    setSource({
       label,
       uri,
     });
