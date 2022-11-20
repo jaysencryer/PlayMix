@@ -17,15 +17,15 @@ const PlayListSelector = ({ setSource, source }) => {
     })); // Probably need track list too.
   };
 
-  const findIndex = (playListName, playLists) => {
-    return playLists.findIndex((element) => element.label === playListName);
+  const findIndex = (playListUri, playLists) => {
+    return playLists.findIndex((element) => element.uri === playListUri);
   };
 
   useEffect(() => {
     const getOptions = async () => {
       const plOptions = await getPlayLists();
       console.log(plOptions);
-      setPlayListOption([findIndex(source?.label, plOptions) + 2]);
+      setPlayListOption([findIndex(source?.uri, plOptions) + 2]);
       setOptions(plOptions);
     };
 
