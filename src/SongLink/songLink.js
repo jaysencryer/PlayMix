@@ -46,7 +46,7 @@ const getLinkedSong = (uri, linked = []) => {
   return listOfSongs;
 };
 
-export const getLinkedSongList = (songList) => {
+export const getLinkedSongList = (songList, songData) => {
   const newSongList = [];
   songList.forEach((song) => {
     newSongList.push(getLinkedSong(song));
