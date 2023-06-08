@@ -13,6 +13,7 @@ import { serverRenderer } from 'renderers/server';
 import { SapControlBuilder } from '../sapControl/sapControl';
 
 import playMixRoutes from './playMixRoutes';
+import linkedSongRoutes from './linkedSongRoutes';
 
 // import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
 // import { randomItem } from '../sapControl/helpers/helpers';
@@ -74,6 +75,7 @@ mongoose.connect(mongoUrl, () => {
 // );
 
 app.use('/playMix', playMixRoutes);
+app.use('/linkedSongs', linkedSongRoutes);
 
 const spotifyControl = SapControlBuilder()
   .useStreamer('spotify')

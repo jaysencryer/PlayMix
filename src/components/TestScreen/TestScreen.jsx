@@ -3,6 +3,7 @@ import { PlayMixProvider } from '../../context/PlayMixContext';
 
 import { useSpotify } from '../../context/SpotifyContext';
 
+import LinkedSongs from '../LinkedSongs/LinkedSongs';
 import NavMenu from '../NavMenu/NavMenu';
 import PlayMix from '../PlayMix/PlayMix';
 import PlayMixes from '../PlayMixes/PlayMixes';
@@ -47,6 +48,7 @@ const TestScreen = () => {
           </PlayMixProvider>
         )}
         {view === 'xmix' && <Xmix />}
+        {view === 'links' && <LinkedSongs />}
       </div>
     </main>
   );

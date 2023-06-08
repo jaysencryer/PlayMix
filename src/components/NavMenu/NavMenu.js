@@ -16,6 +16,7 @@ const menuOptions = [
     view: 'xmix',
     featureKey: 'xmix2022',
   },
+  { name: 'links', label: 'Link Songs', view: 'links' },
 ];
 
 const NavMenu = ({ setView }) => {
