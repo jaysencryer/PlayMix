@@ -22,6 +22,7 @@ const ShowLinks = ({ song, addLinkedSong }) => {
       </button>
       <p>{song.uri}</p>
       <p>
+        Plays after:{` `}
         {song.before || (
           <button type="button" onClick={() => addLinkedSong(song, BEFORE)}>
             Add Link Before
@@ -29,6 +30,7 @@ const ShowLinks = ({ song, addLinkedSong }) => {
         )}
       </p>
       <p>
+        Plays before:{` `}
         {song.after || (
           <button type="button" onClick={() => addLinkedSong(song, AFTER)}>
             Add Link After
@@ -49,10 +51,14 @@ const LinkedSongs = () => {
   //   const addLinkedSongAfter = (editSong) => addLinkedSong(editSong, AFTER);
 
   const addLinkedSong = (editSong, position) => {
+    const songExists = linkedSongs.has(currentSong.uri);
+    const counterPosition = position === BEFORE ? AFTER : BEFORE;
     // If song exists make sure it doesn't already have a Before or After
-    if (linkedSongs.has(currentSong.uri)) {
-      const counterPosition = position === BEFORE ? AFTER : BEFORE;
-      if (linkedSongs.get(currentSong.uri)[counterPosition]) {
+    if (songExists) {
+      const songInCounterPosition = linkedSongs.get(currentSong.uri)[
+        counterPosition
+      ];
+      if (songInCounterPosition && songInCounterPosition !== editSong.uri) {
         console.log(
           `Not adding ${currentSong.name} as ${position} as it is already an ${counterPosition}`,
         );
@@ -75,14 +81,22 @@ const LinkedSongs = () => {
       return;
     }
 
-    // Add the song to he position
+    // Don't allow the song to be added to itself as a before or after
+    if (songExists && editSong.uri === currentSong.uri) {
+      console.log(`Cannot add ${currentSong.name} as a link to itself`);
+      return;
+    }
+
+    // Add the song to the position
 
     editSong[position] = currentSong.uri;
+    // and add the song to the list with it's link
+    currentSong[counterPosition] = editSong.uri;
 
-    // linkedSongs.delete(editSong.uri);
+    linkedSongs.set(editSong.uri, editSong);
+    linkedSongs.set(currentSong.uri, currentSong);
 
-    // TODO
-    const newSongList = new Map(linkedSongs.set(editSong.uri, editSong));
+    const newSongList = new Map(linkedSongs);
 
     // const newSongList = linkedSongs.filter((song) => song.uri != editSong.uri);
     // newSongList.push(editSong);
