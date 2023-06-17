@@ -37,21 +37,28 @@ const authorized = (session, userId) =>
   session?.playMixData?.authorized && userId === session?.playMixData?.userId;
 
 router.post('/save', async (req, res) => {
-  const { _id, ownerId, name, uri, before, after } = req?.body?.linkedSong;
+  //   const { _id, ownerId, name, uri, before, after } = req?.body?.linkedSongs;
+  const ownerId = req?.body?.ownerId;
+  const linkedSongs = req?.body?.linkedSongs;
+  console.log(req?.body?.linkedSongs);
 
   if (!authorized(req.session, ownerId)) {
     res.send({ error: 'Error: Unauthorized' });
     return;
   }
 
-  if (_id) {
-    const response = await updateLinkedSong(_id, name, uri, before, after);
-    res.send(response);
-    return;
-  }
+  for (let song of linkedSongs) {
+    console.log(song);
+    const { _id, name, uri, before, after } = song;
+    if (_id) {
+      const response = await updateLinkedSong(_id, name, uri, before, after);
+      res.send(response);
+      return;
+    }
 
-  const response = await saveLinkedSong(ownerId, name, uri, before, after);
-  res.send(response);
+    const response = await saveLinkedSong(ownerId, name, uri, before, after);
+    res.send(response);
+  }
 });
 
 router.get('/load', async (req, res) => {
