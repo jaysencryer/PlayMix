@@ -23,11 +23,12 @@ const TrackSelector = ({ track, id, saveTrack }) => {
     option = null,
   }) => {
     // we've selected a track
+    console.log(`Saving track ${label} with mode ${mode}`);
     saveTrack(
       id,
       {
         type: selectType,
-        mode: mode,
+        mode: mode ? mode : trackMode.SPOTIFY,
         label: label,
         option: option,
         uri: uri,

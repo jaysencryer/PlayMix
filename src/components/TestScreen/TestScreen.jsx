@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { PlayMixProvider } from '../../context/PlayMixContext';
+import {
+  PlayMixProvider,
+  SongLinkProvider,
+} from '../../context/PlayMixContext';
 
-import { useSpotify } from '../../context/SpotifyContext';
+// import { useSpotify } from '../../context/SpotifyContext';
 
 import LinkedSongs from '../LinkedSongs/LinkedSongs';
 import NavMenu from '../NavMenu/NavMenu';
@@ -48,7 +51,11 @@ const TestScreen = () => {
           </PlayMixProvider>
         )}
         {view === 'xmix' && <Xmix />}
-        {view === 'links' && <LinkedSongs />}
+        {view === 'links' && (
+          <SongLinkProvider>
+            <LinkedSongs />
+          </SongLinkProvider>
+        )}
       </div>
     </main>
   );

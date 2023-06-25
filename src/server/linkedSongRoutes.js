@@ -4,11 +4,11 @@ import LinkedSong from '../model/LinkedSong';
 
 const router = express.Router();
 
-const updateLinkedSong = async (_id, name, uri, before, after) => {
+const updateLinkedSong = async (_id, ownerId, name, uri, before, after) => {
   try {
     const response = await LinkedSong.updateOne(
       { _id },
-      { name, uri, before, after },
+      { ownerId, name, uri, before, after },
     );
     return response;
   } catch (error) {
@@ -47,18 +47,29 @@ router.post('/save', async (req, res) => {
     return;
   }
 
+  const responses = [];
+
   for (let song of linkedSongs) {
     console.log(song);
     const { _id, name, uri, before, after } = song;
     if (_id) {
-      const response = await updateLinkedSong(_id, name, uri, before, after);
-      res.send(response);
-      return;
+      const response = await updateLinkedSong(
+        _id,
+        ownerId,
+        name,
+        uri,
+        before,
+        after,
+      );
+      responses.push(response);
+    } else {
+      console.log(`Saving ${song.name}`);
+      const response = await saveLinkedSong(ownerId, name, uri, before, after);
+      responses.push(response);
     }
-
-    const response = await saveLinkedSong(ownerId, name, uri, before, after);
-    res.send(response);
   }
+
+  res.send(responses);
 });
 
 router.get('/load', async (req, res) => {

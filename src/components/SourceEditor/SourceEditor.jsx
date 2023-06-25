@@ -20,7 +20,7 @@ const SourceEditor = ({ source, onSave }) => {
     // we've selected a track
     setEditSource({
       type: selectType,
-      mode,
+      mode: mode ? mode : trackMode.SPOTIFY,
       label,
       uri,
       id: editSource?.id,

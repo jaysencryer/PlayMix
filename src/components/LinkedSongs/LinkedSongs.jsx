@@ -5,11 +5,13 @@ import { useSpotify } from '../../context/SpotifyContext';
 import { searchType as SEARCHTYPE } from '../../sapControl/constants/enums';
 
 import SpotifySearchBar from '../SpotifySearchBar/SpotifySearchBar';
+// import { useSongLinks } from '../../hooks/useSongLinks';
+import { useLinks } from '../../context/PlayMixContext';
 
 const BEFORE = 'before';
 const AFTER = 'after';
 
-const defaultLinkedSongs = new Map();
+// const defaultLinkedSongs = new Map();
 
 const ShowLinks = ({ song, addLinkedSong }) => {
   const { spotifyClient } = useSpotify();
@@ -42,9 +44,11 @@ const ShowLinks = ({ song, addLinkedSong }) => {
 };
 
 const LinkedSongs = () => {
-  const [linkedSongs, setLinkedSongs] = useState(defaultLinkedSongs);
+  const { linkedSongs, setLinkedSongs } = useLinks();
+  //   const { linkedSongs, setLinkedSongs } = useSongLinks();
+  //   const [linkedSongs, setLinkedSongs] = useState(defaultLinkedSongs);
   const [currentSong, setCurrentSong] = useState({});
-  const { spotifyProfile, spotifyClient } = useSpotify();
+  const { spotifyProfile } = useSpotify();
   const userId = spotifyProfile?.userId;
 
   //   const addLinkedSongBefore = (editSong) => addLinkedSong(editSong, BEFORE);
@@ -128,18 +132,18 @@ const LinkedSongs = () => {
     setLinkedSongs(newSongList);
   };
 
-  useEffect(() => {
-    const loadLinkedSongs = async () => {
-      const response = await axios.get(`/linkedSongs/load?userId=${userId}`);
-      console.log(response);
-      const loadedLinkedSongs = new Map();
-      response?.data?.forEach((song) => loadedLinkedSongs.set(song.uri, song));
-      setLinkedSongs(loadedLinkedSongs);
-    };
-    if (spotifyProfile?.userId) {
-      loadLinkedSongs();
-    }
-  }, [spotifyProfile]);
+  //   useEffect(() => {
+  //     const loadLinkedSongs = async () => {
+  //       const response = await axios.get(`/linkedSongs/load?userId=${userId}`);
+  //       console.log('Loading linked songs');
+  //       const loadedLinkedSongs = new Map();
+  //       response?.data?.forEach((song) => loadedLinkedSongs.set(song.uri, song));
+  //       setLinkedSongs(loadedLinkedSongs);
+  //     };
+  //     if (spotifyProfile?.userId) {
+  //       loadLinkedSongs();
+  //     }
+  //   }, [spotifyProfile]);
 
   return (
     <div style={{ marginTop: 50 }}>
