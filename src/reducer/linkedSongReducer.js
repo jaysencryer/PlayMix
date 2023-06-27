@@ -1,6 +1,4 @@
-const ADD = 'add';
-const BEFORE = 'before';
-const AFTER = 'after';
+import { ADD, BEFORE, AFTER } from '../linkedSongs/linkedSongsConstants';
 
 export default function linkedSongReducer(linkedSongs, action) {
   switch (action?.type) {
