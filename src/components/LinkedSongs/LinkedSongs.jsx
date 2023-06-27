@@ -44,7 +44,7 @@ const ShowLinks = ({ song, addLinkedSong }) => {
 };
 
 const LinkedSongs = () => {
-  const { linkedSongs, setLinkedSongs } = useLinks();
+  const { linkedSongs, setLinkedSongs, linkedSongsController } = useLinks();
   //   const { linkedSongs, setLinkedSongs } = useSongLinks();
   //   const [linkedSongs, setLinkedSongs] = useState(defaultLinkedSongs);
   const [currentSong, setCurrentSong] = useState({});
