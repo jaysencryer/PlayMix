@@ -1,22 +1,30 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { PlayMixProvider } from '../../context/PlayMixContext';
 import { useSpotify } from '../../context/SpotifyContext';
+import { useLinks } from '../../context/PlayMixContext';
 
 import { mapTracksToSongUris } from '../../helpers/generateSong';
 
 import './PlayMixes.css';
 
+const USE_LINKS = true;
+
 const PlayMixes = ({ selectMix }) => {
   const [playMixes, setPlayMixes] = useState([]);
   const { spotifyProfile, spotifyClient } = useSpotify();
+  const { linkedSongsController } = useLinks();
   const userId = spotifyProfile?.userId;
 
   const playPlayMix = async (mix) => {
     console.log(mix);
     const songUris = await mapTracksToSongUris(spotifyClient, mix?.tracks);
     console.log(songUris);
-    spotifyClient.playSong(songUris);
+
+    spotifyClient.playSong(
+      USE_LINKS
+        ? linkedSongsController.getSongListWithLinks(songUris)
+        : songUris,
+    );
   };
 
   useEffect(() => {

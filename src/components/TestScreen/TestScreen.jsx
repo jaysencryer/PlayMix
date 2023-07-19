@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import {
-  PlayMixProvider,
+  PlayMixSongLinkProvider,
   SongLinkProvider,
 } from '../../context/PlayMixContext';
-
-// import { useSpotify } from '../../context/SpotifyContext';
 
 import LinkedSongs from '../LinkedSongs/LinkedSongs';
 import NavMenu from '../NavMenu/NavMenu';
@@ -15,7 +13,6 @@ import RandomSong from '../RandomSong/RandomSong';
 import Xmix from '../Xmix/Xmix';
 
 const TestScreen = () => {
-  // const { spotifyProfile } = useSpotify();
   const [view, setView] = useState('home');
   const [mix, setMix] = useState();
 
@@ -23,6 +20,7 @@ const TestScreen = () => {
     setMix(selectedMix);
     setView('edit-playmix');
   };
+
   return (
     <main id="main-app">
       <NavMenu setView={setView} />
@@ -37,18 +35,20 @@ const TestScreen = () => {
                 <RandomList />
               </li>
             </ul>
-            <PlayMixes selectMix={selectMix} />
+            <SongLinkProvider>
+              <PlayMixes selectMix={selectMix} />
+            </SongLinkProvider>
           </>
         )}
         {view === 'edit-playmix' && (
-          <PlayMixProvider selectedMix={mix}>
+          <PlayMixSongLinkProvider selectedMix={mix}>
             <PlayMix />
-          </PlayMixProvider>
+          </PlayMixSongLinkProvider>
         )}
         {view === 'new-playmix' && (
-          <PlayMixProvider>
+          <PlayMixSongLinkProvider>
             <PlayMix />
-          </PlayMixProvider>
+          </PlayMixSongLinkProvider>
         )}
         {view === 'xmix' && <Xmix />}
         {view === 'links' && (

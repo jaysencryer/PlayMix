@@ -1,19 +1,16 @@
-import { useEffect, useReducer, useState } from 'react';
-import { LOAD } from '../linkedSongs/linkedSongsConstants';
-
+import { useEffect, useReducer } from 'react';
 import axios from 'axios';
 
 import { useSpotify } from '../context/SpotifyContext';
-import linkedSongReducer from '../reducer/linkedSongReducer';
+import linkedSongReducer, { ADD, LOAD } from '../reducer/linkedSongReducer';
 
 export const useSongLinks = () => {
   const { spotifyProfile } = useSpotify();
   const [linkedSongs, dispatch] = useReducer(linkedSongReducer, new Map());
-  //   const [linkedSongs, setLinkedSongs] = useState(new Map());
   const playedSongs = new Set();
+  const userId = spotifyProfile?.userId;
 
   useEffect(() => {
-    const userId = spotifyProfile?.userId;
     const loadLinkedSongs = async () => {
       console.log('Loading linked songs');
       const response = await axios.get(`/linkedSongs/load?userId=${userId}`);
@@ -21,41 +18,20 @@ export const useSongLinks = () => {
       response?.data?.forEach((song) => loadedLinkedSongs.set(song.uri, song));
       console.log(loadedLinkedSongs);
       dispatch({ type: LOAD, linkedSongs: loadedLinkedSongs });
-
-      // setLinkedSongs(loadedLinkedSongs);
     };
+
     if (userId) {
       loadLinkedSongs();
     }
   }, [spotifyProfile]);
 
-  const playLinkedSong = (uri) => {
-    if (playedSongs.has(uri)) return;
-    //   console.log(linkedSongs);
-    const linkedSong = linkedSongs.get(uri);
-    if (linkedSong?.before) {
-      console.log(`Found song before ${linkedSong}`);
-      playLinkedSong(linkedSong.before);
-    }
-
-    // console.log(`playing ${uri}`);
-    playedSongs.add(uri);
-
-    if (linkedSong?.after) {
-      playLinkedSong(linkedSong.after);
-    }
-    return playedSongs;
-  };
-
   const getLinkedSong = (uri) => {
-    console.log(playedSongs);
     if (playedSongs.has(uri)) return [];
+
     const listOfSongs = [];
-    // [...linked];
-    //   console.log(linkedSongs);
     const linkedSong = linkedSongs.get(uri);
+
     if (linkedSong?.before) {
-      //   listOfSongs.push(...playLinkedSong(linkedSong.before, listOfSongs));
       console.log(`Found a song before ${linkedSong.name}`);
       if (!playedSongs.has(linkedSong?.before)) {
         console.log('checking links for before song');
@@ -71,7 +47,7 @@ export const useSongLinks = () => {
 
     if (linkedSong?.after) {
       console.log(`Found a song after ${linkedSong.name}`);
-      //   listOfSongs.push(...playLinkedSong(linkedSong.after, listOfSongs));
+
       if (!playedSongs.has(linkedSong?.after))
         listOfSongs.push(...getLinkedSong(linkedSong.after));
     }
@@ -82,8 +58,10 @@ export const useSongLinks = () => {
   };
 
   const processLinkedSongs = (songUris) => {
+    playedSongs.clear();
     console.log('in processLinked songs');
-    console.log(linkedSongs);
+    console.log('played songs = ');
+    console.table(playedSongs);
     // will check each uri and append the before and after as necessary to each
     const newSongList = [];
     songUris.forEach((song) => {
@@ -92,10 +70,23 @@ export const useSongLinks = () => {
     });
     console.log(newSongList);
     return newSongList;
-    // return songUris;
   };
 
-  const linkedSongController = () => {};
+  const linkedSongsController = {
+    getSongListWithLinks: (songUris) => processLinkedSongs(songUris),
 
-  return { linkedSongs, processLinkedSongs, setLinkedSongs };
+    addLinkedSong: (songToAdd, existingSong = null, position = null) =>
+      dispatch({ type: ADD, songToAdd, existingSong, position, userId }),
+
+    saveLinkedSongs: async () => {
+      const postBody = {
+        ownerId: userId,
+        linkedSongs: Array.from(linkedSongs.values()),
+      };
+      const response = await axios.post(`/linkedSongs/save`, postBody);
+      console.log(response);
+    },
+  };
+
+  return { linkedSongs, linkedSongsController };
 };

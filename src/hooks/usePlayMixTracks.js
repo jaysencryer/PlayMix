@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from 'react';
 import trackReducer from '../reducer/trackReducer';
 
 import { generateSongList, getUris } from '../helpers/generateSong';
-import { useSongLinks } from './useSongLinks';
+import { useLinks } from '../context/PlayMixContext';
 import { useSpotify } from '../context/SpotifyContext';
 import axios from 'axios';
 
@@ -12,7 +12,7 @@ const usePlayMixTracks = (mix) => {
   const [playMixName, setPlayMixName] = useState();
   const id = mix?._id;
   const { spotifyClient, spotifyProfile } = useSpotify();
-  const { processLinkedSongs } = useSongLinks();
+  const { linkedSongsController } = useLinks();
 
   const USING_LINKS = true;
 
@@ -45,14 +45,14 @@ const usePlayMixTracks = (mix) => {
         songs = await generateSongList(spotifyClient, playMixTracks);
       }
       const uris = USING_LINKS
-        ? processLinkedSongs(getUris(songs))
+        ? linkedSongsController.getSongListWithLinks(getUris(songs))
         : getUris(songs);
       await spotifyClient.addSpotifyPlayList(playMixName, uris);
     },
     addToQueue: async () => {
       const songs = await generateSongList(spotifyClient, playMixTracks);
       const songUris = USING_LINKS
-        ? processLinkedSongs(getUris(songs))
+        ? linkedSongsController.getSongListWithLinks(getUris(songs))
         : getUris(songs);
       await spotifyClient.playSong(songUris);
       setPlayMixSongs(songs);
