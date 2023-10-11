@@ -44,9 +44,7 @@ describe('linkedSongReducer Add action tests', () => {
       position: BEFORE,
     };
 
-    const existingList = new Map();
-    existingList.set(mockSong.uri, mockSong);
-    existingList.set(mockAfter.uri, linkedAfter);
+    const existingList = listBuilder(mockSong, linkedAfter);
 
     const newList = linkedSongReducer(existingList, testAction);
     expect(newList.size).toBe(3);
@@ -60,13 +58,13 @@ describe('linkedSongReducer Add action tests', () => {
       songToAdd: mockSong,
     };
 
-    const existingList = new Map();
     const linkedMockSong = { ...mockSong };
     const linkedBeforeSong = { ...mockBefore };
+
     linkedMockSong.before = mockBefore.uri;
     linkedBeforeSong.after = mockSong.uri;
-    existingList.set(linkedMockSong.uri, linkedMockSong);
-    existingList.set(linkedBeforeSong.uri, linkedBeforeSong);
+
+    const existingList = listBuilder(linkedMockSong, linkedBeforeSong);
 
     const newList = linkedSongReducer(existingList, testAction);
 
@@ -76,12 +74,12 @@ describe('linkedSongReducer Add action tests', () => {
 
   test('song already exists as a position, take no action', () => {
     const linkedBeforeSong = { ...mockBefore };
-    linkedBeforeSong.before = mockSong.uri;
     const linkedMockSong = { ...mockSong };
+
+    linkedBeforeSong.before = linkedMockSong.uri;
     linkedMockSong.after = linkedBeforeSong.uri;
-    const existingList = new Map();
-    existingList.set(linkedMockSong.uri, linkedMockSong);
-    existingList.set(linkedBeforeSong.uri, linkedBeforeSong);
+
+    const existingList = listBuilder(linkedMockSong, linkedBeforeSong);
 
     const testAction = {
       type: ADD,
@@ -90,7 +88,7 @@ describe('linkedSongReducer Add action tests', () => {
       existingSong: linkedBeforeSong,
     };
 
-    console.log(existingList);
+    // console.log(existingList);
 
     const newSongList = linkedSongReducer(existingList, testAction);
     // const newSongList = existingList;
@@ -101,6 +99,32 @@ describe('linkedSongReducer Add action tests', () => {
     expect(newSongList.get(linkedBeforeSong.uri).before).toBe(
       linkedMockSong.uri,
     );
+  });
+
+  test('song being added but it already has a counter position', () => {
+    const linkedBeforeSong = { ...mockBefore };
+    const linkedMockSong = { ...mockSong };
+    const linkedAfterSong = { ...mockAfter };
+
+    linkedAfterSong.before = linkedMockSong.uri;
+    linkedBeforeSong.after = linkedMockSong.uri;
+    linkedMockSong.before = linkedBeforeSong.uri;
+
+    const existingList = listBuilder(
+      linkedMockSong,
+      linkedBeforeSong,
+      linkedAfterSong,
+    );
+
+    const testAction = {
+      type: ADD,
+      songToAdd: linkedAfterSong,
+      position: AFTER,
+      existingSong: linkedBeforeSong,
+    };
+
+    const newSongList = linkedSongReducer(existingList, testAction);
+    expect(newSongList).toEqual(existingList);
   });
 
   test('Add a song in a position it already exists in does nothing', () => {
@@ -115,17 +139,13 @@ describe('linkedSongReducer Add action tests', () => {
       existingSong: mockSong,
     };
 
-    const existingList = new Map();
-    existingList.set(linkedBefore.uri, linkedBefore);
-    existingList.set(linkedAfter.uri, linkedAfter);
-    existingList.set(mockSong.uri, mockSong);
-    console.log(existingList);
+    const existingList = listBuilder(linkedBefore, linkedAfter, mockSong);
 
     const newSongList = linkedSongReducer(existingList, testAction);
 
     expect(newSongList).toEqual(existingList);
-    // expect(newSongList.get(mockBefore.uri).after).toBe(mockAfter.uri);
-    // expect(newSongList.get(mockAfter.uri).before).toBe(mockBefore.uri);
+    expect(newSongList.get(mockBefore.uri).after).toBe(mockAfter.uri);
+    expect(newSongList.get(mockAfter.uri).before).toBe(mockBefore.uri);
   });
 
   test('Attempting to add a song to itself does nothing', () => {
@@ -147,7 +167,6 @@ test('Unsupported action type throws error', () => {
   const testAction = {
     type: 'Unsupported',
   };
-  const testList = listBuilder('a', 2, '6');
 
   expect(() => linkedSongReducer(null, testAction)).toThrowError();
 });

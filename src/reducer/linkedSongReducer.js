@@ -3,9 +3,12 @@ import { ADD, AFTER, BEFORE, LOAD } from '../linkedSongs/linkedSongsConstants';
 export { ADD, AFTER, BEFORE, LOAD };
 
 const songAlreadyExistsInPosition = (song, position, linkedSongs) =>
-  !Array.from(linkedSongs.values()).every(
-    (s) => s[position]?.uri !== song?.uri,
-  );
+  !Array.from(linkedSongs.values()).every((s) => {
+    console.log(
+      `Looking at ${s.name} at ${position} -uri = ${s[position]} vs song.uri = ${song.uri}`,
+    );
+    return s[position] !== song?.uri;
+  });
 
 export default function linkedSongReducer(linkedSongs, action) {
   switch (action?.type) {
