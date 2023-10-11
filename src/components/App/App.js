@@ -13,8 +13,8 @@ export function App({ initialData }) {
   if (!sessionData?.authorized) {
     return (
       <main id="not-authorized" data-testid="not-authorized">
-        <h1>PlayMix</h1>
-        <p>To use this app you must connect to spotify</p>
+        <h1>Welcome to PlayMix</h1>
+        <p>Log in with Spotify</p>
         <ConnectSpotify />
       </main>
     );

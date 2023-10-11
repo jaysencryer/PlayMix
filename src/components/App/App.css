@@ -1,7 +1,16 @@
+
 #view-container {
   margin-left: 16px;
   margin-right: 8px;
   flex-grow: 1;
+}
+
+#not-authorized {
+  text-align: center;
+}
+
+#not-authorized.h1 {
+  text-align: center;
 }
 
 @media (min-width: 320px) {
