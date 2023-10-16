@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 
 const mockSpotProfile = {
   user: 'testUser',
-  avatar: 'mockAvater',
+  avatar: 'mockAvatar',
 };
 
 const mockSessionData = {

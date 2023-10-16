@@ -21,10 +21,10 @@ export function App({ initialData }) {
   }
 
   return (
-    <div data-testid="authorized-view">
+    <main data-testid="authorized-view">
       <SpotifyProvider profile={sessionData}>
         <TestScreen />
       </SpotifyProvider>
-    </div>
+    </main>
   );
 }
