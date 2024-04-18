@@ -1,7 +1,8 @@
 import React from 'react';
 
 import ConnectSpotify from '../ConnectSpotify/ConnectSpotify';
-import TestScreen from '../TestScreen/TestScreen';
+// import TestScreen from '../TestScreen/TestScreen';
+import MainScreen from '../MainScreen/MainScreen';
 
 import { SpotifyProvider } from '../../context/SpotifyContext';
 
@@ -23,7 +24,8 @@ export function App({ initialData }) {
   return (
     <main data-testid="authorized-view">
       <SpotifyProvider profile={sessionData}>
-        <TestScreen />
+        {/* <TestScreen /> */}
+        <MainScreen />
       </SpotifyProvider>
     </main>
   );

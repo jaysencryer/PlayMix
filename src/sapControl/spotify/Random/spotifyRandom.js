@@ -47,6 +47,7 @@ export const selectRandomSpotifySong = async function (
       //   console.log(`totalSongs = ${totalSongs}`);
       const randomOffsetSize = totalSongs < 1000 ? totalSongs : 950;
       offset = randomFloored(randomOffsetSize);
+      offset = offset ? offset : 20;
     } while (songList.length === 0);
 
     return randomItem(songList);

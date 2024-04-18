@@ -4,7 +4,8 @@ import { searchType as SEARCHTYPE } from '../sapControl/constants/enums';
 const getRandomQualifier = () => {
   const qualifiers = [
     ['pop', 'rock', 'jazz'],
-    ['hip-hop', "r'n'b", 'alternative', 'traditional'],
+    ['rap', 'soul', 'alternative', 'traditional'],
+    // ['alternative', 'traditional'],
   ];
 
   const randomDistribution = Math.floor(Math.random() * 8) + 1;
@@ -14,7 +15,7 @@ const getRandomQualifier = () => {
   for (let i = 0; i < randomDistribution; i++) {
     randomListOfQualifiers.push(0);
   }
-  for (let j = 0; j < randomDistribution - 2; j++) {
+  for (let j = 0; j < randomDistribution - 3; j++) {
     randomListOfQualifiers.push(1);
   }
 
